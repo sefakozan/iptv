@@ -4,6 +4,7 @@ on:
   schedule:
     - cron: '0 6 * * *' # UTC 06:00, Türkiye saatiyle 09:00
     - cron: '0 18 * * *' # UTC 18:00, Türkiye saatiyle 21:00
+  workflow_dispatch: # Manuel tetikleme için
 
 jobs:
   run-generate:
