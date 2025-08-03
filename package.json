@@ -1,0 +1,29 @@
+{
+	"name": "iptv",
+	"version": "1.0.0",
+	"description": "IPTV channel generator",
+	"main": "src/index.js",
+	"type": "module",
+	"engines": {
+		"node": ">=18.0.0"
+	},
+	"scripts": {
+		"test": "vitest",
+		"format": "biome format --write .",
+		"format:all": "biome check --write .",
+		"format:check": "biome check .",
+		"lint": "biome lint ."
+	},
+	"bin": {
+		"generate": "./bin/generate.js"
+	},
+	"author": "",
+	"license": "Apache-2.0",
+	"devDependencies": {
+		"@biomejs/biome": "^2.1.3",
+		"vitest": "^3.2.4"
+	},
+	"dependencies": {
+		"iptv-util": "^1.2.8"
+	}
+}
