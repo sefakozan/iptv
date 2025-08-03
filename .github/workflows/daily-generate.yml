@@ -26,3 +26,14 @@ jobs:
 
       - name: Run generate script
         run: generate tr
+
+      # Değişiklikleri commit eder
+      - name: Commit changes
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add .
+          git commit -m "Auto-generated files by generate script" || echo "No changes to commit"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
