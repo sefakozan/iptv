@@ -1,0 +1,28 @@
+name: Twice Daily Generate Script
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # UTC 06:00, Türkiye saatiyle 09:00
+    - cron: '0 18 * * *' # UTC 18:00, Türkiye saatiyle 21:00
+
+jobs:
+  run-generate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run link script
+        run: npm link
+
+      - name: Run generate script
+        run: generate tr
