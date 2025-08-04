@@ -36,11 +36,12 @@ https://sefakozan.github.io/iptv/az.m3u
 
 |||||
 |:-|:-:|:-|:-:|
-|Rusya |`https://sefakozan.github.io/iptv/ru.m3u`|Hindistan|`https://sefakozan.github.io/iptv/in.m3u`|
-|İtalya|`https://sefakozan.github.io/iptv/cn.m3u`|İspanya  |`https://sefakozan.github.io/iptv/es.m3u`|
-|Fransa|`https://sefakozan.github.io/iptv/fr.m3u`|Pakistan |`https://sefakozan.github.io/iptv/pk.m3u`|
-|İran  |`https://sefakozan.github.io/iptv/ir.m3u`|Endenozya|`https://sefakozan.github.io/iptv/id.m3u`|
-|Mısır |`https://sefakozan.github.io/iptv/eg.m3u`|Almanya  |`https://sefakozan.github.io/iptv/de.m3u`|
+|Rusya|`https://sefakozan.github.io/iptv/ru.m3u`|Hindistan|`https://sefakozan.github.io/iptv/in.m3u`|
+|Çin  |`https://sefakozan.github.io/iptv/cn.m3u`|İspanya  |`https://sefakozan.github.io/iptv/es.m3u`|
+|İran |`https://sefakozan.github.io/iptv/ir.m3u`|Endenozya|`https://sefakozan.github.io/iptv/id.m3u`|
+|Mısır|`https://sefakozan.github.io/iptv/eg.m3u`|Almanya  |`https://sefakozan.github.io/iptv/de.m3u`|
+|Katar|`https://sefakozan.github.io/iptv/qa.m3u`|İtalya   |`https://sefakozan.github.io/iptv/it.m3u`|
+|Fiji |`https://sefakozan.github.io/iptv/fj.m3u`|Fransa   |`https://sefakozan.github.io/iptv/fr.m3u`|
 ---
 
 ### Herhangi Bir Video Oynatıcı
