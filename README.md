@@ -4,11 +4,22 @@
 ### Kullanım
 Türkçe IPTV televizyon kanallarını izlemek için VLC Player gibi M3U destekli bir Media Player kullanmalısınız. Aşağıdaki linkleri Player'ınıza yapıştırarak kanalları izleyebilirsiniz.
 
-
-|          |                                             |           |                                             |
-|----------|---------------------------------------------|-----------|---------------------------------------------|
-|Türkiye   |```https://sefakozan.github.io/iptv/tr.m3u```|İngiltere  |```https://sefakozan.github.io/iptv/uk.m3u```|
-|Amerika   |```https://sefakozan.github.io/iptv/us.m3u```|Azerbaycan |```https://sefakozan.github.io/iptv/az.m3u```|
+Türkiye
+```
+https://sefakozan.github.io/iptv/tr.m3u
+```
+İngiltere
+```
+https://sefakozan.github.io/iptv/uk.m3u
+```
+Amerika
+```
+https://sefakozan.github.io/iptv/us.m3u
+```
+Azerbaycan
+```
+https://sefakozan.github.io/iptv/az.m3u
+```
 
 ### Türkiye
 
