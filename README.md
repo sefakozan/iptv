@@ -20,15 +20,35 @@ Azerbaycan
 ```
 https://sefakozan.github.io/iptv/az.m3u
 ```
+<details>
+<summary>Rusca</summary>
 
-
-<pre>print("Merhaba")</pre>
-
+```
+https://sefakozan.github.io/iptv/ru.m3u
+```
+</details>
 
 <details>
 <summary>Rusca</summary>
+
 ```
 https://sefakozan.github.io/iptv/ru.m3u
+```
+</details>
+
+<details>
+<summary>Fransızca</summary>
+
+```
+https://sefakozan.github.io/iptv/fr.m3u
+```
+</details>
+
+<details>
+<summary>Çince</summary>
+
+```
+https://sefakozan.github.io/iptv/cn.m3u
 ```
 </details>
 
