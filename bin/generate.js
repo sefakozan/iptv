@@ -1,8 +1,8 @@
 #!/usr/bin/env node
-import { readdir, readFile, writeFile } from "fs/promises";
+import { readdir, readFile, writeFile } from "node:fs/promises";
+import { dirname, extname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import { merger } from "iptv-util";
-import { dirname, extname, join, resolve } from "path";
-import { fileURLToPath } from "url";
 
 const { default: countries } = await import("../docs/countries.json", {
 	assert: { type: "json" },
@@ -42,7 +42,7 @@ const __dirname = dirname(__filename);
 // console.log("Dosya yolu:", __filename);
 // console.log("Dizin yolu:", __dirname);
 
-const target = resolve(__dirname, "..", "docs", `${country}.m3u`);
+const target = resolve(__dirname, "..", "docs", "s", `${country}.m3u`);
 const langRawFolder = resolve(__dirname, "..", "raw-streams", country);
 const readme = resolve(langRawFolder, "README.md");
 

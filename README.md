@@ -11,19 +11,19 @@ To watch Turkish IPTV channels, use a media player that supports M3U, such as VL
 
 **Türkiye**
 ```
-https://sefakozan.github.io/iptv/tr.m3u
+https://sefakozan.github.io/iptv/s/tr.m3u
 ```
 **United Kingdom**
 ```
-https://sefakozan.github.io/iptv/uk.m3u
+https://sefakozan.github.io/iptv/s/uk.m3u
 ```
 **United States**
 ```
-https://sefakozan.github.io/iptv/us.m3u
+https://sefakozan.github.io/iptv/s/us.m3u
 ```
 **Azerbaijan**
 ```
-https://sefakozan.github.io/iptv/az.m3u
+https://sefakozan.github.io/iptv/s/az.m3u
 ```
 
 ---
@@ -31,20 +31,21 @@ https://sefakozan.github.io/iptv/az.m3u
 **Other Languages**
 
 > [!TIP]  
-> For other countries, you can generate the link by changing the 2-letter ISO code.  
-> **Example: Spanish ISO code (`es`) can be used as follows:**  
+> For other countries, you can generate the link by changing the [2-letter ISO code](https://www.iban.com/country-codes).   
+> Country code must be lowecase.  
+> **Example: ISO code of Spain (`es`) can be used as follows:**  
 > ```text
-> https://sefakozan.github.io/iptv/es.m3u
+> https://sefakozan.github.io/iptv/s/es.m3u
 > ```
 
 | Country | URL | Country | URL |
 |---------|-----|---------|-----|
-| Russia | `https://sefakozan.github.io/iptv/ru.m3u` | India | `https://sefakozan.github.io/iptv/in.m3u` |
-| China | `https://sefakozan.github.io/iptv/cn.m3u` | Spain | `https://sefakozan.github.io/iptv/es.m3u` |
-| Iran | `https://sefakozan.github.io/iptv/ir.m3u` | Indonesia | `https://sefakozan.github.io/iptv/id.m3u` |
-| Egypt | `https://sefakozan.github.io/iptv/eg.m3u` | Germany | `https://sefakozan.github.io/iptv/de.m3u` |
-| Qatar | `https://sefakozan.github.io/iptv/qa.m3u` | Italy | `https://sefakozan.github.io/iptv/it.m3u` |
-| Fiji | `https://sefakozan.github.io/iptv/fj.m3u` | France | `https://sefakozan.github.io/iptv/fr.m3u` |
+| Russia| `https://sefakozan.github.io/iptv/s/ru.m3u` | India     | `https://sefakozan.github.io/iptv/s/in.m3u` |
+| China | `https://sefakozan.github.io/iptv/s/cn.m3u` | Spain     | `https://sefakozan.github.io/iptv/s/es.m3u` |
+| Iran  | `https://sefakozan.github.io/iptv/s/ir.m3u` | Indonesia | `https://sefakozan.github.io/iptv/s/id.m3u` |
+| Egypt | `https://sefakozan.github.io/iptv/s/eg.m3u` | Germany   | `https://sefakozan.github.io/iptv/s/de.m3u` |
+| Qatar | `https://sefakozan.github.io/iptv/s/qa.m3u` | Italy     | `https://sefakozan.github.io/iptv/s/it.m3u` |
+| Fiji  | `https://sefakozan.github.io/iptv/s/fj.m3u` | France    | `https://sefakozan.github.io/iptv/s/fr.m3u` |
 
 ---
 
