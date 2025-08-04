@@ -1,6 +1,7 @@
-# 🌎 Global IPTV Listeleri: 8000+ Aktif Kanal 
+# 📺 Global IPTV Listeleri: 8000+ Aktif Online Kanal 
 
-**Tüm dünya geneli 8000+ IPTV kanal listesi, hepsinin oline olup olmadığı [iptv-util](https://github.com/sefakozan/iptv-util) modulü ile kontrol ediliyor. Liste buna göre düzenli periyotlarla temizleniyor.**
+> **Tüm dünya geneli 8000+ IPTV kanal listesi, hepsinin oline olup olmadığı [iptv-util](https://github.com/sefakozan/iptv-util) modulü ile kontrol ediliyor.  
+ Liste buna göre düzenli periyotlarla temizleniyor.**
 
 ### Kullanım
 Türkçe IPTV televizyon kanallarını izlemek için VLC Player gibi M3U destekli bir Media Player kullanmalısınız. Aşağıdaki linkleri Player'ınıza yapıştırarak kanalları izleyebilirsiniz.
