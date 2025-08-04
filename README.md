@@ -1,55 +1,57 @@
-# 📺 Global IPTV Listeleri: 8000+ Çalışan Güncel Kanal 
+# 📺 Global IPTV Lists: 8000+ Active Online Channels
 
-> **Tüm dünya geneli 8000+ IPTV kanal listesi, hepsinin oline olup olmadığı [iptv-util](https://github.com/sefakozan/iptv-util) modulü ile kontrol ediliyor.  
- Liste buna göre düzenli periyotlarla temizleniyor.**
+> **A global IPTV channel list with over 8000 channels, checked for online status using the [iptv-util](https://github.com/sefakozan/iptv-util) module.  
+The list is periodically cleaned based on these checks.**
 
-### Kullanım
-Türkçe IPTV televizyon kanallarını izlemek için VLC Player gibi M3U destekli bir Media Player kullanmalısınız. Aşağıdaki linkleri Player'ınıza yapıştırarak kanalları izleyebilirsiniz.
+## Language Selection
+Türkçe versiyon readme:  [Türkçe README](./README.TR.md)
+
+### Usage
+To watch Turkish IPTV channels, use a media player that supports M3U, such as VLC Player. Paste the links below into your player to access the channels.
 
 **Türkiye**
 ```
 https://sefakozan.github.io/iptv/tr.m3u
 ```
-**İngiltere**
+**United Kingdom**
 ```
 https://sefakozan.github.io/iptv/uk.m3u
 ```
-**Amerika**
+**United States**
 ```
 https://sefakozan.github.io/iptv/us.m3u
 ```
-**Azerbaycan**
+**Azerbaijan**
 ```
 https://sefakozan.github.io/iptv/az.m3u
 ```
 
 ---
 
-**Diğer Diller**
+**Other Languages**
 
 > [!TIP]  
-> Diğer tüm ülkeler için 2 haneli iso kodunu değiştirerek link elde edebilirsiniz.  
-> **İspanyolcanın ISO kodu (`es`) değiştirilerek kullanılır:**  
-> ```text 
->https://sefakozan.github.io/iptv/es.m3u
->```
+> For other countries, you can generate the link by changing the 2-letter ISO code.  
+> **Example: Spanish ISO code (`es`) can be used as follows:**  
+> ```text
+> https://sefakozan.github.io/iptv/es.m3u
+> ```
 
-|||||
-|:-|:-:|:-|:-:|
-|Rusya|`https://sefakozan.github.io/iptv/ru.m3u`|Hindistan|`https://sefakozan.github.io/iptv/in.m3u`|
-|Çin  |`https://sefakozan.github.io/iptv/cn.m3u`|İspanya  |`https://sefakozan.github.io/iptv/es.m3u`|
-|İran |`https://sefakozan.github.io/iptv/ir.m3u`|Endenozya|`https://sefakozan.github.io/iptv/id.m3u`|
-|Mısır|`https://sefakozan.github.io/iptv/eg.m3u`|Almanya  |`https://sefakozan.github.io/iptv/de.m3u`|
-|Katar|`https://sefakozan.github.io/iptv/qa.m3u`|İtalya   |`https://sefakozan.github.io/iptv/it.m3u`|
-|Fiji |`https://sefakozan.github.io/iptv/fj.m3u`|Fransa   |`https://sefakozan.github.io/iptv/fr.m3u`|
+| Country | URL | Country | URL |
+|---------|-----|---------|-----|
+| Russia | `https://sefakozan.github.io/iptv/ru.m3u` | India | `https://sefakozan.github.io/iptv/in.m3u` |
+| China | `https://sefakozan.github.io/iptv/cn.m3u` | Spain | `https://sefakozan.github.io/iptv/es.m3u` |
+| Iran | `https://sefakozan.github.io/iptv/ir.m3u` | Indonesia | `https://sefakozan.github.io/iptv/id.m3u` |
+| Egypt | `https://sefakozan.github.io/iptv/eg.m3u` | Germany | `https://sefakozan.github.io/iptv/de.m3u` |
+| Qatar | `https://sefakozan.github.io/iptv/qa.m3u` | Italy | `https://sefakozan.github.io/iptv/it.m3u` |
+| Fiji | `https://sefakozan.github.io/iptv/fj.m3u` | France | `https://sefakozan.github.io/iptv/fr.m3u` |
+
 ---
 
-### Herhangi Bir Video Oynatıcı
-
+### Any Video Player
 
 ![network](network.png)
 ![vlc](vlc.png)
 
-### Yasal
-Bu depoda hiçbir video dosyası saklanmamaktadır. Depo yalnızca kullanıcılar tarafından gönderilen, telif hakkı sahipleri tarafından bilerek halka açık hale getirildiğine inandığımız, halka açık video akış URL'lerine bağlantılar içermektedir. Bu oynatma listelerindeki herhangi bir bağlantı, telif hakkı sahibi olarak haklarınızı ihlal ediyorsa, bir kaldırma isteği göndererek veya bir sorun açarak bu bağlantılar kaldırılabilir. Ancak, bağlantının hedefi üzerinde hiçbir kontrolümüz olmadığını ve bağlantıyı oynatma listesinden kaldırmanın içeriği internetten kaldırmayacağını unutmayın. Bağlantı sağlama, doğrudan telif hakkı ihlali oluşturmaz çünkü bağlantıyı sağlayan sitede bir kopya oluşturulmaz; bu nedenle GitHub'a DMCA bildirimi göndermek için geçerli bir neden değildir. Bu içeriği internetten kaldırmak için, içeriği gerçekten barındıran web sunucusuna (GitHub veya bu deponun geliştiricilerine değil) başvurmalısınız. Bu link **[https://github.com/sefakozan/iptv/issues](https://github.com/sefakozan/iptv/issues)**, aracılığı ile kaldırma isteği oluşturabilirsiniz.
-
+### Legal
+This repository does not host any video files. It only contains links to publicly available video stream URLs, which we believe have been intentionally made public by their copyright owners. If any link in these playlists infringes on your rights as a copyright holder, you may request removal by submitting a takedown request or opening an issue. Please note that we have no control over the destination of the links, and removing a link from the playlist does not remove the content from the internet. Providing a link does not constitute direct copyright infringement, as no copy is created on the site providing the link; therefore, it is not a valid reason for a DMCA notice to GitHub. To remove content from the internet, you must contact the web server hosting the content (not GitHub or this repository’s developers). You can submit a removal request via this link: **[https://github.com/sefakozan/iptv/issues](https://github.com/sefakozan/iptv/issues)**.
