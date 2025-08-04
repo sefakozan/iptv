@@ -32,14 +32,14 @@ https://sefakozan.github.io/iptv/az.m3u
 >```
 
 |||||
-|:--------------|:---------------------------------------:|:------------|:---------------------------------------:|
-| Rusya         |`https://sefakozan.github.io/iptv/ru.m3u`| Fransa      |`https://sefakozan.github.io/iptv/fr.m3u`|
-| İtalya        |`https://sefakozan.github.io/iptv/cn.m3u`| İspanyol    |`https://sefakozan.github.io/iptv/es.m3u`|
-| Hindistan     |`https://sefakozan.github.io/iptv/in.m3u`| Pakistan    |`https://sefakozan.github.io/iptv/pk.m3u`|
+|:-|:-:|:-|:-:|
+|Rusya    |`https://sefakozan.github.io/iptv/ru.m3u`|Fransa  |`https://sefakozan.github.io/iptv/fr.m3u`|
+|İtalya   |`https://sefakozan.github.io/iptv/cn.m3u`|İspanyol|`https://sefakozan.github.io/iptv/es.m3u`|
+|Hindistan|`https://sefakozan.github.io/iptv/in.m3u`|Pakistan|`https://sefakozan.github.io/iptv/pk.m3u`|
 
+---
 
-
-### Media Player
+### Herhangi Bir Video Oynatıcı
 
 
 ![network](network.png)
