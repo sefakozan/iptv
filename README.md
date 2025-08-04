@@ -1,4 +1,4 @@
-# 📺 Global IPTV Listeleri: 8000+ Aktif Online Kanal 
+# 📺 Global IPTV Listeleri: 8000+ Çalışan Güncel Kanal 
 
 > **Tüm dünya geneli 8000+ IPTV kanal listesi, hepsinin oline olup olmadığı [iptv-util](https://github.com/sefakozan/iptv-util) modulü ile kontrol ediliyor.  
  Liste buna göre düzenli periyotlarla temizleniyor.**
