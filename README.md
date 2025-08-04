@@ -1,13 +1,17 @@
-#  Türkçe IPTV Listeleri
-> Tüm dünya geneli 8000+ IPTV kanal listesine https://github.com/iptv-org/iptv reposundan ulaşabilirsiniz.
+#  IPTV Listeleri
+> Tüm dünya geneli 8000+ IPTV kanal listesi, hepsinin oline olup olmadığı [iptv-util](https://github.com/sefakozan/iptv-util) modulü ile kontrol ediliyor. Liste buna göre düzenli periyotlarla temizleniyor.
 
 ### Kullanım
 Türkçe IPTV televizyon kanallarını izlemek için VLC Player gibi M3U destekli bir Media Player kullanmalısınız. Aşağıdaki linkleri Player'ınıza yapıştırarak kanalları izleyebilirsiniz.
 
+
+|          |                                             |           |                                             |
+|----------|---------------------------------------------|-----------|---------------------------------------------|
+|Türkiye   |```https://sefakozan.github.io/iptv/tr.m3u```|İngiltere  |```https://sefakozan.github.io/iptv/uk.m3u```|
+|Amerika   |```https://sefakozan.github.io/iptv/us.m3u```|Azerbaycan |```https://sefakozan.github.io/iptv/az.m3u```|
+
 ### Türkiye
-```text
-https://sefakozan.github.io/iptv/tr.m3u
-```
+
 
 ![network](network.png)
 ![vlc](vlc.png)
