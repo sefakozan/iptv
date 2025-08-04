@@ -29,8 +29,7 @@ https://sefakozan.github.io/iptv/az.m3u
 >https://sefakozan.github.io/iptv/es.m3u
 >```
 
-
-|               |                                         |             |                                         |
+|||||
 |:--------------|:---------------------------------------:|:------------|:---------------------------------------:|
 | Rusya         |`https://sefakozan.github.io/iptv/ru.m3u`| Fransa      |`https://sefakozan.github.io/iptv/fr.m3u`|
 | Çin           |`https://sefakozan.github.io/iptv/cn.m3u`| Almanya     |`https://sefakozan.github.io/iptv/de.m3u`|
