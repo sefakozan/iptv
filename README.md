@@ -21,20 +21,17 @@ Azerbaycan
 https://sefakozan.github.io/iptv/az.m3u
 ```
 
-| Kod ve Kopyalama | Açıklama |
-|------------------|----------|
-| <pre id="code2">print("Merhaba")</pre><button onclick="copyToClipboard('code2')">Kopyala</button> Merhaba metni | Ekrana Merhaba yazar |
 
-<script>
-function copyToClipboard(elementId) {
-  const text = document.getElementById(elementId).innerText;
-  navigator.clipboard.writeText(text).then(() => {
-    alert("Metin kopyalandı!");
-  }).catch(err => {
-    console.error("Kopyalama başarısız: ", err);
-  });
-}
-</script>
+<pre>print("Merhaba")</pre>
+
+
+<details>
+<summary>Rusca</summary>
+```
+https://sefakozan.github.io/iptv/ru.m3u
+```
+</details>
+
 
 ### Türkiye
 
