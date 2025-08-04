@@ -7,13 +7,27 @@ import { fileURLToPath } from "url";
 // İlk iki elemanı atla (node ve betik yolu)
 const args = process.argv.slice(2);
 
-const lang = args[0];
+const country = args[0].toLowerCase();
 
-if (!lang) {
-	console.error(`arguman olarak dil vermelisiniz!.. (tr|uk|us|az)`);
+if (!country) {
+	console.error(`arguman olarak ulke vermelisiniz!.. (tr|us|uk|es|fr|de|ru|az|ar|it|in|cn)`);
+	process.exit(1);
 }
 
-console.log("lang:", lang);
+console.log("country:", country);
+if (country.length !== 2) {
+	console.error("ulke kodu 2 karekter olmali");
+	process.exit(2);
+}
+
+const defaultLink = `https://raw.githubusercontent.com/iptv-org/iptv/refs/heads/gh-pages/countries/${country}.m3u`;
+
+const isCodeExist = await isCountryExist(defaultLink);
+
+if (!isCodeExist) {
+	console.error("ulke kodu tanimli degil");
+	process.exit(3);
+}
 
 // __filename benzeri: Mevcut dosyanın yolunu al
 const __filename = fileURLToPath(import.meta.url);
@@ -23,12 +37,16 @@ const __dirname = dirname(__filename);
 // console.log("Dosya yolu:", __filename);
 // console.log("Dizin yolu:", __dirname);
 
-const target = resolve(__dirname, "..", "docs", `${lang}.m3u`);
-const langRawFolder = resolve(__dirname, "..", "raw-streams", lang);
+const target = resolve(__dirname, "..", "docs", `${country}.m3u`);
+const langRawFolder = resolve(__dirname, "..", "raw-streams", country);
 const readme = resolve(langRawFolder, "README.md");
 
 const linkArr = await getNonCommentedLines(readme);
 const textArr = await getM3UFileContents(langRawFolder);
+
+if (!linkArr.includes(defaultLink)) {
+	linkArr.push(defaultLink);
+}
 
 const fullList = await merger(...linkArr, ...textArr);
 const cleanList = await fullList.check();
@@ -83,5 +101,22 @@ async function writeTarget(filePath, data) {
 	} catch (error) {
 		console.error("Hata:", error.message);
 		throw error;
+	}
+}
+
+async function isCountryExist(url, timeout = 8000) {
+	try {
+		const response = await fetch(url, {
+			method: "HEAD",
+			signal: AbortSignal.timeout(timeout),
+			headers: {
+				"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+			},
+		});
+
+		if (response.status !== 200) return false;
+		return true;
+	} catch {
+		return false;
 	}
 }
