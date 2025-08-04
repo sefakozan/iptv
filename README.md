@@ -23,6 +23,9 @@ https://sefakozan.github.io/iptv/us.m3u
 https://sefakozan.github.io/iptv/az.m3u
 ```
 
+---
+
+**Diğer Diller**
 
 > [!TIP]  
 > Diğer tüm ülkeler için 2 haneli iso kodunu değiştirerek link elde edebilirsiniz.  
@@ -36,6 +39,27 @@ https://sefakozan.github.io/iptv/az.m3u
 |Rusya    |`https://sefakozan.github.io/iptv/ru.m3u`|Fransa  |`https://sefakozan.github.io/iptv/fr.m3u`|
 |İtalya   |`https://sefakozan.github.io/iptv/cn.m3u`|İspanyol|`https://sefakozan.github.io/iptv/es.m3u`|
 |Hindistan|`https://sefakozan.github.io/iptv/in.m3u`|Pakistan|`https://sefakozan.github.io/iptv/pk.m3u`|
+
+<table>
+  <tr>
+    <td>Rusya</td>
+    <td><code>https://sefakozan.github.io/iptv/ru.m3u</code></td>
+    <td>Fransa</td>
+    <td><code>https://sefakozan.github.io/iptv/fr.m3u</code></td>
+  </tr>
+  <tr>
+    <td>İtalya</td>
+    <td><code>https://sefakozan.github.io/iptv/cn.m3u</code></td>
+    <td>İspanyol</td>
+    <td><code>https://sefakozan.github.io/iptv/es.m3u</code></td>
+  </tr>
+  <tr>
+    <td>Hindistan</td>
+    <td><code>https://sefakozan.github.io/iptv/in.m3u</code></td>
+    <td>Pakistan</td>
+    <td><code>https://sefakozan.github.io/iptv/pk.m3u</code></td>
+  </tr>
+</table>
 
 ---
 
