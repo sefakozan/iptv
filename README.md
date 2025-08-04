@@ -23,9 +23,10 @@ https://sefakozan.github.io/iptv/az.m3u
 
 
 > [!TIP]  
-> Diğer tüm ülkeler için 2 haneli iso kodunu değiştirerek link elde edebilirsiniz.   
+> Diğer tüm ülkeler için 2 haneli iso kodunu değiştirerek link elde edebilirsiniz.  
+> **İspanyolcanın ISO kodu (`es`) değiştirilerek kullanılır:**  
 > ```text 
->https://sefakozan.github.io/iptv/<strong>es</strong>.m3u
+>https://sefakozan.github.io/iptv/es.m3u
 >```
 
 
