@@ -21,6 +21,13 @@ Azerbaycan
 https://sefakozan.github.io/iptv/az.m3u
 ```
 
+
+| Kod                        | Açıklama             |
+|----------------------------|----------------------|
+| `print("Merhaba")`         | Ekrana Merhaba yazar |
+| ```python <br> def selam(): <br>     print("Merhaba, Dünya!") <br> ``` | Bir fonksiyon tanımlar ve Merhaba, Dünya yazar |
+| Kod Bloğu 1                | Tablo dışı kod bloğu örneği |
+
 ### Türkiye
 
 
