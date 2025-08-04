@@ -4,6 +4,10 @@ import { merger } from "iptv-util";
 import { dirname, extname, join, resolve } from "path";
 import { fileURLToPath } from "url";
 
+const { default: countries } = await import("../docs/countries.json", {
+	assert: { type: "json" },
+});
+
 // İlk iki elemanı atla (node ve betik yolu)
 const args = process.argv.slice(2);
 
@@ -21,6 +25,7 @@ if (country.length !== 2) {
 }
 
 const defaultLink = `https://raw.githubusercontent.com/iptv-org/iptv/refs/heads/gh-pages/countries/${country}.m3u`;
+const liveTVCollectorLink = await GetLiveTVCollectorLink(country);
 
 const isCodeExist = await isCountryExist(defaultLink);
 
@@ -45,6 +50,10 @@ const linkArr = await getNonCommentedLines(readme);
 const textArr = await getM3UFileContents(langRawFolder);
 
 if (!linkArr.includes(defaultLink)) {
+	linkArr.push(defaultLink);
+}
+
+if (!linkArr.includes(liveTVCollectorLink) && liveTVCollectorLink) {
 	linkArr.push(defaultLink);
 }
 
@@ -119,4 +128,34 @@ async function isCountryExist(url, timeout = 8000) {
 	} catch {
 		return false;
 	}
+}
+
+async function GetLiveTVCollectorLink(country) {
+	let link = "";
+
+	//https://raw.githubusercontent.com/bugsfreeweb/LiveTVCollector/refs/heads/main/LiveTV/Turkey/LiveTV.m3u
+	//const isCodeExist = await isCountryExist(defaultLink);
+
+	for (const el of countries) {
+		if (el.code.toLowerCase() === country.toLowerCase()) {
+			const name = el.name;
+			link = `https://raw.githubusercontent.com/bugsfreeweb/LiveTVCollector/refs/heads/main/LiveTV/${name}/LiveTV.m3u`;
+			const isCodeExist = await isCountryExist(link);
+			if (isCodeExist) {
+				return link;
+			}
+
+			if (!el.alternatives) return link;
+
+			for (const altName of el.alternatives) {
+				link = `https://raw.githubusercontent.com/bugsfreeweb/LiveTVCollector/refs/heads/main/LiveTV/${altName}/LiveTV.m3u`;
+				const isCodeExist = await isCountryExist(link);
+				if (isCodeExist) {
+					return link;
+				}
+			}
+		}
+	}
+
+	return link;
 }

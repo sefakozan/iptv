@@ -9,7 +9,7 @@
 			"request": "launch",
 			"name": "generate",
 			"program": "${workspaceFolder}/bin/generate.js",
-			"args": ["tr"], // Komut satırı argümanları (isteğe bağlı)
+			"args": ["us"], // Komut satırı argümanları (isteğe bağlı)
 			"console": "integratedTerminal",
 			"skipFiles": ["<node_internals>/**"]
 		}

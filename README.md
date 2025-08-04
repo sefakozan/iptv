@@ -20,29 +20,17 @@ Azerbaycan
 ```
 https://sefakozan.github.io/iptv/az.m3u
 ```
-<details>
-<summary>Rusya</summary>
 
-```
-https://sefakozan.github.io/iptv/ru.m3u
-```
-</details>
 
-<details>
-<summary>Fransa</summary>
+> [!TIP]  
+> Diğer tüm ülkeler için 2 haneli iso kodunu değiştirerek link elde edebilirsiniz. <pre>https://sefakozan.github.io/iptv/<strong>es</strong>.m3u</pre>
 
-```
-https://sefakozan.github.io/iptv/fr.m3u
-```
-</details>
 
-<details>
-<summary>Çin</summary>
+|               |                                         |             |                                         |
+|:--------------|:---------------------------------------:|:------------|:---------------------------------------:|
+| Rusya         |`https://sefakozan.github.io/iptv/ru.m3u`| Fransa      |`https://sefakozan.github.io/iptv/fr.m3u`|
+| Çin           |`https://sefakozan.github.io/iptv/cn.m3u`| Almanya     |`https://sefakozan.github.io/iptv/de.m3u`|
 
-```
-https://sefakozan.github.io/iptv/cn.m3u
-```
-</details>
 
 
 ### Türkiye
