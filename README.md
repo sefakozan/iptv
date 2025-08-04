@@ -21,7 +21,7 @@ Azerbaycan
 https://sefakozan.github.io/iptv/az.m3u
 ```
 <details>
-<summary>Rusca</summary>
+<summary>Rusya</summary>
 
 ```
 https://sefakozan.github.io/iptv/ru.m3u
@@ -29,7 +29,7 @@ https://sefakozan.github.io/iptv/ru.m3u
 </details>
 
 <details>
-<summary>Fransızca</summary>
+<summary>Fransa</summary>
 
 ```
 https://sefakozan.github.io/iptv/fr.m3u
@@ -37,7 +37,7 @@ https://sefakozan.github.io/iptv/fr.m3u
 </details>
 
 <details>
-<summary>Çince</summary>
+<summary>Çin</summary>
 
 ```
 https://sefakozan.github.io/iptv/cn.m3u
