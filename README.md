@@ -29,14 +29,6 @@ https://sefakozan.github.io/iptv/ru.m3u
 </details>
 
 <details>
-<summary>Rusca</summary>
-
-```
-https://sefakozan.github.io/iptv/ru.m3u
-```
-</details>
-
-<details>
 <summary>Fransızca</summary>
 
 ```
