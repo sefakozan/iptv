@@ -53,7 +53,7 @@ https://sefakozan.github.io/iptv/s/az.m3u
 ---
 
 ### Any Video Player
-For VLC video player: ```Media > Open Network Stream > Network URL: https://sefakozan.github.io/iptv/s/us.m3u > Play```
+VLC video player: ```Media > Open Network Stream > Network URL: https://sefakozan.github.io/iptv/s/us.m3u > Play```
 
 ![vlc](docs/assets/vlc.png)
 
