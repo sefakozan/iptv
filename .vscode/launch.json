@@ -5,6 +5,12 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
+			"type": "chrome",
+			"request": "launch",
+			"name": "select.html",
+			"file": "${workspaceFolder}/docs/select.html"
+		},
+		{
 			"type": "node",
 			"request": "launch",
 			"name": "generate",

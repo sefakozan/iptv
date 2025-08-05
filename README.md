@@ -7,7 +7,7 @@ The list is periodically cleaned based on these checks.**
 Türkçe versiyon readme:  [Türkçe README](./README.TR.md)
 
 ### Usage
-To watch Turkish IPTV channels, use a media player that supports M3U, such as VLC Player. Paste the links below into your player to access the channels.
+To watch IPTV channels, use a media player that supports M3U, such as VLC Player. Paste the links below into your player to access the channels.
 
 **Türkiye**
 ```
@@ -51,8 +51,8 @@ https://sefakozan.github.io/iptv/s/az.m3u
 
 ### Any Video Player
 
-![network](network.png)
-![vlc](vlc.png)
+![network](doc/assets/network.png)
+![vlc](doc/assets/vlc.png)
 
 ### Legal
 This repository does not host any video files. It only contains links to publicly available video stream URLs, which we believe have been intentionally made public by their copyright owners. If any link in these playlists infringes on your rights as a copyright holder, you may request removal by submitting a takedown request or opening an issue. Please note that we have no control over the destination of the links, and removing a link from the playlist does not remove the content from the internet. Providing a link does not constitute direct copyright infringement, as no copy is created on the site providing the link; therefore, it is not a valid reason for a DMCA notice to GitHub. To remove content from the internet, you must contact the web server hosting the content (not GitHub or this repository’s developers). You can submit a removal request via this link: **[https://github.com/sefakozan/iptv/issues](https://github.com/sefakozan/iptv/issues)**.

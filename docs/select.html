@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bootstrap + Select2 Search Selection</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        body {
+            padding: 2rem;
+            background-color: #f8f9fa;
+        }
+        .card {
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        .select2-container {
+            width: 100% !important;
+        }
+        /* GitHub-style code block */
+        #selectedValue {
+            background: #f6f8fa !important;
+            color: #24292f !important;
+            border: 1px solid #d0d7de;
+            font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;
+            font-size: 1rem;
+        }
+        /* GitHub-style copy button */
+        #copyBtn {
+            background: #f6f8fa;
+            color: #57606a;
+            border: 1px solid #d0d7de;
+            transition: background 0.2s, color 0.2s;
+        }
+        #copyBtn:hover, #copyBtn:focus {
+            background: #0969da;
+            color: #fff;
+            border-color: #0969da;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="mb-0">Select Country</h2>
+                    </div>
+                    <div class="card-body">
+                        <form>
+                            <div class="mb-3">
+                                <p class="text-muted">Select a country from the dropdown below.</p>
+                                <select id="searchSelect" class="form-select" aria-label="Select a country">
+                                    <option value="">Select a country</option>
+                                </select>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card mt-4">
+                    <div class="card-header bg-info text-white">
+                        <h3 class="mb-0">Country Link</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <code id="selectedValue" class="flex-grow-1 bg-light px-2 py-1 rounded" style="font-size:1rem;">Select a country!..</code>
+                            <button id="copyBtn" class="btn btn-sm btn-outline-secondary ms-2" type="button" title="Copy to clipboard">Copy</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery (required for Select2) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Ülkeleri yükle ve select'e ekle
+            $.getJSON('countries.json', function(countries) {
+                const $select = $('#searchSelect');
+                $select.empty();
+                $select.append('<option value="">Select a country</option>');
+                countries.forEach(function(country) {
+                    $select.append(
+                        `<option value="${country.code}">${country.name}</option>`
+                    );
+                });
+                $select.trigger('change'); // Select2 güncelle
+            });
+
+            // Initialize Select2 on the search select element
+            $('#searchSelect').select2({
+                placeholder: "Search and select a country",
+                allowClear: true
+            });
+
+
+            // Update display when selection changes
+            $('#searchSelect').on('change', function() {
+                const selected = $(this).val();
+                if (selected) {
+                    const code = selected.toLowerCase();
+                    const sefakozanLink = `https://sefakozan.github.io/iptv/s/${code}.m3u`;
+                    const fallbackLink = `https://raw.githubusercontent.com/iptv-org/iptv/refs/heads/gh-pages/countries/${code}.m3u`;
+                    const countryName = $('#searchSelect option:selected').text().replace(/^[^ ]+ /, '');
+                    $(".card-header.bg-info h3").text(`${countryName} Link`);
+                    // Link var mı kontrol et
+                    fetch(sefakozanLink, { method: 'HEAD' })
+                        .then(res => {
+                            let link = sefakozanLink;
+                            if (!res.ok) link = fallbackLink;
+                            $('#selectedValue').text(link);
+                            $('#copyBtn').off('click').on('click', function() {
+                                navigator.clipboard.writeText(link).then(function() {
+                                    $('#copyBtn').text('Copied!');
+                                    setTimeout(function() {
+                                        $('#copyBtn').text('Copy');
+                                    }, 1200);
+                                });
+                            });
+                        })
+                        .catch(() => {
+                            // Hata olursa fallback göster
+                            $('#selectedValue').text(fallbackLink);
+                            $('#copyBtn').off('click').on('click', function() {
+                                navigator.clipboard.writeText(fallbackLink).then(function() {
+                                    $('#copyBtn').text('Copied!');
+                                    setTimeout(function() {
+                                        $('#copyBtn').text('Copy');
+                                    }, 1200);
+                                });
+                            });
+                        });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
