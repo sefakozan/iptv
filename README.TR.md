@@ -3,8 +3,6 @@
 > **Tüm dünya geneli 8000+ IPTV kanal listesi, hepsinin oline olup olmadığı [iptv-util](https://github.com/sefakozan/iptv-util) modulü ile kontrol ediliyor.  
 Liste buna göre düzenli periyotlarla temizleniyor.**
 
-&nbsp;
-
 ## Kullanım
 IPTV kanallarını izlemek için VLC Player gibi M3U destekli bir Media Player kullanmalısınız. Aşağıdaki linkleri Player'ınıza yapıştırarak kanalları izleyebilirsiniz.
 

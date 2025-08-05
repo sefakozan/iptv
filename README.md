@@ -1,9 +1,7 @@
 # 📺 Global IPTV Lists: 8000+ Active Online Channels
 
-**A global IPTV channel list with over 8000 channels, checked for online status using the [iptv-util](https://github.com/sefakozan/iptv-util) module.  
+> **A global IPTV channel list with over 8000 channels, checked for online status using the [iptv-util](https://github.com/sefakozan/iptv-util) module.  
 The list is periodically cleaned based on these checks.**
-
-&nbsp;
 
 ## Language Selection
 Türkçe: [README.TR.md](./README.TR.md)
