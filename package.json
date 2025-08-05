@@ -24,6 +24,6 @@
 		"vitest": "^3.2.4"
 	},
 	"dependencies": {
-		"iptv-util": "^1.2.8"
+		"iptv-util": "^1.2.17"
 	}
 }
