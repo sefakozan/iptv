@@ -1,0 +1,665 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPTV Player</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        body {
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #232526 0%, #414345 100%);
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+            color: #eaeaea;
+        }
+        .card {
+            background: #23272f;
+            border: none;
+            border-radius: 1.2rem;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+            margin-bottom: 2.5rem;
+            color: #eaeaea;
+        }
+        .container-fluid {
+            padding-top: 2.5rem;
+            padding-bottom: 2.5rem;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+        }
+        .card-header.bg-primary {
+            background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%) !important; /* Tron/cyan gradient */
+            color: #fff !important;
+            border-top-left-radius: 1.2rem;
+            border-top-right-radius: 1.2rem;
+            border-bottom: none;
+        }
+        .card-header.bg-info {
+            background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%) !important; /* Tron/green-cyan gradient */
+            color: #fff !important;
+            border-top-left-radius: 1.2rem;
+            border-top-right-radius: 1.2rem;
+            border-bottom: none;
+        }
+        .select2-container {
+            width: 100% !important;
+        }
+        /* Ülke seçme combobox'ını büyüt */
+        #countrySelect {
+            font-size: 1.25rem;
+            min-height: 3.2rem;
+            background: #23272f;
+            color: #eaeaea;
+            border-radius: 0.7rem;
+            border: 1px solid #343a40;
+        }
+        /* Kanal seçme combobox'ı ve diğer .form-select'ler için koyu arka plan */
+        .form-select {
+            background-color: #23272f !important;
+            color: #eaeaea !important;
+            border: 1px solid #343a40 !important;
+        }
+        .select2-container--default .select2-selection--single {
+            min-height: 3.2rem;
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            background: #23272f;
+            color: #eaeaea;
+            border-radius: 0.7rem;
+            border: 1px solid #343a40;
+            box-shadow: 0 2px 8px rgba(31,38,135,0.08);
+        }
+        .select2-selection__rendered{
+            color: #fff !important;
+        }
+        .select2-selection__rendered img {
+            margin-right: 0.5em;
+            vertical-align: middle;
+            width: 1.5em;
+            height: auto;
+            aspect-ratio: 4/3;
+            border-radius: 0.2em;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.08);
+        }
+        #videoPlayer {
+            width: 100%;
+            height: 500px;
+            background: #181a1b;
+            border-radius: 0.7rem;
+            box-shadow: 0 2px 8px rgba(31,38,135,0.08);
+        }
+        .channel-info {
+            background: rgba(255,255,255,0.04);
+            padding: 1.2rem 1.5rem;
+            border-radius: 0.7rem;
+            box-shadow: 0 2px 8px rgba(31,38,135,0.04);
+            color: #eaeaea;
+            min-height: 90px;
+        }
+        /* Kanal URL'si çok uzunsa taşmayı ve kaymayı engelle */
+        #channelInfo .url-clip {
+            display: block;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            vertical-align: bottom;
+        }
+        #channelInfo p {
+            display: flex;
+            align-items: center;
+            gap: 0.5em;
+            margin-bottom: 0.5em;
+            max-width: 100%;
+        }
+        #channelInfo strong {
+            flex-shrink: 0;
+        }
+        #channelInfo .url-clip {
+            flex: 1 1 0%;
+            min-width: 0;
+        }
+        
+        .btn-success, .btn-primary, .btn-secondary {
+            border-radius: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(31,38,135,0.08);
+            border: none;
+            transition: background 0.2s, color 0.2s;
+        }
+        .btn-success {
+            background: linear-gradient(90deg, #6c757d 0%, #495057 100%);
+        }
+        .btn-primary {
+            background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%);
+        }
+        .btn-secondary {
+            background: linear-gradient(90deg, #6c757d 0%, #495057 100%);
+        }
+        .btn:disabled {
+            opacity: 0.6;
+        }
+        label, .form-label {
+            color: #b0b8c1;
+            font-weight: 500;
+        }
+        .select2-dropdown {
+            background: #23272f;
+            color: #eaeaea;
+            border-radius: 0.7rem;
+            border: 1px solid #343a40;
+        }
+        .select2-results__option--highlighted {
+            background: linear-gradient(90deg, #6c757d 0%, #495057 100%) !important;
+            color: #fff !important;
+        }
+        /* Seçili ülkenin arka planı hover ile aynı olsun */
+        .select2-results__option[aria-selected="true"] {
+            background: linear-gradient(90deg, #6c757d 0%, #495057 100%) !important;
+            color: #0c0c0c !important;
+        }
+        .select2-container--default .select2-results__option--selected{
+            color: #0c0c0c !important;
+        }
+        
+        /* Select2 popup: selected but not hovered item same as hover */
+        .select2-results__option[aria-selected="true"]:not(.select2-results__option--highlighted) {
+            background: linear-gradient(90deg, #6c757d 0%, #495057 100%) !important;
+            color: #181717 !important;
+        }
+        .select2-results__option--highlighted{
+             background: linear-gradient(90deg, #6c757d 0%, #495057 100%) !important;
+        }
+        .select2-results__option {
+            padding: 0.7em 1em;
+        }
+        /* Listbox (channelList) selected, hover, and active item green gradient like play button */
+        #channelList option:checked,
+        #channelList option[selected],
+        #channelList option:hover,
+        #channelList option:active {
+            background: linear-gradient(90deg, #6c757d 0%, #495057 100%) !important;
+            color: #fff !important;
+        }
+        
+        /* Minimal scrollbar for Select2 dropdown */
+        .select2-dropdown .select2-results__options {
+            scrollbar-width: thin;
+            scrollbar-color: #444 #23272f;
+        }
+        .select2-dropdown .select2-results__options::-webkit-scrollbar {
+            width: 7px;
+            background: #23272f;
+        }
+        .select2-dropdown .select2-results__options::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 6px;
+        }
+        .select2-dropdown .select2-results__options::-webkit-scrollbar-thumb:hover {
+            background: #666;
+        }
+        ::selection {
+            background: #00f2fe;
+            color: #23272f;
+        }
+        h2.mb-0 {
+        /* --- UX Polish: focus, pointer, accessibility, transitions --- */
+        .btn, button, select, .form-select, .select2-selection--single {
+            cursor: pointer;
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed !important;
+        }
+        .btn:focus, .btn:active, .btn-success:focus, .btn-primary:focus, .btn-secondary:focus {
+            outline: 2px solid #00f2fe !important;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 2px #00f2fe33 !important;
+        }
+        .btn:hover:not(:disabled), .btn:focus-visible:not(:disabled) {
+            filter: brightness(1.08);
+            opacity: 0.95;
+        }
+        .form-select {
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-select:focus {
+            border-color: #00f2fe !important;
+            box-shadow: 0 0 0 2px #00f2fe33 !important;
+            outline: none !important;
+        }
+        .select2-container--default .select2-selection--single {
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .select2-container--default .select2-selection--single:focus,
+        .select2-container--default .select2-selection--single.select2-selection--focus {
+            border-color: #00f2fe !important;
+            box-shadow: 0 0 0 2px #00f2fe33 !important;
+            outline: none !important;
+        }
+        .select2-results__option {
+            transition: background 0.15s, color 0.15s;
+        }
+        #channelList:focus {
+            outline: 2px solid #00f2fe !important;
+            outline-offset: 2px;
+        }
+        /* Visually hide but keep accessible for screen readers */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0,0,0,0);
+            border: 0;
+        }
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+            font-weight: 800;
+            letter-spacing: 1px;
+            font-size: 2.2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Left Column: Country and Channel Selection -->
+            <div class="col-md-5">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="mb-0">IPTV Player</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="iptvForm">
+                            <div class="mb-3">
+                                <label for="countrySelect" class="form-label">Select a Country</label>
+                                <select id="countrySelect" class="form-select">
+                                    <option value="">Choose a country</option>
+                                </select>
+                            </div>
+                        </form>
+                        
+                        <div class="mb-3">
+                            <label for="channelList" class="form-label">Select a Channel</label>
+                            <input type="text" id="channelSearch" class="form-control mb-2" placeholder="Search channel..." autocomplete="off" disabled style="background:#23272f;color:#eaeaea;border:1px solid #343a40;">
+                            <select id="channelList" class="form-select" size="25" disabled style="height: 435px;">
+                                <option value="">Select a country first</option>
+                            </select>
+                        </div>
+                        
+                        <div class="d-grid gap-2">
+                            <button id="playBtn" class="btn btn-success" disabled>Play Selected Channel</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Column: Channel Information and Player -->
+            <div class="col-md-7">
+                <div class="card">
+                    <div class="card-body">
+                        <div id="channelInfo" class="channel-info">
+                            <p class="mb-0">No channel selected</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-body">
+                        <video id="videoPlayer" controls></video>
+                        <div class="mt-3">
+                            <button id="playStreamBtn" class="btn btn-primary" disabled>Play Stream</button>
+                            <button id="stopBtn" class="btn btn-secondary" disabled>Stop Stream</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery (required for Select2) -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <!-- HLS.js for playing HLS streams -->
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.1.5/dist/hls.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/iptv-util@latest/rollup/iptv-util-min.js"></script>
+
+    <script>
+        // Global variables
+        let countriesData = [];
+        let channelsData = [];
+        let hls = null;
+        const cache = new Map();
+
+        // Initialize when document is ready
+        $(document).ready(function() {
+            // Initialize Select2 for country selection
+            $('#countrySelect').select2({
+                placeholder: "Select a country",
+                allowClear: false,
+                language: {
+                    searching: function() {
+                        return "Type to search for a country...";
+                    },
+                    inputTooShort: function() {
+                        return "Type to search for a country...";
+                    },
+                    noResults: function() {
+                        return "No country found";
+                    }
+                },
+                templateResult: function (state) {
+                    if (!state.id) return state.text;
+                    const flagUrl = $(state.element).data('flag');
+                    if (flagUrl) {
+                        return $('<span><img src="' + flagUrl + '" /> ' + state.text + '</span>');
+                    }
+                    return state.text;
+                },
+                templateSelection: function (state) {
+                    if (!state.id) return state.text;
+                    const flagUrl = $(state.element).data('flag');
+                    if (flagUrl) {
+                        // Aspect ratio bozulmasın diye style ekliyoruz
+                        return $('<span><img src="' + flagUrl + '" style="width:1.5em;height:auto;aspect-ratio:4/3;vertical-align:middle;margin-right:0.5em;border-radius:0.2em;box-shadow:0 1px 2px rgba(0,0,0,0.08);" /> ' + state.text + '</span>');
+                    }
+                    return state.text;
+                }
+            });
+
+            // Select2 search input placeholder
+            $('#countrySelect').on('select2:open', function() {
+                setTimeout(function() {
+                    let searchBox = document.querySelector('.select2-search__field');
+                    if (searchBox) {
+                        searchBox.placeholder = 'Type to search for a country...';
+                    }
+                }, 0);
+            });
+
+            // Load countries data
+            loadCountries();
+
+            // Event handlers
+            $('#countrySelect').on('change', handleCountryChange);
+            $('#channelList').on('change', handleChannelChange);
+            $('#playBtn').on('click', playStream);
+            $('#playStreamBtn').on('click', playStream);
+            $('#stopBtn').on('click', stopStream);
+        });
+
+        // Load countries from JSON file
+        async function loadCountries() {
+            try {
+                const response = await fetch('countries.json');
+                countriesData = await response.json();
+                // Populate country select
+                const countrySelect = $('#countrySelect');
+                countriesData.forEach(country => {
+                    // Bayrak url'si flagcdn.io üzerinden
+                    const code = country.code.toLowerCase();
+                    // UK için özel flag
+                    const flagCode = code === 'uk' ? 'gb' : code;
+                    const flagUrl = `https://flagcdn.com/w20/${flagCode}.png`;
+                    countrySelect.append(new Option(`${country.name} (${country.code.toUpperCase()})`, code));
+                    // Option elementine data-flag ekle
+                    countrySelect.find(`option[value='${code}']`).attr('data-flag', flagUrl);
+                });
+                // Automatically select United States
+                $('#countrySelect').val('us').trigger('change');
+            } catch (error) {
+                console.error('Error loading countries:', error);
+                alert('Failed to load countries data');
+            }
+        }
+
+        // Handle country selection change
+        function handleCountryChange() {
+            const selectedCountry = $(this).val();
+            
+            if (selectedCountry) {
+                $('#channelList').prop('disabled', false).html('<option value="">Loading channels...</option>');
+                $('#playBtn').prop('disabled', true);
+                $('#playStreamBtn').prop('disabled', true);
+                $('#stopBtn').prop('disabled', true);
+                $('#channelInfo').html('<p class="mb-0">No channel selected</p>');
+                stopStream();
+                
+                // Automatically load channels for the selected country
+                loadChannels();
+            } else {
+                $('#channelList').prop('disabled', true).html('<option value="">Select a country first</option>');
+                $('#playBtn').prop('disabled', true);
+                $('#playStreamBtn').prop('disabled', true);
+                $('#stopBtn').prop('disabled', true);
+            }
+        }
+
+        // Load channels for selected country
+        async function loadChannels() {
+            const selectedCountry = $('#countrySelect').val();
+            if (!selectedCountry) return;
+
+            try {
+                // Show loading state
+                $('#channelList').prop('disabled', true).html('<option value="">Loading channels...</option>');
+
+                let m3uUrl = `https://sefakozan.github.io/iptv/s/${selectedCountry}.m3u`;
+
+                const res = await fetch(m3uUrl, { method: 'HEAD' });
+                if (!res.ok) {
+                    m3uUrl = `https://raw.githubusercontent.com/iptv-org/iptv/refs/heads/gh-pages/countries/${selectedCountry}.m3u`;
+                }
+
+                
+                // Fetch M3U data
+
+
+                if(cache.has(m3uUrl)) {
+                    channelsData = cache.get(m3uUrl);
+                } else {
+                    // Fetch M3U data
+                    const response = await fetch(m3uUrl);
+                    if (!response.ok) {
+                        throw new Error(`Failed to fetch M3U data: ${response.status}`);
+                    }
+                    
+                    const m3uData = await response.text();
+                    
+                    // Parse M3U data
+                    channelsData = parseM3U(m3uData);
+                    
+                    // Cache the channels data
+                    cache.set(m3uUrl, channelsData);    
+
+                }
+
+                
+                // Populate channel list
+                const channelList = $('#channelList');
+                const channelSearch = $('#channelSearch');
+                channelList.empty();
+
+                channelsData.forEach((channel, index) => {
+                    channelList.append(new Option(channel.name, index));
+                });
+
+                // Enable channel list and search
+                channelList.prop('disabled', false);
+                channelSearch.prop('disabled', false).val('');
+
+                // Otomatik olarak ilk kanalı sadece ilk yüklemede seçme
+                if (window._iptvFirstLoad === undefined) {
+                    window._iptvFirstLoad = false;
+                    // İlk yüklemede hiçbir kanal seçilmesin
+                    channelList.val('').trigger('change');
+                } else {
+                    // Sonraki ülke değişimlerinde ilk kanalı seç
+                    if (channelsData.length > 0) {
+                        channelList.val('0').trigger('change');
+                    } else {
+                        alert('No channels found for this country');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading channels:', error);
+                alert(`Failed to load channels: ${error.message}`);
+                // Reset UI
+                $('#channelList').prop('disabled', false).html('<option value="">Select a country first</option>');
+                $('#channelSearch').prop('disabled', true).val('');
+            }
+            // Channel search filtering
+            $('#channelSearch').on('input', function() {
+                const q = $(this).val().toLowerCase();
+                const channelList = $('#channelList');
+                channelList.empty();
+                let found = false;
+                channelsData.forEach((channel, index) => {
+                    if (channel.name.toLowerCase().includes(q)) {
+                        channelList.append(new Option(channel.name, index));
+                        found = true;
+                    }
+                });
+                if (!found) {
+                    channelList.append(new Option('No channel found', ''));
+                }
+                // Otomatik ilk kanal seçimi (varsa)
+                if (channelList[0].options.length > 0 && channelList[0].options[0].value !== '') {
+                    channelList.val(channelList[0].options[0].value).trigger('change');
+                } else {
+                    $('#playBtn').prop('disabled', true);
+                    $('#playStreamBtn').prop('disabled', true);
+                    $('#stopBtn').prop('disabled', true);
+                    $('#channelInfo').html('<p class="mb-0">No channel selected</p>');
+                    stopStream();
+                }
+            });
+        }
+
+        // Parse M3U data
+        function parseM3U(m3uData) {
+
+            const channels = [];
+            const playlist = IptvUtil.parser(m3uData)
+
+            for (const item of playlist.links) {
+                if(!item.url?.includes('.m3u8')) continue;
+                try {
+                    // Validate URL
+                    new URL(item.url);
+                } catch {
+                    continue;
+                }
+
+                if (item.title) {
+                    channels.push({
+                        name: item.title,
+                        url: item.url,
+                        logo:item?.extinf["tvg-logo"] || ''
+                    });
+                }
+            }
+            
+            return channels;
+        }
+
+        // Handle channel selection change
+        function handleChannelChange() {
+            const selectedIndices = $(this).val();
+            
+            if (selectedIndices) {
+                // Get the first selected index (in case multiple are selected)
+                const selectedIndex = parseInt(selectedIndices)
+                const channel = channelsData[selectedIndex];
+                $('#playBtn').prop('disabled', false);
+                $('#playStreamBtn').prop('disabled', false);
+                $('#stopBtn').prop('disabled', false);
+                
+                // Display channel info: logo, name, and url on the same row
+                let logoHtml = '';
+                if (channel.logo) {
+                    logoHtml = `<img src="${channel.logo}" alt="Logo" style="max-height:38px;max-width:60px;object-fit:contain;filter:drop-shadow(0 2px 6px #0008);background:#23272f;border-radius:0.3em;flex-shrink:0;">`;
+                }
+                $('#channelInfo').html(`
+                    <div style="display:flex;align-items:center;gap:1em;min-height:40px;">
+                        ${logoHtml}
+                        <div style="flex:1 1 0;min-width:0;">
+                            <span style="font-weight:600;font-size:1.1em;">${channel.name}</span>
+                            <span class="url-clip" title="${channel.url}" style="color:#8fd3ff;font-size:0.98em;">${channel.url}</span>
+                        </div>
+                    </div>
+                `);
+                playStream();
+            } else {
+                $('#playBtn').prop('disabled', true);
+                $('#playStreamBtn').prop('disabled', true);
+                $('#stopBtn').prop('disabled', true);
+                $('#channelInfo').html('<p class="mb-0">No channel selected</p>');
+                stopStream();
+            }
+        }
+
+        // Play selected stream
+        function playStream() {
+            const selectedIndices = $('#channelList').val();
+            if (!selectedIndices) return;
+            
+            // Get the first selected index (in case multiple are selected)
+            const selectedIndex = parseInt(selectedIndices);
+            const channel = channelsData[selectedIndex];
+            const video = document.getElementById('videoPlayer');
+            
+            // Stop any existing stream
+            stopStream();
+            
+            if (Hls.isSupported()) {
+                hls = new Hls();
+                hls.loadSource(channel.url);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    const aaa = video.play().then(() => {
+                    }).catch(error => {
+                        console.error('Error playing video:', error);
+                    });
+                });
+                hls.on(Hls.Events.ERROR, function(event, data) {
+                    console.error('HLS error:', data);
+                    console.error(`Streaming error: ${data.type} - ${data.details}`);
+                });
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                // For Safari
+                video.src = channel.url;
+                video.addEventListener('loadedmetadata', function() {
+                    video.play();
+                });
+            } else {
+                alert('HLS is not supported in your browser');
+            }
+        }
+
+        // Stop current stream
+        function stopStream() {
+            const video = document.getElementById('videoPlayer');
+            
+            if (hls) {
+                hls.destroy();
+                hls = null;
+            }
+            
+            video.pause();
+            video.src = '';
+        }
+    </script>
+</body>
+</html>

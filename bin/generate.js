@@ -45,7 +45,9 @@ const __dirname = dirname(__filename);
 const target = resolve(__dirname, "..", "docs", "s", `${country}.m3u`);
 const langRawFolder = resolve(__dirname, "..", "raw-streams", country);
 const readme = resolve(langRawFolder, "README.md");
+const sort = resolve(langRawFolder, "SORT.md");
 
+const sortArr = await getNonCommentedLines(sort);
 const linkArr = await getNonCommentedLines(readme);
 const textArr = await getM3UFileContents(langRawFolder);
 
@@ -59,6 +61,21 @@ if (!linkArr.includes(liveTVCollectorLink) && liveTVCollectorLink) {
 
 const fullList = await merger(...linkArr, ...textArr);
 const cleanList = await fullList.check();
+
+//sort işlemi
+if (sortArr.length > 0) {
+	cleanList.links.sort((a, b) => {
+		let aval = 0;
+		let bval = 0;
+
+		for (const str of sortArr) {
+			if (a.title.includes(str)) aval = 100;
+			if (b.title.includes(str)) bval = 100;
+		}
+
+		return bval - aval;
+	});
+}
 
 const cleanText = cleanList.toText();
 await writeTarget(target, cleanText);
@@ -93,7 +110,8 @@ async function getNonCommentedLines(filePath) {
 		const content = await readFile(filePath, "utf8");
 
 		// Satırlara böl ve # ile başlamayanları filtrele
-		const lines = content.split("\n").filter((line) => line.trim() !== "" && !line.trim().startsWith("#"));
+		//const lineArr = text.split(/\s*\r*\n+\s*/gm);
+		const lines = content.split(/\s*\r*\n+\s*/gm).filter((line) => line.trim() !== "" && !line.trim().startsWith("#"));
 
 		return lines;
 	} catch (error) {

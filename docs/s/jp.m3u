@@ -1,4 +1,6 @@
 #EXTM3U
+#EXTINF:-1 tvg-id="ShopChannel.jp" tvg-logo="https://www.shopch.jp/com/images/common/logo_2021.png" group-title="Shop",Shop Channel (1080p) [Not 24/7]
+https://stream3.shopch.jp/HLS/master.m3u8
 #EXTINF:-1 tvg-id="BBCNews.uk@AsiaPacific" tvg-logo="https://i.imgur.com/vSz2WEp.png" group-title="News",BBC News Asia Pacific (1080p)
 https://tv.ddns.vn/tv/bbcworldnews/index.m3u8
 #EXTINF:-1 tvg-id="BloombergTV.us@Asia" tvg-logo="https://i.imgur.com/OuogLHx.png" group-title="Business",Bloomberg TV Asia (720p)
@@ -22,7 +24,5 @@ https://newssimul-stream.nhk.jp/hls/live/2010561/nhknewssimul/master.m3u8
 https://ntv4.mov3.co/hls/ntv.m3u8
 #EXTINF:-1 tvg-id="QVC.jp" tvg-logo="https://i.imgur.com/xWSzQ34.png" group-title="Shop",QVC Japan (720p)
 https://cdn-live1.qvc.jp/iPhone/1501/1501.m3u8
-#EXTINF:-1 tvg-id="ShopChannel.jp" tvg-logo="https://www.shopch.jp/com/images/common/logo_2021.png" group-title="Shop",Shop Channel (1080p) [Not 24/7]
-https://stream3.shopch.jp/HLS/master.m3u8
 #EXTINF:-1 tvg-id="RTRPlanetaAsia.ru" tvg-logo="https://i.imgur.com/DTtK0z7.png" group-title="General",РТР Планета Азия
 https://player.smotrim.ru/iframe/stream/live_id/683d9649-a96c-4a4d-b468-91c0ee2bf363
