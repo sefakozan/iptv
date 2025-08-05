@@ -51,6 +51,7 @@ https://sefakozan.github.io/iptv/s/az.m3u
 ---
 
 ### Herhangi Bir Video Oynatıcı
+VLC video oynatıcı: ```Ortam > Ağ Akışı Aç > Adres: https://sefakozan.github.io/iptv/s/tr.m3u > Oynat```  
 VLC video oynatıcı: ```Media > Open Network Stream > Network URL: https://sefakozan.github.io/iptv/s/tr.m3u > Play```
 
 ![vlc](docs/assets/vlc.png)
