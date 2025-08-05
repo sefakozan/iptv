@@ -112,7 +112,7 @@
                     const code = selected.toLowerCase();
                     const sefakozanLink = `https://sefakozan.github.io/iptv/s/${code}.m3u`;
                     const fallbackLink = `https://raw.githubusercontent.com/iptv-org/iptv/refs/heads/gh-pages/countries/${code}.m3u`;
-                    const countryName = $('#searchSelect option:selected').text().replace(/^[^ ]+ /, '');
+                    const countryName = $('#searchSelect option:selected').text().trim();
                     $(".card-header.bg-info h3").text(`${countryName} Link`);
                     // Link var mı kontrol et
                     fetch(sefakozanLink, { method: 'HEAD' })
