@@ -394,6 +394,58 @@
             // Event handlers
             $('#countrySelect').on('change', handleCountryChange);
             $('#channelList').on('change', handleChannelChange);
+            
+            // Global klavye event handler'ları
+            $(document).on('keydown', function(e) {
+                // Sağ-sol ok tuşları ile kanal değiştirme (global)
+                if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                    if (channelsData.length === 0) return; // Kanal yoksa çık
+                    
+                    e.preventDefault();
+                    const currentIndex = parseInt($('#channelList').val()) || 0;
+                    let newIndex;
+                    
+                    if (e.key === 'ArrowLeft') {
+                        // Sol ok: önceki kanal
+                        newIndex = currentIndex > 0 ? currentIndex - 1 : channelsData.length - 1;
+                    } else {
+                        // Sağ ok: sonraki kanal
+                        newIndex = currentIndex < channelsData.length - 1 ? currentIndex + 1 : 0;
+                    }
+                    
+                    $('#channelList').val(newIndex).trigger('change');
+                }
+                // Alt-üst ok tuşları ile ülke değiştirme (global)
+                else if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+                    if (countriesData.length === 0) return; // Ülke yoksa çık
+                    
+                    e.preventDefault();
+                    const currentValue = $('#countrySelect').val();
+                    const options = $('#countrySelect').find('option').not(':first'); // İlk boş option'ı hariç tut
+                    let currentIndex = -1;
+                    
+                    // Mevcut seçili ülkenin index'ini bul
+                    options.each(function(index) {
+                        if ($(this).val() === currentValue) {
+                            currentIndex = index;
+                            return false;
+                        }
+                    });
+                    
+                    let newIndex;
+                    if (e.key === 'ArrowUp') {
+                        // Yukarı ok: önceki ülke
+                        newIndex = currentIndex > 0 ? currentIndex - 1 : options.length - 1;
+                    } else {
+                        // Aşağı ok: sonraki ülke
+                        newIndex = currentIndex < options.length - 1 ? currentIndex + 1 : 0;
+                    }
+                    
+                    const newValue = options.eq(newIndex).val();
+                    $('#countrySelect').val(newValue).trigger('change');
+                }
+            });
+
             $('#playBtn').on('click', playStream);
             $('#playStreamBtn').on('click', playStream);
             $('#stopBtn').on('click', stopStream);
@@ -601,6 +653,7 @@
                         </div>
                     </div>
                 `);
+                // Eski kanalı durdur, ancak otomatik oynatma yapma
                 playStream();
             } else {
                 $('#playBtn').prop('disabled', true);
