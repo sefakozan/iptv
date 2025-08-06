@@ -329,7 +329,7 @@ async function loadCountries() {
 		const countrySelect = $("#countrySelect");
 
 		for (const country of countriesData) {
-			if (countriesData.disabled) continue;
+			if (country.disabled) continue;
 			// Bayrak url'si flagcdn.io üzerinden
 			const code = country.code.toLowerCase();
 			// UK için özel flag
