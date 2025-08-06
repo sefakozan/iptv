@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>IPTV Player Icon Generator v2</title>
+    <style>
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 2rem; 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            margin: 0;
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+        h1 {
+            color: #4f46e5;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: 700;
+        }
+        .icon-preview { 
+            background: white; 
+            padding: 2rem; 
+            border-radius: 16px; 
+            box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1); 
+            margin: 1rem auto;
+            text-align: center;
+            border: 2px solid #e5e7eb;
+        }
+        canvas { 
+            border: 2px solid #e5e7eb; 
+            margin: 0.5rem; 
+            border-radius: 8px;
+        }
+        button {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            cursor: pointer;
+            margin: 0.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+        }
+        .canvas-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+        .canvas-item {
+            text-align: center;
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
+        }
+        .canvas-item a {
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        .canvas-item a:hover {
+            text-decoration: underline;
+        }
+        .version-info {
+            text-align: center;
+            margin-top: 2rem;
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📺 IPTV Player Icon Generator - Ultra Minimal</h1>
+        <p style="text-align: center; color: #6b7280; margin-bottom: 2rem;">
+            Font Awesome fa-tv gibi ultra minimal ve temiz TV ikonu
+        </p>
+        
+        <div class="icon-preview">
+            <svg width="512" height="512" id="iconSvg" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background gradient -->
+                <defs>
+                    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#4f46e5;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="tvGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#f8fafc;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="screenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#1e293b;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#334155;stop-opacity:1" />
+                    </linearGradient>
+                    <linearGradient id="playGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+                        <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+                    </linearGradient>
+                </defs>
+                
+                <!-- Background circle -->
+                <circle cx="256" cy="256" r="240" fill="url(#bgGradient)" />
+                
+                <!-- Ultra Minimal TV Design -->
+                <!-- Main TV Body - Clean Rectangle -->
+                <rect x="120" y="160" width="272" height="144" rx="16" fill="url(#tvGradient)" stroke="#334155" stroke-width="4"/>
+                
+                <!-- TV Screen - Empty Black Screen -->
+                <rect x="140" y="180" width="232" height="104" rx="8" fill="#1e293b"/>
+                
+                <!-- TV Stand - Minimal Design -->
+                <rect x="230" y="320" width="52" height="16" rx="8" fill="#64748b"/>
+                <rect x="200" y="340" width="112" height="20" rx="10" fill="#475569"/>
+            </svg>
+        </div>
+        
+        <div style="text-align: center; margin: 2rem 0;">
+            <button onclick="generateIcons()">🚀 Tüm İkon Boyutlarını Oluştur</button>
+            <button onclick="downloadSVG()">📥 SVG İndir</button>
+            <button onclick="previewInBrowser()">👁️ Tarayıcıda Önizle</button>
+        </div>
+        
+        <div id="canvasContainer" class="canvas-grid"></div>
+        
+        <div class="version-info">
+            <p><strong>Ultra Minimal Icon Generator</strong> - Font Awesome fa-tv benzeri</p>
+            <p>Tamamen temiz ve minimal TV ikonu tasarımı</p>
+        </div>
+    </div>
+
+    <script>
+        function generateIcons() {
+            const sizes = [16, 32, 48, 72, 96, 128, 144, 152, 180, 192, 256, 384, 512];
+            const container = document.getElementById('canvasContainer');
+            container.innerHTML = '<h3 style="grid-column: 1/-1; text-align: center; color: #4f46e5;">🎨 Oluşturulan İkonlar</h3>';
+            
+            sizes.forEach(size => {
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                canvas.title = `${size}x${size} IPTV Icon`;
+                
+                const ctx = canvas.getContext('2d');
+                const svg = document.getElementById('iconSvg');
+                const svgData = new XMLSerializer().serializeToString(svg);
+                const img = new Image();
+                
+                img.onload = function() {
+                    // High quality rendering
+                    ctx.imageSmoothingEnabled = true;
+                    ctx.imageSmoothingQuality = 'high';
+                    ctx.drawImage(img, 0, 0, size, size);
+                    
+                    // Create download link
+                    const link = document.createElement('a');
+                    link.download = `iptv-icon-${size}x${size}.png`;
+                    link.href = canvas.toDataURL('image/png', 1.0);
+                    link.textContent = `📥 ${size}×${size}`;
+                    
+                    const div = document.createElement('div');
+                    div.className = 'canvas-item';
+                    
+                    const sizeLabel = document.createElement('div');
+                    sizeLabel.textContent = `${size}×${size}px`;
+                    sizeLabel.style.fontWeight = '600';
+                    sizeLabel.style.color = '#374151';
+                    sizeLabel.style.marginBottom = '0.5rem';
+                    
+                    div.appendChild(sizeLabel);
+                    div.appendChild(canvas);
+                    div.appendChild(document.createElement('br'));
+                    div.appendChild(link);
+                    
+                    container.appendChild(div);
+                };
+                
+                img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+            });
+        }
+        
+        function downloadSVG() {
+            const svg = document.getElementById('iconSvg');
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const blob = new Blob([svgData], {type: 'image/svg+xml'});
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'iptv-icon-v2.svg';
+            link.click();
+            
+            URL.revokeObjectURL(url);
+        }
+        
+        function previewInBrowser() {
+            const svg = document.getElementById('iconSvg');
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const blob = new Blob([svgData], {type: 'image/svg+xml'});
+            const url = URL.createObjectURL(blob);
+            
+            window.open(url, '_blank');
+            
+            setTimeout(() => {
+                URL.revokeObjectURL(url);
+            }, 5000);
+        }
+
+        // Auto-generate on load with delay for better UX
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                generateIcons();
+                console.log('🎯 IPTV Icon Generator v2 loaded successfully!');
+            }, 1500);
+        });
+        
+        // Add some interactive hover effects
+        document.getElementById('iconSvg').addEventListener('mouseenter', () => {
+            document.getElementById('iconSvg').style.transform = 'scale(1.02)';
+            document.getElementById('iconSvg').style.transition = 'transform 0.3s ease';
+        });
+        
+        document.getElementById('iconSvg').addEventListener('mouseleave', () => {
+            document.getElementById('iconSvg').style.transform = 'scale(1)';
+        });
+    </script>
+</body>
+</html>
