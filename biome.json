@@ -11,7 +11,7 @@
 	"formatter": {
 		"enabled": true,
 		"indentStyle": "tab",
-		"lineWidth": 180
+		"lineWidth": 250
 	},
 	"linter": {
 		"enabled": true,
@@ -21,7 +21,7 @@
 	},
 	"javascript": {
 		"formatter": {
-			"quoteStyle": "double"
+			"quoteStyle": "single"
 		}
 	},
 	"assist": {
