@@ -10,75 +10,75 @@ const { default: countries } = await import("../docs/countries.json", {
 
 // İlk iki elemanı atla (node ve betik yolu)
 const args = process.argv.slice(2);
-
-const country = args[0].toLowerCase();
-
-if (!country) {
+if (args.length === 0) {
 	console.error(`arguman olarak ulke vermelisiniz!.. (tr|us|uk|es|fr|de|ru|az|ar|it|in|cn)`);
 	process.exit(1);
 }
 
-// console.log("country:", country);
-// if (country.length !== 2) {
-// 	console.error("ulke kodu 2 karekter olmali");
-// 	process.exit(2);
-// }
-
-const defaultLink = `https://raw.githubusercontent.com/iptv-org/iptv/refs/heads/gh-pages/countries/${country}.m3u`;
-const liveTVCollectorLink = await GetLiveTVCollectorLink(country);
-
-const isCodeExist = await isCountryExist(defaultLink);
-
-if (!isCodeExist) {
-	console.error("ulke kodu tanimli degil");
-	process.exit(3);
+for (let country of args) {
+	console.log(`${country} islenmeye baslandi`);
+	country = country.toLowerCase();
+	await checkCountry(country);
+	console.log(`${country} tamamlandi!..`);
 }
 
-// __filename benzeri: Mevcut dosyanın yolunu al
-const __filename = fileURLToPath(import.meta.url);
-// __dirname benzeri: Mevcut dosyanın dizin yolunu al
-const __dirname = dirname(__filename);
+async function checkCountry(country) {
+	const defaultLink = `https://raw.githubusercontent.com/iptv-org/iptv/refs/heads/gh-pages/countries/${country}.m3u`;
+	const liveTVCollectorLink = await GetLiveTVCollectorLink(country);
 
-// console.log("Dosya yolu:", __filename);
-// console.log("Dizin yolu:", __dirname);
+	const isCodeExist = await isCountryExist(defaultLink);
 
-const target = resolve(__dirname, "..", "docs", "s", `${country}.m3u`);
-const langRawFolder = resolve(__dirname, "..", "raw-streams", country);
-const readme = resolve(langRawFolder, "README.md");
-const sort = resolve(langRawFolder, "SORT.md");
+	if (!isCodeExist) {
+		console.error("ulke kodu tanimli degil");
+		process.exit(3);
+	}
 
-const sortArr = await getNonCommentedLines(sort);
-const linkArr = await getNonCommentedLines(readme);
-const textArr = await getM3UFileContents(langRawFolder);
+	// __filename benzeri: Mevcut dosyanın yolunu al
+	const __filename = fileURLToPath(import.meta.url);
+	// __dirname benzeri: Mevcut dosyanın dizin yolunu al
+	const __dirname = dirname(__filename);
 
-if (!linkArr.includes(defaultLink)) {
-	linkArr.push(defaultLink);
+	// console.log("Dosya yolu:", __filename);
+	// console.log("Dizin yolu:", __dirname);
+
+	const target = resolve(__dirname, "..", "docs", "s", `${country}.m3u`);
+	const langRawFolder = resolve(__dirname, "..", "raw-streams", country);
+	const readme = resolve(langRawFolder, "README.md");
+	const sort = resolve(langRawFolder, "SORT.md");
+
+	const sortArr = await getNonCommentedLines(sort);
+	const linkArr = await getNonCommentedLines(readme);
+	const textArr = await getM3UFileContents(langRawFolder);
+
+	if (!linkArr.includes(defaultLink)) {
+		linkArr.push(defaultLink);
+	}
+
+	if (!linkArr.includes(liveTVCollectorLink) && liveTVCollectorLink) {
+		linkArr.push(defaultLink);
+	}
+
+	const fullList = await merger(...linkArr, ...textArr);
+	const cleanList = await fullList.check(10000, true);
+
+	//sort işlemi
+	if (sortArr.length > 0) {
+		cleanList.links.sort((a, b) => {
+			let aval = 0;
+			let bval = 0;
+
+			for (const str of sortArr) {
+				if (a.title.includes(str)) aval = 100;
+				if (b.title.includes(str)) bval = 100;
+			}
+
+			return bval - aval;
+		});
+	}
+
+	const cleanText = cleanList.toText();
+	await writeTarget(target, cleanText);
 }
-
-if (!linkArr.includes(liveTVCollectorLink) && liveTVCollectorLink) {
-	linkArr.push(defaultLink);
-}
-
-const fullList = await merger(...linkArr, ...textArr);
-const cleanList = await fullList.check(10000, true);
-
-//sort işlemi
-if (sortArr.length > 0) {
-	cleanList.links.sort((a, b) => {
-		let aval = 0;
-		let bval = 0;
-
-		for (const str of sortArr) {
-			if (a.title.includes(str)) aval = 100;
-			if (b.title.includes(str)) bval = 100;
-		}
-
-		return bval - aval;
-	});
-}
-
-const cleanText = cleanList.toText();
-await writeTarget(target, cleanText);
 
 async function getM3UFileContents(directoryPath) {
 	try {
