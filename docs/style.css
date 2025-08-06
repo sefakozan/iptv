@@ -503,6 +503,7 @@ h2.mb-0 {
 		0 2px 4px -1px rgba(0, 0, 0, 0.06);
 	transition: all 0.2s ease;
 	overflow: hidden;
+	min-width: 180px;
 }
 
 .keyboard-controls:hover {
@@ -556,6 +557,22 @@ h2.mb-0 {
 	border: 2px solid #e5e7eb !important;
 	border-radius: 12px !important;
 	padding: 8px !important;
+	height: 100% !important;
+	min-height: 300px !important;
+	max-height: calc(100vh - 400px) !important;
+	flex: 1 !important;
+	overflow-y: auto !important;
+}
+
+/* Channel list container için flex ayarları */
+.mb-3.flex-grow-1 {
+	display: flex !important;
+	flex-direction: column !important;
+}
+
+/* Keyboard controls column minimum width */
+.col-md-3 {
+	min-width: 200px;
 }
 
 /* Settings Panel Styling */
