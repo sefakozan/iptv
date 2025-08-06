@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>IPTV Player Icon Generator</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 2rem; 
+            background: #f0f0f0;
+        }
+        .icon-preview { 
+            background: white; 
+            padding: 2rem; 
+            border-radius: 12px; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1); 
+            margin: 1rem;
+        }
+        canvas { 
+            border: 1px solid #ddd; 
+            margin: 0.5rem; 
+        }
+        button {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 0.5rem;
+            font-weight: 600;
+        }
+        button:hover {
+            background: #3730a3;
+        }
+    </style>
+</head>
+<body>
+    <h1>IPTV Player Icon Generator</h1>
+    <div class="icon-preview">
+        <svg width="512" height="512" id="iconSvg" xmlns="http://www.w3.org/2000/svg">
+            <!-- Background gradient -->
+            <defs>
+                <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#4f46e5;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1" />
+                </linearGradient>
+                <linearGradient id="tvGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+                    <stop offset="100%" style="stop-color:#f1f5f9;stop-opacity:1" />
+                </linearGradient>
+            </defs>
+            
+            <!-- Background circle -->
+            <circle cx="256" cy="256" r="240" fill="url(#bgGradient)" />
+            
+            <!-- TV Screen -->
+            <rect x="140" y="140" width="232" height="174" rx="16" fill="url(#tvGradient)" stroke="#334155" stroke-width="4"/>
+            
+            <!-- Screen content -->
+            <rect x="160" y="160" width="192" height="134" rx="8" fill="#1e293b"/>
+            
+            <!-- Play button -->
+            <polygon points="230,227 290,256 230,285" fill="#10b981"/>
+            
+            <!-- Signal waves -->
+            <path d="M 190 200 Q 200 190, 210 200" stroke="#10b981" stroke-width="3" fill="none"/>
+            <path d="M 185 205 Q 200 185, 215 205" stroke="#10b981" stroke-width="3" fill="none"/>
+            <path d="M 180 210 Q 200 180, 220 210" stroke="#10b981" stroke-width="3" fill="none"/>
+            
+            <!-- TV stand -->
+            <rect x="230" y="320" width="52" height="20" rx="4" fill="#64748b"/>
+            <rect x="200" y="340" width="112" height="16" rx="8" fill="#64748b"/>
+            
+            <!-- Antenna -->
+            <line x1="256" y1="140" x2="240" y2="100" stroke="#ffd700" stroke-width="4"/>
+            <line x1="256" y1="140" x2="272" y2="100" stroke="#ffd700" stroke-width="4"/>
+            <circle cx="240" cy="100" r="6" fill="#ffd700"/>
+            <circle cx="272" cy="100" r="6" fill="#ffd700"/>
+        </svg>
+    </div>
+    
+    <div>
+        <button onclick="generateIcons()">Generate All Icon Sizes</button>
+        <button onclick="downloadSVG()">Download SVG</button>
+    </div>
+    
+    <div id="canvasContainer"></div>
+
+    <script>
+        function generateIcons() {
+            const sizes = [16, 32, 72, 96, 128, 144, 152, 180, 192, 384, 512];
+            const container = document.getElementById('canvasContainer');
+            container.innerHTML = '';
+            
+            sizes.forEach(size => {
+                const canvas = document.createElement('canvas');
+                canvas.width = size;
+                canvas.height = size;
+                canvas.title = `${size}x${size}`;
+                
+                const ctx = canvas.getContext('2d');
+                const svg = document.getElementById('iconSvg');
+                const svgData = new XMLSerializer().serializeToString(svg);
+                const img = new Image();
+                
+                img.onload = function() {
+                    ctx.drawImage(img, 0, 0, size, size);
+                    
+                    // Create download link
+                    const link = document.createElement('a');
+                    link.download = `icon-${size}x${size}.png`;
+                    link.href = canvas.toDataURL();
+                    link.textContent = `Download ${size}x${size}`;
+                    link.style.display = 'block';
+                    link.style.margin = '0.25rem';
+                    link.style.color = '#4f46e5';
+                    link.style.textDecoration = 'none';
+                    
+                    const div = document.createElement('div');
+                    div.style.display = 'inline-block';
+                    div.style.margin = '0.5rem';
+                    div.style.textAlign = 'center';
+                    div.appendChild(canvas);
+                    div.appendChild(link);
+                    container.appendChild(div);
+                };
+                
+                img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+            });
+        }
+        
+        function downloadSVG() {
+            const svg = document.getElementById('iconSvg');
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const blob = new Blob([svgData], {type: 'image/svg+xml'});
+            const url = URL.createObjectURL(blob);
+            
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'iptv-icon.svg';
+            link.click();
+            
+            URL.revokeObjectURL(url);
+        }
+
+        // Auto-generate on load
+        window.addEventListener('load', () => {
+            setTimeout(generateIcons, 1000);
+        });
+    </script>
+</body>
+</html>
