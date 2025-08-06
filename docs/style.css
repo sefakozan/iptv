@@ -447,3 +447,22 @@ h2.mb-0 {
 	font-size: 0.75rem !important;
 	border: 1px solid rgba(79, 70, 229, 0.2) !important;
 }
+
+/* Channel List with Logos */
+#channelList option {
+	padding: 8px 12px 8px 40px !important;
+	background-repeat: no-repeat !important;
+	background-position: 8px center !important;
+	background-size: 24px 24px !important;
+	border-radius: 6px !important;
+	margin: 2px 0 !important;
+	min-height: 32px !important;
+	line-height: 1.4 !important;
+}
+
+#channelList {
+	background: #ffffff !important;
+	border: 2px solid #e5e7eb !important;
+	border-radius: 12px !important;
+	padding: 8px !important;
+}

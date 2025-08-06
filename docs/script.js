@@ -224,7 +224,18 @@ async function loadChannels() {
 		channelList.empty();
 
 		channelsData.forEach((channel, index) => {
-			channelList.append(new Option(channel.name, index));
+			const option = new Option(channel.name, index);
+			if (channel.logo) {
+				// Set logo as background image for the option
+				$(option).css({
+					"background-image": `url(${channel.logo})`,
+					"background-repeat": "no-repeat",
+					"background-position": "8px center",
+					"background-size": "24px 24px",
+					"padding-left": "40px",
+				});
+			}
+			channelList.append(option);
 		});
 
 		// Enable channel list and search
@@ -259,7 +270,18 @@ async function loadChannels() {
 		let found = false;
 		channelsData.forEach((channel, index) => {
 			if (channel.name.toLowerCase().includes(q)) {
-				channelList.append(new Option(channel.name, index));
+				const option = new Option(channel.name, index);
+				if (channel.logo) {
+					// Set logo as background image for the option
+					$(option).css({
+						"background-image": `url(${channel.logo})`,
+						"background-repeat": "no-repeat",
+						"background-position": "8px center",
+						"background-size": "24px 24px",
+						"padding-left": "40px",
+					});
+				}
+				channelList.append(option);
 				found = true;
 			}
 		});
