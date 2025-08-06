@@ -1,0 +1,912 @@
+#EXTM3U
+#EXTINF:-1 user-agent="WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer" group-title="Undefined",2х2
+#EXTVLCOPT:http-user-agent=WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer
+https://zabava-htlive.cdn.ngenix.net/hls/CH_2X2/variant.m3u8
+#EXTINF:-1 group-title="Undefined",4Afghanistan
+https://4afghls.persiana.live/hls/stream.m3u8
+#EXTINF:-1 group-title="Undefined",4K Travel TV
+https://streams2.sofast.tv/sofastplayout/33c31ac4-51fa-46ae-afd0-0d1fe5e60a80_0_HLS/master.m3u8
+#EXTINF:-1 group-title="Undefined",4Music
+https://4muhls.persiana.live/hls/stream.m3u8
+#EXTINF:-1 group-title="Undefined",5-Minute Craft (1080p)
+https://soul-5mincrafteng-rakuten.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",100% Docs
+https://amg02162-newenconnect-amg02162c2-rakuten-us-1981.playouts.now.amagi.tv/playlist/amg02162-newenconnect-100pour100docs-rakutenus/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",ABN Freedom of Speech
+https://mediaserver.abnvideos.com/streams/freedom_of_speech.m3u8
+#EXTINF:-1 group-title="Undefined",ABN I AM
+https://mediaserver.abnvideos.com/streams/i_am_.m3u8
+#EXTINF:-1 group-title="Undefined",ABN Son of God
+https://mediaserver.abnvideos.com/streams/son_of_god_.m3u8
+#EXTINF:-1 group-title="Undefined",Action Hollywood Movies
+https://amg01076-lightningintern-actionhollywood-samsungnz-82rry.amagi.tv/ts-eu-w1-n2/playlist/amg01076-lightningintern-actionhollywood-samsungnz/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Adventure Earth (720p)
+https://autentic-adventure-earth-1-eu.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Afra Film
+https://afrafhls.wns.live/hls/stream.m3u8
+#EXTINF:-1 group-title="Undefined",Afra Series
+https://afrashls.wns.live/hls/stream.m3u8
+#EXTINF:-1 group-title="Undefined",Alfred Hitchcock Presents
+https://xumo-xumoent-ch825-ku23q.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",Alien Nation
+https://linear-888.frequency.stream/dist/xumo/888/hls/master/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Alqanat9 TV (1080p)
+https://cdn.bestream.io:19360/alqanat9/alqanat9.m3u8
+#EXTINF:-1 group-title="Undefined",Amasia (720p)
+https://splendid-film-amasia-1-eu.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",American Crimes
+https://xumo-xumoent-vc-113-at8kn.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",American Ninja Warrior
+https://xumo-drct-ch812-n4996.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",Anger Management en Espanol (1080p)
+https://livetv-fa.tubi.video/anger-management-espanol2/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Arax TV
+https://araxhls.wns.live/hls/stream.m3u8
+#EXTINF:-1 group-title="Undefined",Arko TV
+https://arkhls.wns.live/hls/stream.m3u8
+#EXTINF:-1 group-title="Undefined",Arvan
+https://arvhls.wns.live/hls/stream.m3u8
+#EXTINF:-1 group-title="Undefined",Atrina TV
+https://atrihls.wns.live/hls/stream.m3u8
+#EXTINF:-1 group-title="Undefined",Auto TV (720p)
+https://cdn3.skygo.mn/live/disk1/AutoTV/HLS-FTA/AutoTV.m3u8
+#EXTINF:-1 group-title="Undefined",Azstar TV
+https://live.livestreamtv.ca/azstar/amlst:azstar/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Bad Girls Club
+https://xumo-xumoent-vc-118-jed5p.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",Banijay Mr Bean Animé
+https://amg00627-amg00627c31-rakuten-fr-3991.playouts.now.amagi.tv/ts-eu-w1-n2/playlist/amg00627-banijayfast-mrbeanfrcc-rakutenfr/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Banijay Mr Bean Classic
+https://amg00627-amg00627c40-rakuten-uk-5725.playouts.now.amagi.tv/ts-eu-w1-n2/playlist/amg00627-banijayfast-mrbeanpopupcc-rakutenuk/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",BBC Drama Italy (1080p)
+https://amg00793-amg00793c41-rakuten-it-5445.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",BBC Impossible
+https://bbc-impossible-1-us.xumo.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",BBC Silent Witness New Tricks (720p)
+https://aegis-cloudfront-1.tubi.video/3723e418-8627-4a29-96fd-bcfebfccb004/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",BBC Top Gear
+https://amg00793-amg00793c5-xumo-us-2664.playouts.now.amagi.tv/bbcstudios-bbctopgear8min-all/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",BBC Top Gear Finland (1080p)
+https://amg00793-amg00793c49-rakuten-fi-5848.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",BBC Top Gear France (1080p)
+https://amg00793-amg00793c45-rakuten-fr-5539.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",BBC Top Gear Germany (1080p)
+https://amg00793-amg00793c44-rakuten-de-5538.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",BBC Top Gear Italy (1080p)
+https://amg00793-amg00793c43-rakuten-it-5537.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Beyblade
+https://amg01796-amg01796c6-rakuten-fr-5334.playouts.now.amagi.tv/ts-eu-w1-n2/playlist/amg01796-fastmediafast-beybladefr-rakutenfr/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Beyblade en Español (1080p)
+https://amg01796-amg01796c8-rakuten-es-5333.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 user-agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36" group-title="Undefined",BFM 2 (1080p)
+#EXTVLCOPT:http-user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36
+https://tmp2-cdn-edge-live08.pfd.sfr.net/bfm-ncdn-live-pal1.pfd.sfr.net/sid=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtaXQxLWNkbi1zcjAwIiwiaWF0IjoxNzU0NDgyODg5LCJqdGkiOiIwMzNuczlpMmExaGFlanNkNTA5MCIsInN1YiI6IkJGTTIiLCJpcCI6IjI0LjEzMy42NS4yNiIsImV4cCI6MTc1NDUyNjA4OX0.da6pZD3_vtxVxPSP6mXj0tAYWijUtkSFKxPReN__qFc/shls/LIVE$BFM2/index.m3u8?start=LIVE&end=END
+#EXTINF:-1 user-agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36" group-title="Undefined",BFM Grands Reportages (1080p)
+#EXTVLCOPT:http-user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36
+https://tra1-cdn-edge-live03.pfd.sfr.net/bfm-ncdn-live-pal1.pfd.sfr.net/sid=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJtaXQxLWNkbi1zcjAwIiwiaXAiOiIyNC4xMzMuNjUuMjYiLCJzdWIiOiJCRk1fR1JBTkRTUkVQT1JUQUdFUyIsImp0aSI6IjAzM25zOXJwbnNqb2EwOGwyMnJnIiwiaWF0IjoxNzU0NDgyODkwLCJleHAiOjE3NTQ1MjYwOTB9.9PaQwp0r2C7Ssv1iVjEXNMpQ0MjUOtf5kTZJmzPuAA0/shls/LIVE$BFM_GRANDSREPORTAGES/index.m3u8?start=LIVE&end=END
+#EXTINF:-1 group-title="Undefined",Big 12 Studios
+https://amg01258-raycom-amg01258c7-xumo-us-5514.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Bleav Football
+https://linear-493.frequency.stream/dist/glewedtv/493/hls/master/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Bloomberg TV+
+https://bloomberg-bloombergtv-3-nl.samsung.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Bloomberg TV+
+https://bloomberg-bloombergtv-3-se.samsung.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Bloomberg TV+ UHD (2160p)
+https://bloomberg-bloombergtv-1-it.samsung.wurl.tv/manifest/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Bloomberg TV+ UHD (2160p)
+https://bloomberg-bloombergtv-1-gb.samsung.wurl.tv/manifest/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Bloomberg TV+ UHD (2160p)
+https://bloomberg-bloombergtv-1-gb.samsung.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Bravo Vault
+https://xumo-xumoent-vc-114-x0p7i.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",Bref Cinéma 100% Court Métrage
+https://lagenceducourtmetrage-brefcinema-01-eu.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Brividy Cinema (720p)
+https://ixmediasrl-serially-1-it.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Cafe Film
+https://cafefhls.wns.live/hls/stream.m3u8
+#EXTINF:-1 tvg-id="Canal17TVNosara.cr@HD" group-title="Undefined",Canal 17 TV Nosara (720p)
+https://latamvdo.com:3870/hybrid/play.m3u8
+#EXTINF:-1 group-title="Undefined",CBS News Texas (720p)
+https://cbsn-dal.cbsnstream.cbsnews.com/out/v1/ffa98bbf7d2b4c038c229bd4d9122708/master.m3u8
+#EXTINF:-1 group-title="Undefined",CG Grandi Film (720p)
+https://cgentertainment-cgtv-1-it.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Channel One
+https://ch1hls.wns.live/hls/stream.m3u8
+#EXTINF:-1 group-title="Undefined",Cinevault Classics (540p)
+https://gsn-cinevault-classics-1-us.roku.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",CineView
+https://amg01076-lightningintern-rialto-samsungnz-03h40.amagi.tv/ts-eu-w1-n2/playlist/amg01076-lightningintern-rialto-samsungnz/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",CNBC MGL (720p)
+https://cdn3.skygo.mn/live/disk1/CNBC/HLS-FTA/CNBC.m3u8
+#EXTINF:-1 group-title="Undefined",Come Dine With Me (1080p)
+https://amg00654-itv-amg00654c2-rakuten-uk-1281.playouts.now.amagi.tv/playlist/amg00654-itvstudiosfast-comedinewithmeukglobal-rakutenuk/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Comedy Tadka
+https://streams2.sofast.tv/WiseM3U8_27/sofast/cleanhls/master.m3u8
+#EXTINF:-1 group-title="Undefined",Cops en Español (720p)
+https://rightsboosterltd-cops-1-es.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Cosmic Frontiers (1080p)
+https://amg00376-magellan-amg00376c14-rakuten-uk-1694.playouts.now.amagi.tv/playlist/amg00376-magellantv-spacesciencenowcauk-rakutenuk/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Court TV Legendary Trials
+https://scripps-ctvlegendary-1-us.xumo.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Craftsy (1080p)
+https://linear-492.frequency.stream/dist/stirr/492/hls/master/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",CraftsyTV
+https://linear-492.frequency.stream/dist/xumo/492/hls/master/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Crafty Panda (720p)
+https://bpd-cp-stirr.otteravision.com/bpd/cp/cp.m3u8
+#EXTINF:-1 group-title="Undefined",Crime & Justice [Geo-blocked]
+https://linear-474.frequency.stream/dist/glewedtv/474/hls/master/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Crímenes Reales (1080p)
+https://amg01796-amg01796c13-rakuten-gb-6739.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",CTB Perth News (720p)
+https://news.ctbperth.net.au/hls/stream.m3u8
+#EXTINF:-1 group-title="Undefined",Curiosity Now (1080p)
+https://amg00170-curiositystream-amg00170c3-rakuten-us-2289.playouts.now.amagi.tv/playlist/amg00170-curiositystreamllcfast-curiositynowrow-rakutenus/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Datis TV
+https://dathls.wns.live/hls/stream.m3u8
+#EXTINF:-1 group-title="Undefined",Dazn Ringside (1080p)
+https://aegis-cloudfront-1.tubi.video/adc77f33-ab7b-4553-b886-a31d73b5be93/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Deal Masters (1080p)
+https://amg00841-amg00841c8-rakuten-uk-2819.playouts.now.amagi.tv/playlist/amg00841-aeemeafast-dealmastersrakuten-rakutenuk/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Def Jam (720p)
+https://aegis-cloudfront-1.tubi.video/b2fc97e6-b98f-42b4-be35-bd0361f1f637/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",DEFA TV (720p)
+https://wdrmediagroup-defatv-1-eu.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",DesiPlay TV (1080p)
+https://amg00857-amg00857c1-rakuten-us-4656.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Directo das Reuniões da Assembleia de Macau (720p)
+https://live3.tdm.com.mo/tv/ch22.live/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Diya TV (720p)
+https://a-cdn.klowdtv.com/live2/diyatv_720p/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Drive TV (1080p)
+https://amg01796-amg01796c2-rakuten-uk-3887.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",DryBar Comedy
+https://drybar-drybarcomedy-1-ca.samsung.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Drybar Comedy
+https://drybar-drybarcomedy-1-nz.samsung.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",E! Keeping Up
+https://xumo-xumoent-vc-117-a3ga4.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",Ebony TV (1080p)
+https://aegis-cloudfront-1.tubi.video/22574bab-8a1f-44f4-b62f-ae2963c6a875/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Eggheads (1080p)
+https://amg00654-itv-amg00654c28-rakuten-uk-5302.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Elsharq TV (1080p) [Not 24/7]
+https://mn-nl.mncdn.com/elsharq_live/live/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",EnerGeek Fan
+https://backend.energeek.cl/webtv/egfanweb/index.m3u8?token=ZZDemoIPTVGH
+#EXTINF:-1 group-title="Undefined",Escape to The Country (1080p)
+https://amg00145-amg00145c11-rakuten-uk-5450.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Eslah TV
+https://eslahtvhls.wns.live/hls/stream.m3u8
+#EXTINF:-1 group-title="Undefined",Everyday Refresh
+https://qvc-amd-live.akamaized.net/hls/live/2034113/lsqvc6us/master.m3u8
+#EXTINF:-1 group-title="Undefined",Family Feud Classic
+https://amg00145-amg00145c3-xumo-us-3802.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Fanduel TV Extra (720p)
+https://aegis-cloudfront-1.tubi.video/fdd93041-1042-41bf-9200-8f9efe38ace5/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",FilmGold Germany (1080p)
+https://mainstreamfilmgold-rakuten.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Filmzie (720p)
+https://filmzie-filmzie-1-eu.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Fluss Monster (1080p)
+https://rivermonstergermany-rakuten.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Fork & Flight
+https://amg00346-vizioono-forkandfligt-xumo-us.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Fox Sports 1
+https://fl3.moveonjoy.com/FOX_Sports_1/index.m3u8
+#EXTINF:-1 group-title="Undefined",France 24 FAST English
+https://amg00106-amg00106c1-rakuten-uk-4654.playouts.now.amagi.tv/ts-eu-w1-n2/playlist/amg00106-france24fast-france24-rakutenuk/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",FrankenPlus (1080p)
+https://stream01.welocal.stream/stream/fhd-frankenplus_119/ngrp:stream_all/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Gardening with Monty Don
+https://all3media-gardening-with-monty-don-us.xumo.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",GenB TV (1080p)
+https://bad-badiv-stirr.otteravision.com/bad/badiv/badiv.m3u8
+#EXTINF:-1 group-title="Undefined",Generation Sitcoms (1080p)
+https://production-fastbpk.content.okast.tv/channels/eec463a6-4364-473b-8d89-555acc5b8fb2/e36e4304-73ff-4f9f-8d38-e748576a1f51/media_.m3u8?bpkio_sessionid=10f0e44b133-129c4d7f-99a3-418b-b13a-b258222d5395&bpkio_serviceid=fa2e8c4385712f9aa35c5b79a2b4ac2d&category=all
+#EXTINF:-1 group-title="Undefined",GlobalTV (480p)
+https://streamtv.intervenhosting.net:3179/live/globaltvlive.m3u8
+#EXTINF:-1 group-title="Undefined",Gold Star
+https://moviethls.wns.live/hls/stream.m3u8
+#EXTINF:-1 group-title="Undefined",Golden Boy
+https://goldenboy.duckhunting.playout.vju.tv/DuckhuntingTV_GoldenBoy/main.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH3 真情部落格 短版 (720p)
+https://live.streamingfast.net/osmflivech3.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH5 共享觀點 短版 (720p) [Not 24/7]
+https://live.streamingfast.net/osmflivech5.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH6 親近神 詩歌音樂 (720p) [Not 24/7]
+https://live.streamingfast.net/osmflivech6.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH7 禱告大軍 信息 (720p)
+https://live.streamingfast.net/osmflivech7.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH9 愛+好醫生 短版 (720p)
+https://live.streamingfast.net/osmflivech9.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH12 維他命施 (720p)
+https://live.streamingfast.net/osmflivech12.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH14 真情部落格 (720p) [Not 24/7]
+https://live.streamingfast.net/osmflivech14.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH15 真情之夜 (720p)
+https://live.streamingfast.net/osmflivech15.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH16 葉光明 (720p) [Not 24/7]
+https://live.streamingfast.net/osmflivech16.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH17 大衛鮑森 (720p) [Not 24/7]
+https://live.streamingfast.net/osmflivech17.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH18 國際講員 (720p) [Not 24/7]
+https://live.streamingfast.net/osmflivech18.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH20 恩典時分 (720p) [Not 24/7]
+https://live.streamingfast.net/osmflivech20.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH21 華語講員 (720p) [Not 24/7]
+https://live.streamingfast.net/osmflivech21.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH24 劉三講古 (720p) [Not 24/7]
+https://live.streamingfast.net/osmflivech24.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH27 空中聖經學院 (720p) [Not 24/7]
+https://live.streamingfast.net/osmflivech27.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH28 現代詩歌 (720p) [Not 24/7]
+https://live.streamingfast.net/osmflivech28.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH29 經典音樂河 (720p) [Not 24/7]
+https://live.streamingfast.net/osmflivech29.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH30 天堂敬拜 (720p) [Not 24/7]
+https://live.streamingfast.net/osmflivech30.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH32 特會系列：禱告與轉化 (720p) [Not 24/7]
+https://live.streamingfast.net/osmflivech32.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH38 特會系列：青年特會 (720p) [Not 24/7]
+https://live.streamingfast.net/osmflivech38.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH40 家庭8點檔轉轉發現愛 (720p) [Not 24/7]
+https://live.streamingfast.net/osmflivech40.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH45 卡通 (720p) [Not 24/7]
+https://live.streamingfast.net/osmflivech45.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH47 牧者頻道 (720p) [Not 24/7]
+https://live.streamingfast.net/osmflivech47.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH49 禱告頻道 (720p) [Not 24/7]
+https://live.streamingfast.net/osmflivech49.m3u8
+#EXTINF:-1 group-title="Undefined",GOOD TV CH50 國際講員 中文發音 (720p) [Not 24/7]
+https://live.streamingfast.net/osmflivech50.m3u8
+#EXTINF:-1 group-title="Undefined",Graham Norton (1080p)
+https://amg00654-itv-amg00654c35-rakuten-gb-7598.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Graham Norton Germany (1080p)
+https://amg00654-itv-amg00654c37-rakuten-de-7600.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Great British Menu (720p)
+https://all3media-great-british-menu-1-gb.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",GREAT! real (1080p)
+https://amg01753-amg01753c5-rakuten-uk-5500.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Grjngo Italy (720p)
+https://amogonetworx-grjngo-6-it.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Grjngo Spain (720p)
+https://amogo-networx-grjngopelculasdeloeste-1-es.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Haiti News Channel (720p) [Not 24/7]
+https://haititivi.com/website/haitinews/index.m3u8
+#EXTINF:-1 group-title="Undefined",Hardcore Pawn (1080p)
+https://amg00627-amg00627c8-rakuten-uk-4801.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Haunt TV Canada (1080p)
+https://aegis-cloudfront-1.tubi.video/62f59fa9-7923-47ae-8c71-5446cf927f7e/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Hell's Kitchen Germany (1080p)
+https://hellskitchengermany-rakuten.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Hell's Kitchen Italy (1080p)
+https://amg00654-itv-amg00654c20-rakuten-it-3615.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Highway Thru Hell (1080p)
+https://amg00627-amg00627c15-rakuten-uk-4803.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",History Hunters (1080p)
+https://amg00841-amg00841c7-rakuten-uk-2820.playouts.now.amagi.tv/playlist/amg00841-aeemeafast-historyhuntersrakuten-rakutenuk/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Hmong Star TV (720p) [Not 24/7]
+https://livefta.malimarcdn.com/ftaedge00/hmongstartv.sdp/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Home Plus
+https://homeplushls.wns.live/hls/stream.m3u8
+#EXTINF:-1 group-title="Undefined",Homeful
+https://amg00090-blueantllc-homefull-xumo-rn9cd.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Homeful (1080p)
+https://amg00090-amg00090c4-rakuten-uk-2806.playouts.now.amagi.tv/playlist/amg00090-blueantfast-homefulworldwide-rakutenuk/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Homeful (1080p)
+https://aegis-cloudfront-1.tubi.video/36785f5f-4e63-4cca-a16a-c8b309af0287/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Homicide la chaîne du fait divers
+https://rakutenaa-fastmedia-homicide-rakuten-pw6g3.amagi.tv/ts-eu-w1-n2/playlist/rakutenAA-fastmedia-homicide-rakuten/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Hotel Inspector (1080p)
+https://amg00654-itv-amg00654c4-rakuten-uk-5263.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",I24 News Hebrew (720p)
+https://bcovlive-a.akamaihd.net/d89ede8094c741b7924120b27764153c/eu-central-1/5377161796001/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",icnet 3
+https://ic3hls.wns.live/hls/stream.m3u8
+#EXTINF:-1 group-title="Undefined",Ideas en 5 minutos (1080p)
+https://soul-5mincraftspa-rakuten.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Iman TV (480p)
+https://live.relentlessinnovations.net:1936/imantv/imantv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",INA 70s
+https://fast-rakuten.okast.tv/channels/34d82f76-b51f-4bf5-9b35-769fb5904e79/96f96405-90e7-489a-a1e6-8ede5d2b4933/media_.m3u8?bpkio_sessionid=10e0e47e131-23c731aa-ce57-4bfb-bc6b-8cd837b20be7&bpkio_serviceid=fa2e8c4385712f9af3e719ec904b3543&category=all
+#EXTINF:-1 group-title="Undefined",INA Ardivision
+https://fast-rakuten.okast.tv/channels/34d82f76-b51f-4bf5-9b35-769fb5904e79/a4226699-b685-4f5d-9cb6-2a6cac14c377/media_.m3u8?bpkio_sessionid=10b0e2e230-25267c76-0823-40d5-8aed-05700438d393&bpkio_serviceid=fa2e8c4385712f9a3b579747e448699c&category=all
+#EXTINF:-1 group-title="Undefined",Inazuma Eleven Go Italy (720p)
+https://minerva-pictures-inazumaelevengo-1-it.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",InfoWars The Alex Jones Show (1080p)
+https://freespeech.akamaized.net/hls/live/2024573/live2/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",InfoWars The American Journal (1080p)
+https://freespeech.akamaized.net/hls/live/2016873/live3/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",InfoWars War Room With Owen Shroyer (1080p)
+https://freespeech.akamaized.net/hls/live/2024574/live4/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",InTravel (1080p)
+https://amg00861-amg00861c10-rakuten-uk-3152.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Investigation
+https://amg00346-vizioono-investigation-xumo-us.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",ION Mystery (1080p)
+https://aegis-cloudfront-1.tubi.video/b11b44b8-461f-4034-becb-9bb14ee45be2/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",ION Mystery (1080p)
+https://livetv-fa.tubi.video/ion-mystery/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",ITV Deportes
+https://stream.ads.ottera.tv/playlist.m3u8?network_id=3010
+#EXTINF:-1 group-title="Undefined",ITV Un Village Français
+https://amg00654-itv-amg00654c32-rakuten-fr-6134.playouts.now.amagi.tv/ts-eu-w1-n2/playlist/amg00654-itvstudiosfast-unvillagesfrancais-rakutenfr/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Iunior TV (720p) [Not 24/7]
+https://5f22d76e220e1.streamlock.net/iuniortv/iuniortv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Jail (720p)
+https://langleyproductions-jail-1-eu.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",JCN TV (1080p)
+https://jcnonair-1108.acs.wecandeo.com/ms/3162/1108/index.m3u8
+#EXTINF:-1 group-title="Undefined",Jewelry Television Espanol (720p)
+https://82934cf9c8696bd2.mediapackage.us-east-1.amazonaws.com/out/v1/72b5a55e4c35445f9e742871aa0aefa2/index.m3u8
+#EXTINF:-1 group-title="Undefined",Joel Osteen Network
+https://linear-860.frequency.stream/dist/xumo/860/hls/master/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Kajou TV (480p) [Not 24/7]
+https://video1.getstreamhosting.com:1936/8055/8055/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",KANAL 58 (720p) [Not 24/7]
+https://live.artidijitalmedya.com/artidijital_kanal58/kanal58/playlist.m3u8
+#EXTINF:-1 tvg-id="KulinarHD.ru" group-title="Undefined",Kulinar TV Show
+https://api.alpaca.t62a.com/hls/9110/index.m3u8
+#EXTINF:-1 group-title="Undefined",L'Effet Papillon
+https://amg02162-newenconnect-amg02162c1-rakuten-us-1983.playouts.now.amagi.tv/playlist/amg02162-newenconnect-leffetpapillon-rakutenus/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",La Sentinelle TV (576p)
+https://tnt-television.com/LA_SENTINELLE/index.m3u8
+#EXTINF:-1 group-title="Undefined",Laff More
+https://scripps-laffmore-1-us.xumo.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Lassie
+https://xumo-xumoent-ch833-p47sj.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",Latvijas Radio 3 Klasika (240p)
+https://5a44e5b800a41.streamlock.net/liveVLR3/mp4:Klasika/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Le Meilleur d'Arthur
+https://amg02393-awpg-amg02393c2-rakuten-uk-2464.playouts.now.amagi.tv/playlist/amg02393-awpg-lemeilleurdarthur-rakutenuk/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Le Meilleur de la TV Realite (1080p)
+https://amg02393-awpg-amg02393c4-rakuten-uk-3886.playouts.now.amagi.tv/ts-eu-w1-n2/playlist/amg02393-awpg-lemeilleurdelatvrealite-rakutenuk/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Leave It to Beaver
+https://xumo-xumoent-ch826-z0h0h.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",Legend Films (720p)
+https://a-cdn.klowdtv.com/live3/legendfilms_720p/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Legislative Assembly of Ontario (without interpretation)
+https://temp2.isilive.ca/live/_definst_/ontla/house-en-cc/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Legislative Assembly of Ontario Committees (room 1)
+https://temp2.isilive.ca/live/_definst_/ontla/committee_1-en/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Legislative Assembly of Ontario Committees (room 2)
+https://lin13.isilive.ca/live/_definst_/ontla/committee_2-en/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Legislative Assembly of Ontario Committees (room 151)
+https://temp3.isilive.ca/live/_definst_/ontla/rm151-en/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Les Anges
+https://amg02393-awpg-amg02393c5-rakuten-uk-2463.playouts.now.amagi.tv/playlist/amg02393-awpg-lesanges-rakutenuk/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Les Secrets de Nos Régions
+https://amg02393-awpg-amg02393c6-rakuten-uk-2460.playouts.now.amagi.tv/playlist/amg02393-awpg-lessecretsdenosregions-rakutenuk/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Les Z'Amours
+https://amg02393-awpg-amg02393c3-rakuten-uk-2462.playouts.now.amagi.tv/playlist/amg02393-awpg-leszamours-rakutenuk/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Life Minute (720p)
+https://amg01468-lifeminutetv-lifeminute-klowdtv-r4hhz.amagi.tv/playlist/amg01468-lifeminutetv-lifeminute-klowdtv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Lighting Lives Blessing Nations TV Romanian (LLBN) (480p)
+https://brightstar-romanian-pull-secure.akamaized.net/brightstarromanian/stream.m3u8
+#EXTINF:-1 group-title="Undefined",Little House on the Prairie
+https://xumo-xumoent-vc-121-ghge7.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",LOL! Network (720p)
+https://lol-lolnetwork-2-gb.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",LooLoo Kids TV (1080p)
+https://amg02757-amg02757c3-rakuten-de-6135.playouts.now.amagi.tv/ts-eu-w1-n2/playlist/amg02757-loolookids-llkdefast-rakutende/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Love Pets (1080p)
+https://rakutenaa-blueskyent-lovepetsemea-rakuten-ikc4q.amagi.tv/ts-eu-w1-n2/playlist/rakutenAA-blueskyent-lovepetsemea-rakuten/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Loveworld TV (1080p) [Not 24/7]
+https://cdn3.wowza.com/5/L1Uzd2FrbVlLRG1W/live/smil:lwukweb.smil/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",LoveWorld USA (720p)
+https://cdn3.wowza.com/5/RGtVZkFxL3FOQkxX/LWU/ngrp:lwu.stream_all/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",MeatEater
+https://amg01201-amg01201c35-cineverse-us-3139.playouts.now.amagi.tv/playlist/amg01201-cinedigmentertainment-meateater-cineverseus/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Mech+ (720p)
+https://mechtvltd-mechplus-1-gb.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Milennio TV (720p)
+https://videostream.shockmedia.com.ar:19360/milenniotv/milenniotv.m3u8
+#EXTINF:-1 group-title="Undefined",Million Dollar Listing Vault
+https://xumo-xumoent-ch838-coy7x.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",Mission Asia (1080p)
+https://livecdn.live247stream.com/missionasia/tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",MNB Гэр бүл (1080p) [Not 24/7]
+https://cdn3.skygo.mn/live/disk1/MNB_Family/HLS-FTA/MNB_Family.m3u8
+#EXTINF:-1 group-title="Undefined",MO Channel
+https://cloudvideo.servers10.com:8081/8070/index.m3u8
+#EXTINF:-1 group-title="Undefined",Mojitv
+https://odmedia-mojitv-1-nl.samsung.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Motus La Chaîne
+https://rakutenaa-fastmedia-motuslachaine-rakuten-547u3.amagi.tv/playlist/rakutenAA-fastmedia-motuslachaine-rakuten/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Mr. Bean Anime (1080p)
+https://amg00627-amg00627c28-rakuten-uk-3984.playouts.now.amagi.tv/ts-eu-w1-n2/playlist/amg00627-banijayfast-mrbeanukcc-rakutenuk/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Mr. Bean Anime Italy (1080p)
+https://amg00627-amg00627c29-rakuten-it-3989.playouts.now.amagi.tv/ts-eu-w1-n2/playlist/amg00627-banijayfast-mrbeanitcc-rakutenit/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Mr. Bean Anime Spain (1080p)
+https://amg00627-amg00627c30-rakuten-es-3990.playouts.now.amagi.tv/ts-eu-w1-n2/playlist/amg00627-banijayfast-mrbeanescc-rakutenes/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Murder She Wrote
+https://xumo-xumoent-vc-119-t7wx7.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",MyTime Movie Network (1080p)
+https://appletree-mytimeuk-rakuten.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",MyTime Movie Network France (1080p)
+https://mytimemoviefrance-rakuten.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",MyTime Movie Network Germany (1080p)
+https://appletree-mytimemoviegerman-rakuten.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",MyZen Wellbeing TV (1080p)
+https://rakutenaa-myzen-en-rakuten-5sex7.amagi.tv/ts-eu-w1-n2/playlist/rakutenAA-myzen-en-rakuten/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",MyZen Wellbeing TV (French)
+https://rakutenaa-myzen-fr-rakuten-mc9xe.amagi.tv/ts-eu-w1-n2/playlist/rakutenAA-myzen-fr-rakuten/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Naruto Germany (1080p)
+https://palatinmedia-naruto-rakuten.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",NAT TV (1080p)
+https://livefta.malimarcdn.com/ftaedge00/nat.sdp/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Nature Time France (1080p)
+https://bamusa-naturetime-emea-fra-rakuten.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",NatureTime Finland (1080p)
+https://bamusa-naturetime-emea-eng-rakuten.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",NBC Boston News
+https://nbcu-nbcbostonnews-firetv.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",NBC Chicago News
+https://nbcu-nbcchicagonews-firetv.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",NBC Comedy Vault
+https://xumo-xumoent-vc-105-z0vpm.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",NBC Connecticut News
+https://nbcu-nbcconnecticutnews-firetv.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",NBC Dallas Fortworth News
+https://nbcu-nbcdallasfortworthnews-firetv.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",NBC Los Angeles News
+https://nbcu-nbclosangelesnews-firetv.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",NBC New York News
+https://nbcu-nbcnewyorknews-firetv.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",NBC Philadelphia News
+https://nbcu-nbcphiladelphianews-firetv.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",NBC San Diego News
+https://nbcu-nbcsandiegonews-firetv.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",NBC San Francisco News
+https://nbcu-nbcsanfrancisconews-firetv.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",NBC South Florida News
+https://nbcu-nbcsouthfloridanews-firetv.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",NBC Sports
+https://xumo-xumoent-vc-122-sjv70.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",NBC Washington News
+https://nbcu-nbcwashingtonnews-firetv.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",NBCU Telemundo Florida
+https://nbcu-telemundoflorida-firetv.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",NBCU Telemundo North East
+https://nbcu-telemundonortheast-firetv.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",NBCU Telemundo Texas
+https://nbcu-telemundotexas-firetv.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",NBCU Telemundo West
+https://nbcu-telemundowest-firetv.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",NETALKOLE TV (720p) [Not 24/7]
+https://watch.haitilive.net/naktvhd/index.m3u8
+#EXTINF:-1 group-title="Undefined",Netlink TV (720p)
+https://netlink.netlinkbroadcaster.com/hls/test.m3u8
+#EXTINF:-1 group-title="Undefined",Newflix
+https://newfhls.wns.live/hls/stream.m3u8
+#EXTINF:-1 tvg-id="NewsNation.us@East" tvg-logo="https://zap2it.tmsimg.com/h3/NowShowing/91097/s91097_ll_h15_ae.png?w=512" group-title="News",News Nation (720p)
+https://fl3.moveonjoy.com/NEWS_NATION/index.m3u8
+#EXTINF:-1 group-title="Undefined",NewsWorld
+https://amg01076-lightning-amg01076c5-rakuten-us-1788.playouts.now.amagi.tv/playlist/amg01076-lightning-newsworld-rakutenus/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Ninja Warrior (1080p)
+https://amg00654-itv-amg00654c27-rakuten-uk-5295.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Nolan Nanton Productions (720p) [Not 24/7]
+https://cdn.mycloudstream.io/hls/live/broadcast/wbxpvv7l/index.m3u8
+#EXTINF:-1 group-title="Undefined",Nosey Confess
+https://nosey-confessbynosey-1-us.xumo.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",NTD TV UK (New Tang Dynasty Television)
+https://ntd02.akamaized.net/NTD-UK/index.m3u8
+#EXTINF:-1 group-title="Undefined",Outersphere (1080p)
+https://livetv-fa.tubi.video/outersphere2/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Oxygen Music (1080p)
+https://oxygenmusic.hu:2443/hls/oxygenmusic.m3u8
+#EXTINF:-1 group-title="Undefined",Passion Bollywood
+https://fast-rakuten.okast.tv/channels/2888294c-5918-42f6-a2bd-91d49b26634c/03bc9e11-13bd-4a07-ba09-0586d910741d/PassionBollywood_FR.m3u8?bpkio_sessionid=10b0c4f64-677ade29-abc1-4715-92af-233e58e5f903&bpkio_serviceid=fa2e8c4385712f9a9a653242c406e725&category=all
+#EXTINF:-1 group-title="Undefined",PeekFlick
+https://streams2.sofast.tv/WiseM3U8_26/sofast/cleanhls/master.m3u8
+#EXTINF:-1 group-title="Undefined",Persiana Medical
+https://phd2hls.persiana.live/hls/stream.m3u8
+#EXTINF:-1 group-title="Undefined",Persiana One Plus
+https://poneplushls.persiana.live/hls/stream.m3u8
+#EXTINF:-1 group-title="Undefined",Persiana Teen
+https://kphls.persiana.live/hls/stream.m3u8
+#EXTINF:-1 group-title="Undefined",Persiana Travel
+https://ptravelhls.persiana.live/hls/stream.m3u8
+#EXTINF:-1 group-title="Undefined",Pointless (1080p)
+https://amg00627-amg00627c34-rakuten-uk-4005.playouts.now.amagi.tv/master.m3u8
+#EXTINF:-1 group-title="Undefined",Popcorn (720p)
+https://cdn3.skygo.mn/live/disk1/Popcorn/HLS-FTA/Popcorn.m3u8
+#EXTINF:-1 group-title="Undefined",Popflix (720p)
+https://signatureentertainment-popflix-1-gb.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Project Runway (1080p)
+https://amg02189-amg02189c1-rakuten-us-5453.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Property & Reno [Geo-blocked]
+https://linear-476.frequency.stream/dist/glewedtv/476/hls/master/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Property & Reno [Geo-blocked]
+https://linear-476.frequency.stream/dist/xumo/476/hls/master/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Pulse TV
+https://amg01076-lightningintern-pulse-samsungnz-ibqdy.amagi.tv/ts-eu-w1-n2/playlist/amg01076-lightningintern-pulse-samsungnz/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Qui Veut Gagner Des Millions La Chaîne
+https://amg02393-awpg-amg02393c1-rakuten-uk-2461.playouts.now.amagi.tv/playlist/amg02393-awpg-quiveutgagnerdesmillions-rakutenuk/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",QVC The Big Dish Channel (1080p)
+https://amg01717-qvc-amg01717c1-stirr-us-2651.playouts.now.amagi.tv/qvc-bigdishdelayed-switcher-localnow/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",QVC West
+https://qvc-amd-live.akamaized.net/hls/live/2034113/lsqvc1uswest/master.m3u8
+#EXTINF:-1 group-title="Undefined",Radio Brianza TV
+https://57068da1deb21.streamlock.net/radiorbs/radiorbs/playlist.m3u8
+#EXTINF:-1 tvg-id="RadioItaliaTrendTV.it@HD" tvg-logo="https://i.imgur.com/HNrKqGM.png" group-title="Music",Radio Italia Trend (720p)
+https://amg00745-radioitailaspa-radioitalia-rakuten-sucsc.amagi.tv/hls/amagi_hls_data_rakutenAA-radioitalia-rakuten/CDN/master.m3u8
+#EXTINF:-1 group-title="Undefined",Rakuten TV Viki Europe (720p)
+https://newidco-rakutenviki-2-eu.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",RCG TV (Timeshifted -2 Hours) (432p)
+https://video1.getstreamhosting.com:1936/8246/8246/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Real Crime Beta (1080p)
+https://lds-realcrimebeta-rakuten.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Real Disaster Channel [Geo-blocked]
+https://linear-475.frequency.stream/dist/glewedtv/475/hls/master/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Real Disaster Channel [Geo-blocked]
+https://linear-475.frequency.stream/dist/xumo/475/hls/master/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Real Housewives Vault
+https://xumo-xumoent-vc-123-8gq0q.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",Reelz Famous & Infamous
+https://linear-190.frequency.stream/dist/xumo/190/hls/master/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Rig TV
+https://buzzr-rigtv-xumo.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Risate Dal Sud (720p)
+https://ixmedia-srl-risatealsud-1-it.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Royalworld Germany (720p)
+https://amogonetworx-royalworld-2-de.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 tvg-id="RTL1025Caliente.it" group-title="Undefined",RTL 102.5 Caliente (1080p)
+https://streamcdnb3-dd782ed59e2a4e86aabf6fc508674b59.msvdn.net/live/S8448465/zTYa1Z5Op9ue/playlist_video.m3u8
+#EXTINF:-1 tvg-id="RTL1025Disco.it" group-title="Undefined",RTL 102.5 Disco (1080p)
+https://streamcdnb4-dd782ed59e2a4e86aabf6fc508674b59.msvdn.net/live/S51100361/0Fb4R3k82b5Z/playlist_video.m3u8
+#EXTINF:-1 tvg-id="RTL1025Traffic.it" group-title="Undefined",RTL 102.5 Traffic (1080p)
+https://streamcdnb4-dd782ed59e2a4e86aabf6fc508674b59.msvdn.net/live/S38122967/2lyQRIAAGgRR/playlist_video.m3u8
+#EXTINF:-1 user-agent="WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer" group-title="Undefined",Russian Extreme UHD
+#EXTVLCOPT:http-user-agent=WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer
+https://zabava-htlive.cdn.ngenix.net/hls/CH_RUSSIANEXTREMEULTRA/variant.m3u8
+#EXTINF:-1 group-title="Undefined",Samuel Goldwyn Films (1080p)
+https://samuelgoldwyn-films-1-us.roku.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Saved by the Bell
+https://xumo-xumoent-vc-111-0pd1g.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",Scares by Shudder
+https://amc-scaresbyshudder-1-us.xumo.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Serially Crime (720p)
+https://ixmediasrl-seriallycrime-1-it.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Shaun the Sheep & Friends
+https://aar-shaun-xumo.otteravision.com/aar/shaun/shaun.m3u8
+#EXTINF:-1 group-title="Undefined",SNL Vault
+https://xumo-xumoent-vc-103-d3uqt.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",Soap Latino (720p)
+https://fast-channels-network-soaplatino-1-it.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Soap Turco (720p)
+https://fast-channels-network-soapturco-1-it.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Sound View Community Media Government (480p)
+https://livestream.telvue.com/soundviewcmt3/f7b44cfafd5c52223d5498196c8a2e7b.sdp/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Spark TV Luz & Amor (1080p)
+https://candlelightmedia-sparklightlove-6-us.roku.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Speed Sport 1 (1080p)
+https://linear-599.frequency.stream/dist/stirr/599/hls/master/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Sportoutdoor.tv
+https://gto2000-sportoutdoortv-1-it.samsung.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Starke Frauen (1080p)
+https://mainstreamstarkefrauen-rakuten.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Stormcast Novelas
+https://stormcast-novelas-2-es.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Stormcast Novelas TV
+https://stormcast-telenovelatv-1-fr.samsung.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Stormcast Westerns (720p)
+https://stormcast-cinema-llc-westernmaniafast-1-eu.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 tvg-id="TBD.us" group-title="Undefined",TBD (1080p)
+https://fast-channels.sinclairstoryline.com/TBD/index.m3u8
+#EXTINF:-1 group-title="Undefined",Team USA (1080p)
+https://amg01416-amg01416c4-firetv-us-4522.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Telemundo Accion
+https://xumo-drct-ch835-ekq0p.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",Telemundo Noticias Ahora
+https://xumo-xumoent-ch827-uj0ch.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",Telemundo Noticias California
+https://amg00884-nbcuniversal-nbctelemundowest-xumo-xc0n5.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Telemundo Noticias Florida
+https://amg00884-nbcuniversal-nbctelemundoflorida-xumo-atn0m.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Telemundo Noticias Noreste
+https://amg00884-nbcuniversal-nbctelemundonortheast-xumo-ok3ha.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Telemundo Noticias Texas
+https://amg00884-nbcuniversal-nbctelemundotexas-xumo-eeb56.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Telemundo Romance
+https://xumo-drct-ch836-57aiq.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",TeleRegione 118 (576p)
+https://streaming.softwarecreation.it/TR118/TR118/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Telerumba TV (720p)
+https://inliveserver.com:1936/18506/18506/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Televisa Telenovela Channel
+https://televisa-telenovelas-3-eu.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Televisa Telenovelas
+https://televisa-televisa-1-it.samsung.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Tennis Channel Germany (720p)
+https://tennischanneldeu-rakuten.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Tennis+ (1080p)
+https://amg01935-amg01935c1-amgplt0165.playout.now3.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Test My Ride
+https://streams2.sofast.tv/sofastplayout/WiseM3U8_21/master.m3u8
+#EXTINF:-1 group-title="Undefined",Teton Gravity Research (1080p)
+https://d1ur2fy7sesb3x.cloudfront.net/hls/main.m3u8
+#EXTINF:-1 group-title="Undefined",The Chat Show Channel (1080p)
+https://amg00426-lds-amg00426c11-rakuten-uk-3888.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",The Cycling Channel
+https://cyclingtv.playout.vju.tv/cyclingtv/main.m3u8
+#EXTINF:-1 group-title="Undefined",The Jack Hanna Channel (1080p)
+https://aegis-cloudfront-1.tubi.video/fee88745-76df-428f-ad7e-1766f91e2098/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",The Jack Hannah Channel
+https://littonjackhannah-samsungca.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",The Lone Ranger
+https://xumo-xumoent-ch829-wojlf.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",TOP Barça Spain (1080p)
+https://amg17560-fcb-amg17560c2-rakuten-es-4889.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Top Chef Vault
+https://xumo-xumoent-vc-116-hrcw0.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",Top Sci-Fi (1080p)
+https://amg00609-amg00609c5-rakuten-uk-3764.playouts.now.amagi.tv/master.m3u8
+#EXTINF:-1 group-title="Undefined",Top Serien (1080p)
+https://rakutenaa-cractiontv-rakuten-ktuot.amagi.tv/ts-eu-w1-n2/playlist/rakutenAA-cractiontv-rakuten/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Total Crime (1080p)
+https://aegis-cloudfront-1.tubi.video/0c770ac6-72a3-4618-aed4-4518a19df0d5/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Travelxp France (720p)
+https://travelxp-travelxp-4-fr.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Travelxp Germany (720p)
+https://travelxp-travelxp-2-de.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Travelxp Spain (720p)
+https://travelxp-travelxp-5-eu.rakuten.wurl.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",TRT EBA Ortaokul (720p)
+https://tv-e-okul01.medya.trt.com.tr/master.m3u8
+#EXTINF:-1 group-title="Undefined",True Crime Now (1080p)
+https://amg00376-magellan-amg00376c9-rakuten-uk-1941.playouts.now.amagi.tv/playlist/amg00376-magellantv-truecrimenowcauk-rakutenuk/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",True History Channel
+https://linear-188.frequency.stream/dist/xumo/188/hls/master/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",True Lives (1080p)
+https://amg00654-itv-amg00654c7-rakuten-uk-1282.playouts.now.amagi.tv/playlist/amg00654-itvstudiosfast-truelives-rakutenuk/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",TV7 (720p)
+https://cdn3.skygo.mn/live/disk1/TV7/HLS-FTA/TV7.m3u8
+#EXTINF:-1 group-title="Undefined",TV Blossom (1080p)
+https://amg00437-amg00437c3-firetv-us-5409.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 tvg-id="TVBRICSSpanish.es" group-title="Undefined",TV BRICS Spanish (1080p)
+https://espbrics.mediacdn.ru/cdn/brics/spanish/playlist.m3u8
+#EXTINF:-1 tvg-id="FamypancTV.es@HD" tvg-logo="https://serenotv.com/cargas/2024/08/Sin-titulo-1-150x85.jpg" group-title="General;News",Tv Famypanc HD (1080p)
+https://panel.host-live.com:19360/8042/8042.m3u8
+#EXTINF:-1 group-title="Undefined",TV One Crime & Justice
+https://linear-593.frequency.stream/dist/xumo/593/hls/master/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",TVCARiB Radio (720p) [Not 24/7]
+https://cdn.mycloudstream.io/hls/live/broadcast/agf7yo9x/index.m3u8
+#EXTINF:-1 tvg-id="TVRI.id@DKIJakarta" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/TVRILogo2019.svg/512px-TVRILogo2019.svg.png" group-title="General",TVRI DKI Jakarta (720p) [Not 24/7]
+https://ott-balancer.tvri.go.id/live/eds/DKI/hls/DKI.m3u8
+#EXTINF:-1 tvg-id="TVRI.id@Nasional" tvg-logo="https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/TVRILogo2019.svg/512px-TVRILogo2019.svg.png" group-title="General",TVRI Nasional (720p)
+https://ott-balancer.tvri.go.id/live/eds/Nasional/hls/Nasional.m3u8
+#EXTINF:-1 group-title="Undefined",UFC
+https://linear-893.frequency.stream/dist/xumo/893/hls/master/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",UFC (1080p)
+https://aegis-cloudfront-1.tubi.video/a78ea283-8666-44a1-a0f6-fde5d229ac21/playlist.m3u8
+#EXTINF:-1 user-agent="WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer" group-title="Undefined",Ultra HD Cinema
+#EXTVLCOPT:http-user-agent=WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer
+https://zabava-htlive.cdn.ngenix.net/hls/CH_ULTRAHDCINEMA/variant.m3u8
+#EXTINF:-1 tvg-id="UN24.ve@untv720" tvg-logo="https://yt3.googleusercontent.com/z_UkT5nJZOIk2Gi0et3qf5VTJfoR2oRZGhzBqMf7VmUmXxxYR9DEXLIZ2G7s4Ob0YITLpkunSw=s900-c-k-c0x00ffffff-no-rj" group-title="News",UN24 (720p)
+#EXTVLCOPT:http-referrer=https://un24.tv/
+https://59d39900ebfb8.streamlock.net/untv-720/untv-720/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Universal Action
+https://xumo-xumoent-ch828-w6val.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",Universal Monsters
+https://xumo-xumoent-ch824-d4q5c.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",Universal Westerns
+https://xumo-xumoent-ch834-iwtka.fast.nbcuni.com/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",UniversCiné Le Meilleur du Cinéma (1080p)
+https://rakutenaa-universcine-rakuten-unbsv.amagi.tv/ts-eu-w1-n2/playlist/rakutenAA-universcine-rakuten/playlist.m3u8
+#EXTINF:-1 tvg-id="UniversidadMayordeSanAndres.bo" group-title="Undefined",UniversidadMayordeSanAndres (1080p) [Not 24/7]
+#EXTVLCOPT:http-referrer=https://tvu.umsa.bo/en-vivo
+https://live.enhdtv.com:8081/8190/index.m3u8
+#EXTINF:-1 group-title="Undefined",Vevo '90s & '00s Italy (1080p)
+https://amg00056-amg00056c12-rakuten-it-3240.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Vevo Hip-Hop & R&B (1080p)
+https://amg00056-amg00056c26-rakuten-uk-3236.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Vevo Hip-Hop et RnB
+https://amg00056-amg00056c14-rakuten-fr-3244.playouts.now.amagi.tv/ts-eu-w1-n2/playlist/amg00056-vevotvfast-vevohiphopandrbfr-rakutenfr/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Vevo Pop (1080p)
+https://amg00056-amg00056c6-rakuten-uk-3235.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Vevo Pop Germany (1080p)
+https://amg00056-amg00056c7-rakuten-de-3245.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Vevo Pop Italy (1080p)
+https://amg00056-amg00056c8-rakuten-it-3239.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Vevo Pop Spain (1080p)
+https://amg00056-amg00056c10-rakuten-es-3242.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Vevo Schlager Pop (1080p)
+https://amg00056-amg00056c15-rakuten-it-3241.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Wasabi la chaîne anime
+https://amg01796-amg01796c3-rakuten-uk-2555.playouts.now.amagi.tv/playlist/amg01796-fastmediafast-wasabii-rakutenuk/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Waterbear
+https://amg01415-waterbearnetwor-waterbear-samsungnl-dkx60.amagi.tv/ts-eu-w1-n2/playlist/amg01415-waterbearnetwor-waterbear-samsungnl/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Waterbear
+https://amg01415-waterbearnetwor-waterbear-samsungse-qhe4s.amagi.tv/ts-eu-w1-n2/playlist/amg01415-waterbearnetwor-waterbear-samsungse/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Waterbear (1080p)
+https://waterbear-waterbear-rakuten.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",WFMZ Dorney Park Camera
+https://cdn.jaybirdtv.com/wfmz/5/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",WFMZ PennST camera
+https://cdn.jaybirdtv.com/wfmz/6/live/master.m3u8
+#EXTINF:-1 group-title="Undefined",WFMZ Traffic
+https://cdn.jaybirdtv.com/wfmz/channel/7/master.m3u8
+#EXTINF:-1 group-title="Undefined",Wicked Tuna
+https://amg00353-lionsgatestudio-wickedtunanl-samsungnl-l67j0.amagi.tv/ts-eu-w1-n2/playlist/amg00353-lionsgatestudio-wickedtunanl-samsungnl/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Wicked Tuna (1080p)
+https://amg00353-amg00353c25-rakuten-us-4896.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Wicked Tuna Germany (1080p)
+https://amg00353-amg00353c28-rakuten-us-4895.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Wild West TV
+https://linear-799.frequency.stream/dist/xumo/799/hls/master/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",World of Love Island (1080p)
+https://worldofloveisland-rakuten.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",World War TV (1080p)
+https://aenetworks-worldwartv-rakuten.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Xtrema Kids TV
+https://627bb251f23c7.streamlock.net:444/ExtremaKids/ExtremaKids/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Y'a Que La Vérité Qui Compte La Chaîne
+https://rakutenaa-fastmedia-yaquelaverite-rakuten-81p2x.amagi.tv/ts-eu-w1-n2/playlist/rakutenAA-fastmedia-yaquelaverite-rakuten/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Yu-Gi-Oh! (1080p)
+https://amg01796-amg01796c19-rakuten-gb-7486.playouts.now.amagi.tv/ts-eu-w1-n2/playlist/amg01796-fastmediafast-yugioh2en-rakutengb/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Yu-Gi-Oh! Italy
+https://amg01796-amg01796c17-rakuten-it-7492.playouts.now.amagi.tv/ts-eu-w1-n2/playlist/amg01796-fastmediafast-yugioh3it-rakutenit/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Zylo Cine Friki (1080p)
+https://zylo-cinefriki-rakuten.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Zylo Ciné Nanar
+https://zylo-cinenanar-rakuten.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Zylo Ciné Western
+https://amg00711-zylo-amg00711c8-rakuten-uk-2686.playouts.now.amagi.tv/playlist/amg00711-zylofast-cinewestern-rakutenuk/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Zylo Emotion' L
+https://rakutenaa-zylo-emotional-rakuten-r1zkm.amagi.tv/ts-eu-w1-n2/playlist/rakutenAA-zylo-emotional-rakuten/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Zylo Fréquence Novelas
+https://d20oth1416y9a1.cloudfront.net/playlist/amg00711-zylofast-frequencenovelas-rakutenus/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Zylo Into Crime (1080p)
+https://amg00711-zylo-amg00711c10-rakuten-fr-6731.playouts.now.amagi.tv/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Zylo ScreamIN
+https://rakutenaa-zylo-screamin-rakuten-p11ej.amagi.tv/ts-eu-w1-n2/playlist/rakutenAA-zylo-screamin-rakuten/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",За!ТВ
+https://streaming.televizor-24-tochka.ru/live/25.m3u8
+#EXTINF:-1 user-agent="WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer" group-title="Undefined",Звезда
+#EXTVLCOPT:http-user-agent=WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer
+https://zabava-htlive.cdn.ngenix.net/hls/CH_ZVEZDA/variant.m3u8
+#EXTINF:-1 user-agent="WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer" group-title="Undefined",Кубань 24
+#EXTVLCOPT:http-user-agent=WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer
+https://zabava-block-htvod.cdn.ngenix.net/rtk_block.m3u8
+#EXTINF:-1 user-agent="WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer" group-title="Undefined",Мир
+#EXTVLCOPT:http-user-agent=WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer
+https://zabava-htlive.cdn.ngenix.net/hls/CH_MIR/variant.m3u8
+#EXTINF:-1 user-agent="WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer" group-title="Undefined",Мир +7
+#EXTVLCOPT:http-user-agent=WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer
+https://zabava-htlive.cdn.ngenix.net/hls/CH_MIR_7/variant.m3u8
+#EXTINF:-1 user-agent="WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer" group-title="Undefined",Муз ТВ
+#EXTVLCOPT:http-user-agent=WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer
+https://zabava-htlive.cdn.ngenix.net/hls/CH_MUZTV/variant.m3u8
+#EXTINF:-1 user-agent="WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer" group-title="Undefined",Муз ТВ +7
+#EXTVLCOPT:http-user-agent=WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer
+https://zabava-htlive.cdn.ngenix.net/hls/CH_MUZTV_7/variant.m3u8
+#EXTINF:-1 group-title="Undefined",НТВ Мир
+https://streaming.thestream.cyou/live/213.m3u8
+#EXTINF:-1 user-agent="WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer" group-title="Undefined",ОТР
+#EXTVLCOPT:http-user-agent=WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer
+https://zabava-htlive.cdn.ngenix.net/hls/CH_OTR/variant.m3u8
+#EXTINF:-1 user-agent="WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer" group-title="Undefined",Первый канал
+#EXTVLCOPT:http-user-agent=WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer
+https://zabava-htlive.cdn.ngenix.net/hls/CH_1TVSD/variant.m3u8
+#EXTINF:-1 group-title="Undefined",Первый канал Европа
+https://streaming.thestream.cyou/live/210.m3u8
+#EXTINF:-1 user-agent="WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer" group-title="Undefined",Россия 1
+#EXTVLCOPT:http-user-agent=WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer
+https://zabava-htlive.cdn.ngenix.net/hls/CH_RUSSIA1/variant.m3u8
+#EXTINF:-1 tvg-id="SmaylikTV.ru@SD" group-title="Undefined",Смайлик TV
+https://5f05e059699ae.streamlock.net/WEB_Smilik/ngrp:Smilik.stream-adaptive/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",Смотрим
+https://live-vgtrksmotrim.cdnvideo.ru/vgtrksmotrim/smotrim-live-01.smil/playlist.m3u8
+#EXTINF:-1 user-agent="WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer" group-title="Undefined",Спас
+#EXTVLCOPT:http-user-agent=WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer
+https://zabava-htlive.cdn.ngenix.net/hls/CH_SPAS/variant.m3u8
+#EXTINF:-1 user-agent="WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer" group-title="Undefined",Спас +7
+#EXTVLCOPT:http-user-agent=WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer
+https://zabava-htlive.cdn.ngenix.net/hls/CH_SPAS_7/variant.m3u8
+#EXTINF:-1 group-title="Undefined",Таврия
+https://streaming.televizor-24-tochka.ru/live/24.m3u8
+#EXTINF:-1 user-agent="WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer" group-title="Undefined",ТВ Центр
+#EXTVLCOPT:http-user-agent=WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer
+https://zabava-htlive.cdn.ngenix.net/hls/CH_TVC/variant.m3u8
+#EXTINF:-1 user-agent="WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer" group-title="Undefined",ТВ Центр +7
+#EXTVLCOPT:http-user-agent=WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer
+https://zabava-htlive.cdn.ngenix.net/hls/CH_TVC_7/variant.m3u8
+#EXTINF:-1 group-title="Undefined",Телеканал Краснодар
+https://live-tvkrasnodar.cdnvideo.ru/tvkrasnodar/tvkrasnodar.sdp/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",ТНР
+https://streaming.televizor-24-tochka.ru/live/26.m3u8
+#EXTINF:-1 user-agent="WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer" group-title="Undefined",ТНТ4
+#EXTVLCOPT:http-user-agent=WINK/1.40.1 (AndroidTV/9) HlsWinkPlayer
+https://zabava-htlive.cdn.ngenix.net/hls/CH_TNT4/variant.m3u8
+#EXTINF:-1 group-title="Undefined",ТРК Юнион
+https://streaming.televizor-24-tochka.ru/live/27.m3u8
+#EXTINF:-1 group-title="Undefined",Хөгжим (720p)
+https://cdn3.skygo.mn/live/disk1/Khugjim/HLS-FTA/Khugjim.m3u8
+#EXTINF:-1 group-title="Undefined",上虞1新闻综合 (720p) [Not 24/7]
+https://l.cztvcloud.com/channels/lantian/SXshangyu1/720p.m3u8
+#EXTINF:-1 group-title="Undefined",上虞3新商都 (720p) [Not 24/7]
+https://l.cztvcloud.com/channels/lantian/SXshangyu3/720p.m3u8
+#EXTINF:-1 group-title="Undefined",上虞經濟文化 (720p) [Not 24/7]
+https://l.cztvcloud.com/channels/lantian/SXshangyu2/720p.m3u8
+#EXTINF:-1 group-title="Undefined",之江纪录
+https://ali-m-l.cztv.com/channels/lantian/channel012/1080p.m3u8
+#EXTINF:-1 group-title="Undefined",余姚姚江文化 (576p)
+https://l.cztvcloud.com/channels/lantian/SXyuyao3/720p.m3u8
+#EXTINF:-1 group-title="Undefined",余姚新闻综合 (576p)
+https://l.cztvcloud.com/channels/lantian/SXyuyao1/720p.m3u8
+#EXTINF:-1 group-title="Undefined",农安新闻综合 [Geo-blocked]
+https://stream2.jlntv.cn/naxw/sd/live.m3u8
+#EXTINF:-1 group-title="Undefined",前郭综合 [Geo-blocked]
+https://stream2.jlntv.cn/qg/sd/live.m3u8
+#EXTINF:-1 group-title="Undefined",半岛新闻 (1080p)
+https://live-hls-web-aje.getaj.net/AJE/01.m3u8
+#EXTINF:-1 group-title="Undefined",吉林市新闻综合 [Geo-blocked]
+https://stream2.jlntv.cn/jilin1/sd/live.m3u8
+#EXTINF:-1 group-title="Undefined",四平新闻综合 [Geo-blocked]
+https://stream2.jlntv.cn/sptv/sd/live.m3u8
+#EXTINF:-1 group-title="Undefined",嵊州综合 (720p) [Not 24/7]
+https://l.cztvcloud.com/channels/lantian/SXshengzhou1/720p.m3u8
+#EXTINF:-1 group-title="Undefined",延边新闻综合 [Geo-blocked]
+https://stream2.jlntv.cn/jlyb/sd/live.m3u8
+#EXTINF:-1 group-title="Undefined",新昌休闲影视 (1080p) [Not 24/7]
+https://l.cztvcloud.com/channels/lantian/SXxinchang2/720p.m3u8
+#EXTINF:-1 group-title="Undefined",新昌新聞綜合 (1080p) [Not 24/7]
+https://l.cztvcloud.com/channels/lantian/SXxinchang1/720p.m3u8
+#EXTINF:-1 group-title="Undefined",松原新闻综合 [Geo-blocked]
+https://stream2.jlntv.cn/sytv/sd/live.m3u8
+#EXTINF:-1 group-title="Undefined",河源综合 (540p)
+https://tmpstream.hyrtv.cn/xwzh/sd/live.m3u8
+#EXTINF:-1 group-title="Undefined",浙江国际
+https://ali-m-l.cztv.com/channels/lantian/channel010/1080p.m3u8
+#EXTINF:-1 group-title="Undefined",浙江教科
+https://ali-m-l.cztv.com/channels/lantian/channel004/1080p.m3u8
+#EXTINF:-1 group-title="Undefined",浙江新闻
+https://ali-m-l.cztv.com/channels/lantian/channel007/1080p.m3u8
+#EXTINF:-1 group-title="Undefined",浙江民生
+https://ali-m-l.cztv.com/channels/lantian/channel006/1080p.m3u8
+#EXTINF:-1 group-title="Undefined",浙江经济
+https://ali-m-l.cztv.com/channels/lantian/channel003/1080p.m3u8
+#EXTINF:-1 group-title="Undefined",浙江钱江
+https://ali-m-l.cztv.com/channels/lantian/channel002/1080p.m3u8
+#EXTINF:-1 group-title="Undefined",白山新闻综合 [Geo-blocked]
+https://stream2.jlntv.cn/baishan1/sd/live.m3u8
+#EXTINF:-1 group-title="Undefined",立法會直播 (Legislative Council Live) (720p)
+https://live3.tdm.com.mo/tv/ch21.live/playlist.m3u8
+#EXTINF:-1 group-title="Undefined",立法院IVOD直播交通委員會 (450p)
+https://lylive-videorent.cdn.hinet.net/out/u/live/gop4/ly/ly-Live6/hls-cl-tv/index.m3u8
+#EXTINF:-1 group-title="Undefined",立法院IVOD直播內政委員會 (450p)
+https://lylive-videorent.cdn.hinet.net/out/u/live/gop4/ly/ly-Live7/hls-cl-tv/index.m3u8
+#EXTINF:-1 group-title="Undefined",立法院IVOD直播司法及法制委員會 (450p)
+https://lylive-videorent.cdn.hinet.net/out/u/live/gop4/ly/ly-Live9/hls-cl-tv/index.m3u8
+#EXTINF:-1 group-title="Undefined",立法院IVOD直播外交及國防委員會 (450p)
+https://lylive-videorent.cdn.hinet.net/out/u/live/gop4/ly/ly-Live8/hls-cl-tv/index.m3u8
+#EXTINF:-1 group-title="Undefined",立法院IVOD直播教育及文化委員會 (450p)
+https://lylive-videorent.cdn.hinet.net/out/u/live/gop4/ly/ly-Live4/hls-cl-tv/index.m3u8
+#EXTINF:-1 group-title="Undefined",立法院IVOD直播朝野協商 (450p)
+https://lylive-videorent.cdn.hinet.net/out/u/live/gop4/ly/ly-Live10/hls-cl-tv/index.m3u8
+#EXTINF:-1 group-title="Undefined",立法院IVOD直播社會福利及衛生環境委員會 (450p)
+https://lylive-videorent.cdn.hinet.net/out/u/live/gop4/ly/ly-Live3/hls-cl-tv/index.m3u8
+#EXTINF:-1 group-title="Undefined",立法院IVOD直播經濟委員會 (450p)
+https://lylive-videorent.cdn.hinet.net/out/u/live/gop4/ly/ly-Live5/hls-cl-tv/index.m3u8
+#EXTINF:-1 group-title="Undefined",立法院IVOD直播財政委員會 (450p)
+https://lylive-videorent.cdn.hinet.net/out/u/live/gop4/ly/ly-Live2/hls-cl-tv/index.m3u8
+#EXTINF:-1 group-title="Undefined",立法院IVOD直播院會 (450p)
+https://lylive-videorent.cdn.hinet.net/out/u/live/gop4/ly/ly-Live1/hls-cl-tv/index.m3u8
+#EXTINF:-1 group-title="Undefined",红牛REDBULL TV (720p)
+https://rbmn-live.akamaized.net/hls/live/590964/BoRB-AT/master_3360.m3u8
+#EXTINF:-1 group-title="Undefined",萧山新闻综合 (720p) [Not 24/7]
+https://l.cztvcloud.com/channels/lantian/SXxiaoshan1/720p.m3u8
+#EXTINF:-1 group-title="Undefined",蕭山生活頻道 (720p) [Not 24/7]
+https://l.cztvcloud.com/channels/lantian/SXxiaoshan2/720p.m3u8
+#EXTINF:-1 group-title="Undefined",辽源新闻综合 [Geo-blocked]
+https://stream2.jlntv.cn/liaoyuan1/sd/live.m3u8
+#EXTINF:-1 group-title="Undefined",长春综合 [Geo-blocked]
+https://stream2.jlntv.cn/jlcc/sd/live.m3u8
+#EXTINF:-1 group-title="Undefined",集安综合 [Geo-blocked]
+https://stream2.jlntv.cn/ja/sd/live.m3u8
+#EXTINF:-1 group-title="Undefined",餘姚姚江文化 (576p) [Not 24/7]
+https://l.cztvcloud.com/channels/lantian/SXyuyao2/720p.m3u8

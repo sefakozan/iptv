@@ -1,6 +1,6 @@
 [
 	{ "name": "Afghanistan", "code": "AF", "languages": ["prs", "pus", "tuk"], "flag": "🇦🇫" },
-	{ "name": "Aland", "code": "AX", "languages": ["swe"], "flag": "🇦🇽" },
+	{ "name": "Aland", "code": "AX", "languages": ["swe"], "flag": "🇦🇽", "disabled": true },
 	{ "name": "Albania", "code": "AL", "languages": ["sqi"], "flag": "🇦🇱" },
 	{ "name": "Algeria", "code": "DZ", "languages": ["ara"], "flag": "🇩🇿" },
 	{ "name": "American Samoa", "code": "AS", "languages": ["eng", "smo"], "flag": "🇦🇸" },
@@ -248,5 +248,6 @@
 	{ "name": "Western Sahara", "code": "EH", "languages": ["zgh", "mey", "spa"], "flag": "🇪🇭" },
 	{ "name": "Yemen", "code": "YE", "languages": ["ara"], "flag": "🇾🇪" },
 	{ "name": "Zambia", "code": "ZM", "languages": ["eng"], "flag": "🇿🇲" },
-	{ "name": "Zimbabwe", "code": "ZW", "languages": ["bwg", "eng", "kck", "hio", "ndc", "nde", "nya", "sna", "sot", "toi", "tsn", "tso", "ven", "xho", "zib"], "flag": "🇿🇼" }
+	{ "name": "Zimbabwe", "code": "ZW", "languages": ["bwg", "eng", "kck", "hio", "ndc", "nde", "nya", "sna", "sot", "toi", "tsn", "tso", "ven", "xho", "zib"], "flag": "🇿🇼" },
+	{ "name": "The Others", "code": "undefined", "languages": ["eng"], "flag": "🇺🇲", "alternatives": ["Mixed"] }
 ]
