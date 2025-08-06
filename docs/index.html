@@ -1,157 +1,159 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IPTV Player - Live TV Streaming</title>
-    
-    <!-- PWA Meta Tags -->
-    <meta name="description" content="Professional IPTV streaming application with 247+ countries support">
-    <meta name="theme-color" content="#4f46e5">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <meta name="apple-mobile-web-app-title" content="IPTV Player">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>IPTV Player - Live TV Streaming</title>
 
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="mobile-web-app-status-bar-style" content="default">
-    <meta name="mobile-web-app-title" content="IPTV Player">
+		<!-- PWA Meta Tags -->
+		<meta name="description" content="Professional IPTV streaming application with 247+ countries support">
+		<meta name="theme-color" content="#4f46e5">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="apple-mobile-web-app-status-bar-style" content="default">
+		<meta name="apple-mobile-web-app-title" content="IPTV Player">
 
-    <meta name="msapplication-TileColor" content="#4f46e5">
-    <meta name="msapplication-config" content="browserconfig.xml">
-    
-    <!-- PWA Manifest -->
-    <link rel="manifest" href="manifest.json">
-    
-    <!-- Favicons and App Icons -->
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="assets/icon-16x16.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/icon-180x180.png">
-    <link rel="mask-icon" href="assets/safari-pinned-tab.svg" color="#4f46e5">
-    
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Select2 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-    <!-- Font Awesome for icons -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
-    <!-- Custom CSS -->
-    <link href="style.css" rel="stylesheet">
-</head>
-<body>
-    <div class="container-fluid h-100">
-        <div class="row h-100">
-            <!-- Left Column: Country and Channel Selection -->
-            <div class="col-md-5 d-flex">
-                <div class="card flex-fill">
-                    <div class="card-header bg-primary text-white">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h2 class="mb-0">
-                                <i class="fas fa-tv me-3" style="color: #ffd700;"></i>
-                                IPTV Player
-                            </h2>
-                            <button id="headerInstallBtn" class="btn btn-outline-light btn-sm" style="border-radius: 8px; font-weight: 600;">
-                                <i class="fas fa-download me-2"></i>
-                                <span class="btn-text">Install App</span>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body d-flex flex-column">
-                        <form id="iptvForm">
-                            <div class="mb-3">
-                                <label for="countrySelect" class="form-label">
-                                    <i class="fas fa-globe me-2"></i>Select a Country
-                                </label>
-                                <div class="d-flex gap-2">
-                                    <select id="countrySelect" class="form-select flex-grow-1">
-                                        <option value="">Choose a country</option>
-                                    </select>
-                                    <button type="button" id="settingsBtn" class="btn btn-outline-secondary" title="Settings">
-                                        <i class="fas fa-cog"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                        
-                        <!-- Settings Panel (hidden by default) -->
-                        <div id="settingsPanel" class="card mb-3" style="display: none;">
-                            <div class="card-body">
-                                <h6 class="card-title">
-                                    <i class="fas fa-cog me-2"></i>Settings
-                                </h6>
-                                <div class="mb-3">
-                                    <label for="defaultCountrySelect" class="form-label">Default Country on Startup:</label>
-                                    <select id="defaultCountrySelect" class="form-select">
-                                        <option value="">No default (manual selection)</option>
-                                    </select>
-                                </div>
-                                <div class="d-flex gap-2">
-                                    <button type="button" id="saveSettingsBtn" class="btn btn-primary btn-sm">Save Settings</button>
-                                    <button type="button" id="closeSettingsBtn" class="btn btn-secondary btn-sm">Close</button>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3 flex-grow-1">
-                            <label for="channelList" class="form-label">
-                                <i class="fas fa-list me-2"></i>Select a Channel
-                            </label>
-                            <input type="text" id="channelSearch" class="form-control mb-2" placeholder="Search channel..." autocomplete="off" disabled style="background:#23272f;color:#eaeaea;border:1px solid #343a40;">
-                            <select id="channelList" class="form-select flex-grow-1" size="25" disabled>
-                                <option value="">Select a country first</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Right Column: Channel Information and Player -->
-            <div class="col-md-7 d-flex">
-                <div class="w-100 d-flex flex-column">
-                    <div class="row mb-3">
-                        <div class="col-12 col-xl-9">
-                            <div class="card">
-                                <div class="card-body">
-                                    <div id="channelInfo" class="channel-info">
-                                        <p class="mb-0">No channel selected</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-xl-3 d-none d-xl-block">
-                            <div class="card">
-                                <div class="card-body keyboard-controls d-flex flex-column justify-content-center" style="padding:1.2rem 0.8rem !important; min-height:90px;">
-                                    <h6 class="mb-3" style="font-size:0.9rem;">Keyboard Controls</h6>
-                                    <small style="font-size:0.8rem;line-height:2.2;">
-                                        <strong>Tab:</strong> Random Country<br>
-                                        <strong>← →:</strong> Change Country<br>
-                                        <strong>↑ ↓:</strong> Change Channel
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+		<meta name="mobile-web-app-capable" content="yes">
+		<meta name="mobile-web-app-status-bar-style" content="default">
+		<meta name="mobile-web-app-title" content="IPTV Player">
 
-                    <div class="card flex-grow-1">
-                        <div class="card-body d-flex flex-column h-100">
-                            <video id="videoPlayer" controls class="flex-grow-1"></video>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+		<meta name="msapplication-TileColor" content="#4f46e5">
+		<meta name="msapplication-config" content="browserconfig.xml">
 
-    <!-- Bootstrap 5 JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- jQuery (required for Select2) -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <!-- Select2 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-    <!-- HLS.js for playing HLS streams -->
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@1.1.5/dist/hls.min.js"></script>
-    <!-- IPTV Util -->
-    <script src="https://cdn.jsdelivr.net/npm/iptv-util@latest/rollup/iptv-util-min.js"></script>
-    <!-- Custom JavaScript -->
-    <script src="script.js"></script>
-</body>
+		<!-- PWA Manifest -->
+		<link rel="manifest" href="manifest.json">
+
+		<!-- Favicons and App Icons -->
+		<link rel="icon" type="image/png" sizes="32x32" href="assets/icon-32x32.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="assets/icon-16x16.png">
+		<link rel="apple-touch-icon" sizes="180x180" href="assets/icon-180x180.png">
+		<link rel="mask-icon" href="assets/safari-pinned-tab.svg" color="#4f46e5">
+
+		<!-- Bootstrap 5 CSS -->
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+		<!-- Select2 CSS -->
+		<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+		<!-- Font Awesome for icons -->
+		<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+		<!-- Custom CSS -->
+		<link href="style.css" rel="stylesheet">
+	</head>
+	<body>
+		<div class="container-fluid h-100">
+			<div class="row h-100">
+				<!-- Left Column: Country and Channel Selection -->
+				<div class="col-md-5 d-flex">
+					<div class="card flex-fill">
+						<div class="card-header bg-primary text-white">
+							<div class="d-flex justify-content-between align-items-center">
+								<h2 class="mb-0">
+									<i class="fas fa-tv me-3" style="color: #ffd700;"></i>
+									IPTV Player
+								</h2>
+								<button id="headerInstallBtn" class="btn btn-outline-light btn-sm" style="border-radius: 8px; font-weight: 600;">
+									<i class="fas fa-download me-2"></i>
+									<span class="btn-text">Install App</span>
+								</button>
+							</div>
+						</div>
+						<div class="card-body d-flex flex-column">
+							<form id="iptvForm">
+								<div class="mb-3">
+									<label for="countrySelect" class="form-label">
+										<i class="fas fa-globe me-2"></i>Select a Country
+									</label>
+									<div class="d-flex gap-2">
+										<select id="countrySelect" class="form-select flex-grow-1">
+											<option value="">Choose a country</option>
+										</select>
+										<button type="button" id="settingsBtn" class="btn btn-outline-secondary" title="Settings">
+											<i class="fas fa-cog"></i>
+										</button>
+									</div>
+								</div>
+							</form>
+
+							<!-- Settings Panel (hidden by default) -->
+							<div id="settingsPanel" class="card mb-3" style="display: none;">
+								<div class="card-body">
+									<h6 class="card-title">
+										<i class="fas fa-cog me-2"></i>Settings
+									</h6>
+									<div class="mb-3">
+										<label for="defaultCountrySelect" class="form-label">Default Country on Startup:</label>
+										<select id="defaultCountrySelect" class="form-select">
+											<option value="">No default (manual selection)</option>
+										</select>
+									</div>
+									<div class="d-flex gap-2">
+										<button type="button" id="saveSettingsBtn" class="btn btn-primary btn-sm">Save Settings</button>
+										<button type="button" id="closeSettingsBtn" class="btn btn-secondary btn-sm">Close</button>
+									</div>
+								</div>
+							</div>
+
+							<div class="mb-3 flex-grow-1">
+								<label for="channelList" class="form-label">
+									<i class="fas fa-list me-2"></i>Select a Channel
+								</label>
+								<input type="text" id="channelSearch" class="form-control mb-2" placeholder="Search channel..." autocomplete="off" disabled style="background:#23272f;color:#eaeaea;border:1px solid #343a40;">
+								<select id="channelList" class="form-select flex-grow-1" size="25" disabled>
+									<option value="">Select a country first</option>
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Right Column: Channel Information and Player -->
+				<div class="col-md-7 d-flex">
+					<div class="w-100 d-flex flex-column">
+						<div class="row mb-3">
+							<div class="col-12 col-xl-9">
+								<div class="card">
+									<div class="card-body">
+										<div id="channelInfo" class="channel-info">
+											<p class="mb-0">No channel selected</p>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-xl-3 d-none d-xl-block">
+								<div class="card">
+									<div class="card-body keyboard-controls d-flex flex-column justify-content-center" style="padding:1.2rem 0.8rem !important; min-height:90px;">
+										<h6 class="mb-3" style="font-size:0.9rem;">Keyboard Controls</h6>
+										<small style="font-size:0.8rem;line-height:2.2;">
+											<strong>Tab:</strong>Random Country
+											<br>
+											<strong>← →:</strong>Change Country
+											<br>
+											<strong>↑ ↓:</strong>Change Channel
+										</small>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="card flex-grow-1">
+							<div class="card-body d-flex flex-column h-100">
+								<video id="videoPlayer" controls class="flex-grow-1"></video>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Bootstrap 5 JS Bundle with Popper -->
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+		<!-- jQuery (required for Select2) -->
+		<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+		<!-- Select2 JS -->
+		<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+		<!-- HLS.js for playing HLS streams -->
+		<script src="https://cdn.jsdelivr.net/npm/hls.js@1.1.5/dist/hls.min.js"></script>
+		<!-- IPTV Util -->
+		<script src="https://cdn.jsdelivr.net/npm/iptv-util@latest/rollup/iptv-util-min.js"></script>
+		<!-- Custom JavaScript -->
+		<script src="script.js"></script>
+	</body>
 </html>

@@ -1,6 +1,7 @@
 {
 	"files.autoSave": "onFocusChange",
 	"editor.formatOnSave": true,
+	"editor.formatOnPaste": false,
 	"editor.codeActionsOnSave": {
 		"quickfix.biome": "always",
 		"source.organizeImports.biome": "always",
@@ -22,5 +23,9 @@
 	},
 	"[json]": {
 		"editor.defaultFormatter": "biomejs.biome"
-	}
+	},
+	"[html]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"html.format.enable": true
 }
