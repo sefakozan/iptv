@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { merger } from "iptv-util";
 
 const { default: countries } = await import("../docs/countries.json", {
-	assert: { type: "json" },
+	with: { type: "json" },
 });
 
 // İlk iki elemanı atla (node ve betik yolu)

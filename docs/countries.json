@@ -231,7 +231,7 @@
 	{ "name": "Turkmenistan", "code": "TM", "languages": ["rus", "tuk"], "flag": "🇹🇲" },
 	{ "name": "Turks and Caicos Islands", "code": "TC", "languages": ["eng"], "flag": "🇹🇨" },
 	{ "name": "Tuvalu", "code": "TV", "languages": ["eng", "tvl"], "flag": "🇹🇻" },
-	{ "name": "U.S. Minor Outlying Islands", "code": "UM", "languages": ["eng"], "flag": "🇺🇲" },
+	{ "name": "U.S. Minor Outlying Islands", "code": "UM", "languages": ["eng"], "flag": "🇺🇲", "disabled": true },
 	{ "name": "U.S. Virgin Islands", "code": "VI", "languages": ["eng"], "flag": "🇻🇮" },
 	{ "name": "Uganda", "code": "UG", "languages": ["eng", "swa"], "flag": "🇺🇬" },
 	{ "name": "Ukraine", "code": "UA", "languages": ["ukr"], "flag": "🇺🇦" },
