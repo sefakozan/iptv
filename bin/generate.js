@@ -60,7 +60,7 @@ if (!linkArr.includes(liveTVCollectorLink) && liveTVCollectorLink) {
 }
 
 const fullList = await merger(...linkArr, ...textArr);
-const cleanList = await fullList.check();
+const cleanList = await fullList.check(10000, true);
 
 //sort işlemi
 if (sortArr.length > 0) {
