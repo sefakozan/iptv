@@ -557,3 +557,30 @@ h2.mb-0 {
 	border-radius: 12px !important;
 	padding: 8px !important;
 }
+
+/* Settings Panel Styling */
+#settingsPanel {
+	border: 2px solid #e5e7eb;
+	border-radius: 12px;
+	background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+#settingsPanel .card-title {
+	color: #4f46e5;
+	font-weight: 600;
+	font-size: 0.9rem;
+	margin-bottom: 1rem;
+}
+
+#settingsBtn {
+	min-width: 45px;
+	border-radius: 8px;
+	transition: all 0.2s ease;
+}
+
+#settingsBtn:hover {
+	background-color: #f3f4f6;
+	border-color: #d1d5db;
+	transform: translateY(-1px);
+}

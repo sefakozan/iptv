@@ -57,6 +57,11 @@ $(document).ready(() => {
 	$("#countrySelect").on("change", handleCountryChange);
 	$("#channelList").on("change", handleChannelChange);
 
+	// Settings panel event handlers
+	$("#settingsBtn").on("click", showSettingsPanel);
+	$("#closeSettingsBtn").on("click", hideSettingsPanel);
+	$("#saveSettingsBtn").on("click", saveSettings);
+
 	// Global klavye event handler'ları
 	$(document).on("keydown", (e) => {
 		// Tab tuşu ile rastgele ülke seç
@@ -144,8 +149,11 @@ $(document).ready(() => {
 // Load countries from JSON file
 async function loadCountries() {
 	try {
+		console.log("Loading countries...");
 		const response = await fetch("countries.json");
 		countriesData = await response.json();
+		console.log("Countries loaded:", countriesData.length);
+
 		// Populate country select
 		const countrySelect = $("#countrySelect");
 		countriesData.forEach((country) => {
@@ -158,8 +166,16 @@ async function loadCountries() {
 			// Option elementine data-flag ekle
 			countrySelect.find(`option[value='${code}']`).attr("data-flag", flagUrl);
 		});
-		// Automatically select United States
-		$("#countrySelect").val("us").trigger("change");
+
+		// Populate settings panel default country select
+		console.log("Populating default country select...");
+		populateDefaultCountrySelect();
+
+		// Wait a bit for Select2 to be fully ready, then load default country
+		setTimeout(() => {
+			console.log("Loading default country...");
+			loadDefaultCountry();
+		}, 100);
 	} catch (error) {
 		console.error("Error loading countries:", error);
 		alert("Failed to load countries data");
@@ -169,6 +185,7 @@ async function loadCountries() {
 // Handle country selection change
 function handleCountryChange() {
 	const selectedCountry = $(this).val();
+	console.log("Country changed to:", selectedCountry);
 
 	if (selectedCountry) {
 		$("#channelList").prop("disabled", false).html('<option value="">Loading channels...</option>');
@@ -176,6 +193,7 @@ function handleCountryChange() {
 		stopStream();
 
 		// Automatically load channels for the selected country
+		console.log("Loading channels for:", selectedCountry);
 		loadChannels();
 	} else {
 		$("#channelList").prop("disabled", true).html('<option value="">Select a country first</option>');
@@ -407,4 +425,74 @@ function stopStream() {
 
 	video.pause();
 	video.src = "";
+}
+
+// Settings Panel Functions
+function showSettingsPanel() {
+	console.log("Settings panel opening...");
+	$("#settingsPanel").slideDown(300);
+}
+
+function hideSettingsPanel() {
+	$("#settingsPanel").slideUp(300);
+}
+
+function saveSettings() {
+	console.log("Save settings clicked");
+	const defaultCountry = $("#defaultCountrySelect").val();
+	console.log("Selected default country:", defaultCountry);
+
+	// Save to localStorage
+	if (defaultCountry) {
+		localStorage.setItem("iptvDefaultCountry", defaultCountry);
+		console.log("Saved to localStorage:", defaultCountry);
+		alert("Settings saved! The default country will be selected on next page load.");
+	} else {
+		localStorage.removeItem("iptvDefaultCountry");
+		console.log("Removed from localStorage");
+		alert("Settings saved! No default country will be selected.");
+	}
+
+	hideSettingsPanel();
+}
+
+function loadDefaultCountry() {
+	const defaultCountry = localStorage.getItem("iptvDefaultCountry");
+	console.log("Loading default country:", defaultCountry);
+
+	if (defaultCountry && countriesData.length > 0) {
+		// Check if the country still exists in the data
+		const countryExists = countriesData.some((country) => country.code.toLowerCase() === defaultCountry.toLowerCase());
+		console.log("Country exists:", countryExists);
+		if (countryExists) {
+			// Use Select2's proper way to set value
+			$("#countrySelect").val(defaultCountry.toLowerCase()).trigger("change");
+			console.log("Set default country:", defaultCountry.toLowerCase());
+			return;
+		}
+	}
+
+	// Fallback to US if no default is set or default country doesn't exist
+	console.log("Fallback to US");
+	$("#countrySelect").val("us").trigger("change");
+}
+
+function populateDefaultCountrySelect() {
+	console.log("populateDefaultCountrySelect called");
+	const defaultCountrySelect = $("#defaultCountrySelect");
+	const currentDefault = localStorage.getItem("iptvDefaultCountry");
+	console.log("Current default from localStorage:", currentDefault);
+
+	// Clear existing options except the first one
+	defaultCountrySelect.find("option:not(:first)").remove();
+
+	// Add country options
+	countriesData.forEach((country) => {
+		const option = new Option(country.name, country.code.toLowerCase());
+		if (currentDefault && country.code.toLowerCase() === currentDefault.toLowerCase()) {
+			option.selected = true;
+		}
+		defaultCountrySelect.append(option);
+	});
+	console.log("Default country select populated with", countriesData.length, "countries");
 }
