@@ -12,6 +12,63 @@ body {
 	font-weight: 400;
 	line-height: 1.6;
 }
+
+/* Page Header */
+.page-header {
+	background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+	border-bottom: 3px solid #4f46e5;
+	padding: 0.5rem 0;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	position: sticky;
+	top: 0;
+	z-index: 1000;
+}
+
+.page-header .header-title h1 {
+	color: #ffffff;
+	font-size: 1.6rem;
+	font-weight: 700;
+	letter-spacing: -0.025em;
+	margin: 0;
+}
+
+.page-header .header-title i {
+	color: #ffd700;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.keyboard-controls-header h6 {
+	color: rgba(255, 255, 255, 0.9);
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin-bottom: 0.3rem;
+	font-size: 0.75rem;
+}
+
+.controls-grid {
+	display: flex;
+	gap: 1rem;
+	flex-wrap: wrap;
+}
+
+.control-item {
+	color: rgba(255, 255, 255, 0.8);
+	font-size: 0.7rem;
+	font-weight: 500;
+}
+
+.control-item strong {
+	color: #ffd700;
+	font-weight: 700;
+	background: rgba(255, 215, 0, 0.15);
+	padding: 0.2rem 0.4rem;
+	border-radius: 6px;
+	font-family: "SF Mono", "Monaco", "Cascadia Code", "Roboto Mono", monospace;
+	font-size: 0.7rem;
+	margin-right: 0.5rem;
+	border: 1px solid rgba(255, 215, 0, 0.3);
+}
 .card {
 	background: rgba(255, 255, 255, 0.95);
 	border: none;
@@ -32,12 +89,15 @@ body {
 		0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 .container-fluid {
-	padding-top: 3rem;
-	padding-bottom: 3rem;
-	padding-left: 2rem;
-	padding-right: 2rem;
+	padding: 1rem;
 	max-width: 1400px;
 	margin: 0 auto;
+}
+
+/* Main content area */
+.container-fluid.h-100 {
+	height: calc(100vh - 60px);
+	padding-top: 1rem;
 }
 .card-header.bg-primary {
 	background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
@@ -54,6 +114,37 @@ body {
 	font-weight: 700;
 	margin: 0;
 	letter-spacing: -0.025em;
+}
+
+.card-header.bg-primary h3 {
+	font-size: 1.5rem;
+	font-weight: 600;
+	margin: 0;
+	letter-spacing: -0.025em;
+}
+
+/* Keyboard Controls in Header */
+.keyboard-controls-header h6 {
+	color: rgba(255, 255, 255, 0.9);
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	margin-bottom: 0.3rem;
+}
+
+.keyboard-controls-header small {
+	color: rgba(255, 255, 255, 0.8);
+	font-weight: 500;
+}
+
+.keyboard-controls-header strong {
+	color: #ffd700;
+	font-weight: 600;
+	background: rgba(255, 215, 0, 0.15);
+	padding: 0.1rem 0.3rem;
+	border-radius: 4px;
+	font-family: "SF Mono", "Monaco", "Cascadia Code", "Roboto Mono", monospace;
+	font-size: 0.65rem;
 }
 .card-header.bg-info {
 	background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
