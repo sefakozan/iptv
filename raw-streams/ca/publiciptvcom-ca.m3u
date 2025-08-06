@@ -1,0 +1,301 @@
+#EXTM3U
+#EXTINF:-1 tvg-id="GustoTV.ca" tvg-name="Gusto TV" tvg-logo="" group-title="cooking",Gusto TV
+https://e75fc053c0d2406fb74cdd71d77e1a7f.mediatailor.us-east-1.amazonaws.com/v1/master/f4e8c53a8367a5b58e20ce054ea3ce25a3e904d3/RakutenTV-eu_GustoTV/playlist.m3u8
+#EXTINF:-1 tvg-id="ParnianTV.ca" tvg-name="Parnian TV" tvg-logo="" group-title="general",Parnian TV
+https://live2.parnian.tv/hls/.m3u8
+#EXTINF:-1 tvg-id="OntarioParliamentaryNetwork.ca" tvg-name="Ontario Parliamentary Network" tvg-logo="" group-title="legislative",Ontario Parliamentary Network
+https://origin-http-delivery.isilive.ca/live/_definst_/ontla/house-fr/playlist.m3u8
+#EXTINF:-1 tvg-id="LoveNature.ca" tvg-name="Love Nature" tvg-logo="" group-title="outdoor",Love Nature
+https://aegis-cloudfront-1.tubi.video/dc8bda97-ce9e-4091-b4e8-11254dea4da6/playlist.m3u8
+#EXTINF:-1 tvg-id="IIPCTV.ca" tvg-name="IIPC TV" tvg-logo="" group-title="religious",IIPC TV
+https://uni10rtmp.tulix.tv/iipctv/iipctv.smil/playlist.m3u8
+#EXTINF:-1 tvg-id="HardKnocks.ca" tvg-name="Hard Knocks" tvg-logo="" group-title="sports",Hard Knocks
+https://d3uyzhwvmemdyf.cloudfront.net/v1/master/9d062541f2ff39b5c0f48b743c6411d25f62fc25/Hard-Knocks-DistroTV/109.m3u8
+#EXTINF:-1 tvg-id="AzStarTV.ca" tvg-name="Az Star TV" tvg-logo="" group-title="general",Az Star TV
+http://live.azstartv.com/azstar/smil:azstar.smil/playlist.m3u8
+#EXTINF:-1 tvg-id="WNetwork.ca" tvg-name="W Network" tvg-logo="" group-title="",W Network
+https://fl3.moveonjoy.com/W_NETWORK/index.m3u8
+#EXTINF:-1 tvg-id="NTVPlus.ca" tvg-name="NTV+" tvg-logo="" group-title="",NTV+
+https://2-fss-1.streamhoster.com/pl_122/201748-1431018-1/chunklist.m3u8
+#EXTINF:-1 tvg-id="WildTV.ca" tvg-name="Wild TV" tvg-logo="" group-title="",Wild TV
+https://dfhsahpa45kk2.cloudfront.net/scheduler/scheduleMaster/476.m3u8
+#EXTINF:-1 tvg-id="WCGtv.ca" tvg-name="WCGtv" tvg-logo="" group-title="",WCGtv
+https://wowzastream.westmancom.com/wcgtvlive/wcgtvPSA.stream/master.m3u8
+#EXTINF:-1 tvg-id="WataneMaaTV.ca" tvg-name="Watan-e-Maa TV" tvg-logo="" group-title="general",Watan-e-Maa TV
+https://5caf24a595d94.streamlock.net:1937/8132/8132/playlist.m3u8
+#EXTINF:-1 tvg-id="TSNTheOcho.ca" tvg-name="TSN The Ocho" tvg-logo="" group-title="sports",TSN The Ocho
+https://d3pnbvng3bx2nj.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-rds8g35qfqrnv/TSN_The_Ocho.m3u8
+#EXTINF:-1 tvg-id="TSN5.ca" tvg-name="TSN5" tvg-logo="" group-title="sports",TSN5
+https://fl5.moveonjoy.com/TSN_5/index.m3u8
+#EXTINF:-1 tvg-id="TSN4.ca" tvg-name="TSN4" tvg-logo="" group-title="sports",TSN4
+https://fl5.moveonjoy.com/TSN_4/index.m3u8
+#EXTINF:-1 tvg-id="TSN3.ca" tvg-name="TSN3" tvg-logo="" group-title="sports",TSN3
+https://fl5.moveonjoy.com/TSN_3/index.m3u8
+#EXTINF:-1 tvg-id="TSN2.ca" tvg-name="TSN2" tvg-logo="" group-title="sports",TSN2
+https://fl5.moveonjoy.com/TSN_2/index.m3u8
+#EXTINF:-1 tvg-id="TSN1.ca" tvg-name="TSN1" tvg-logo="" group-title="sports",TSN1
+https://fl5.moveonjoy.com/TSN_1/index.m3u8
+#EXTINF:-1 tvg-id="TSC.ca" tvg-name="TSC" tvg-logo="" group-title="shop",TSC
+https://tscamd.akamaized.net/hls/live/503340/TSCLive/master.m3u8
+#EXTINF:-1 tvg-id="Toronto360TV.ca" tvg-name="Toronto 360 TV" tvg-logo="" group-title="",Toronto 360 TV
+http://cdn3.toronto360.tv:8081/toronto360/hd/playlist.m3u8
+#EXTINF:-1 tvg-id="TAGTV.ca" tvg-name="TAG TV" tvg-logo="" group-title="",TAG TV
+http://cdn11.live247stream.com/tag/tv/playlist.m3u8
+#EXTINF:-1 tvg-id="StingrayUrbanBeat.ca" tvg-name="Stingray Urban Beat" tvg-logo="" group-title="music",Stingray Urban Beat
+https://lotus.stingray.com/manifest/ose-133ads-montreal/samsungtvplus/master.m3u8
+#EXTINF:-1 tvg-id="StingrayTodaysLatinPop.ca" tvg-name="Stingray Today's Latin Pop" tvg-logo="" group-title="music",Stingray Today's Latin Pop
+https://lotus.stingray.com/manifest/ose-190ads-montreal/samsungtvplus/master.m3u8
+#EXTINF:-1 tvg-id="StingrayTodaysKPop.ca" tvg-name="Stingray Today's K-Pop" tvg-logo="" group-title="music",Stingray Today's K-Pop
+https://lotus.stingray.com/manifest/ose-317ads-montreal/samsungtvplus/master.m3u8
+#EXTINF:-1 tvg-id="StingrayTheSpa.ca" tvg-name="Stingray The Spa" tvg-logo="" group-title="music",Stingray The Spa
+https://lotus.stingray.com/manifest/ose-122ads-montreal/samsungtvplus/master.m3u8
+#EXTINF:-1 tvg-id="StingraySoulStorm.ca" tvg-name="Stingray Soul Storm" tvg-logo="" group-title="music",Stingray Soul Storm
+https://lotus.stingray.com/manifest/ose-134ads-montreal/samsungtvplus/master.m3u8
+#EXTINF:-1 tvg-id="StingraySmoothJazz.ca" tvg-name="Stingray Smooth Jazz" tvg-logo="" group-title="music",Stingray Smooth Jazz
+https://lotus.stingray.com/manifest/ose-140ads-montreal/samsungtvplus/master.m3u8
+#EXTINF:-1 tvg-id="StingrayRomanceLatino.ca" tvg-name="Stingray Romance Latino" tvg-logo="" group-title="music",Stingray Romance Latino
+https://lotus.stingray.com/manifest/ose-202ads-montreal/samsungtvplus/master.m3u8
+#EXTINF:-1 tvg-id="StingrayRockAlternative.ca" tvg-name="Stingray Rock Alternative" tvg-logo="" group-title="music",Stingray Rock Alternative
+https://lotus.stingray.com/manifest/ose-102ads-montreal/samsungtvplus/master.m3u8
+#EXTINF:-1 tvg-id="StingrayPopAdult.ca" tvg-name="Stingray Pop Adult" tvg-logo="" group-title="music",Stingray Pop Adult
+https://lotus.stingray.com/manifest/ose-104ads-montreal/samsungtvplus/master.m3u8
+#EXTINF:-1 tvg-id="StingrayNothinBut90s.ca" tvg-name="Stingray Nothin' But 90s" tvg-logo="" group-title="music",Stingray Nothin' But 90s
+https://lotus.stingray.com/manifest/ose-142ads-montreal/samsungtvplus/master.m3u8
+#EXTINF:-1 tvg-id="StingrayNaturescape.ca" tvg-name="Stingray Naturescape" tvg-logo="" group-title="music",Stingray Naturescape
+https://lotus.stingray.com/manifest/naturescape-a003-montreal/samsungtvplus/master.m3u8
+#EXTINF:-1 tvg-id="StingrayKaraoke.ca" tvg-name="Stingray Karaoke" tvg-logo="" group-title="music",Stingray Karaoke
+https://lotus.stingray.com/manifest/karaoke-kar000-montreal/samsungtvplus/master.m3u8
+#EXTINF:-1 tvg-id="StingrayHotCountry.ca" tvg-name="Stingray Hot Country" tvg-logo="" group-title="music",Stingray Hot Country
+https://lotus.stingray.com/manifest/ose-108ads-montreal/samsungtvplus/master.m3u8
+#EXTINF:-1 tvg-id="StingrayHolidayHits.ca" tvg-name="Stingray Holiday Hits" tvg-logo="" group-title="music",Stingray Holiday Hits
+https://lotus.stingray.com/manifest/ose-155ads-montreal/samsungtvplus/master.m3u8
+#EXTINF:-1 tvg-id="StingrayHitList.ca" tvg-name="Stingray Hit List" tvg-logo="" group-title="music",Stingray Hit List
+https://lotus.stingray.com/manifest/ose-107ads-montreal/samsungtvplus/master.m3u8
+#EXTINF:-1 tvg-id="StingrayFlashback70s.ca" tvg-name="Stingray Flashback 70's" tvg-logo="" group-title="music",Stingray Flashback 70's
+https://lotus.stingray.com/manifest/ose-115ads-montreal/samsungtvplus/master.m3u8
+#EXTINF:-1 tvg-id="StingrayEverything80s.ca" tvg-name="Stingray Everything '80s" tvg-logo="" group-title="music",Stingray Everything '80s
+https://lotus.stingray.com/manifest/ose-128ads-montreal/samsungtvplus/master.m3u8
+#EXTINF:-1 tvg-id="StingrayEasyListening.ca" tvg-name="Stingray Easy Listening" tvg-logo="" group-title="music",Stingray Easy Listening
+https://lotus.stingray.com/manifest/ose-137ads-montreal/samsungtvplus/master.m3u8
+#EXTINF:-1 tvg-id="StingrayDJAZZ.ca" tvg-name="Stingray DJAZZ" tvg-logo="" group-title="music",Stingray DJAZZ
+https://lotus.stingray.com/manifest/djazz-djaads-montreal/samsungtvplus/master.m3u8
+#EXTINF:-1 tvg-id="StingrayCMusic.ca" tvg-name="Stingray CMusic" tvg-logo="" group-title="music",Stingray CMusic
+https://lotus.stingray.com/manifest/cmusic-cme004-montreal/samsungtvplus/master.m3u8
+#EXTINF:-1 tvg-id="StingrayClassicRock.ca" tvg-name="Stingray Classic Rock" tvg-logo="" group-title="music",Stingray Classic Rock
+https://lotus.stingray.com/manifest/ose-101ads-montreal/samsungtvplus/master.m3u8
+#EXTINF:-1 tvg-id="StingrayClassica.ca" tvg-name="Stingray Classica" tvg-logo="" group-title="music",Stingray Classica
+https://lotus.stingray.com/manifest/classica-cla008-montreal/samsungtvplus/master.m3u8
+#EXTINF:-1 tvg-id="SikhSpiritualCentreRexdale.ca" tvg-name="Sikh Spiritual Centre Rexdale" tvg-logo="" group-title="",Sikh Spiritual Centre Rexdale
+https://cdn12.henico.net:8443/live/ssct/index.m3u8
+#EXTINF:-1 tvg-id="SardariTV.ca" tvg-name="Sardari TV" tvg-logo="" group-title="",Sardari TV
+http://158.69.124.9:1935/sardaritv/sardaritv/playlist.m3u8
+#EXTINF:-1 tvg-id="RadioTeleEvangileSansLimite.ca" tvg-name="Radio Tele Evangile Sans Limite" tvg-logo="" group-title="religious",Radio Tele Evangile Sans Limite
+https://5790d294af2dc.streamlock.net/8124/8124/chunklist.m3u8
+#EXTINF:-1 tvg-id="QuoVadisTV.ca" tvg-name="Quo Vadis TV" tvg-logo="" group-title="religious",Quo Vadis TV
+https://tgn.bozztv.com/qvtv/qvtv-web/playlist.m3u8
+#EXTINF:-1 tvg-id="QelloConcertsbyStingray.ca" tvg-name="Qello Concerts by Stingray" tvg-logo="" group-title="music",Qello Concerts by Stingray
+https://lotus.stingray.com/manifest/qello-qello001-montreal/samsungtvplus/master.m3u8
+#EXTINF:-1 tvg-id="ProbashiTVNews.ca" tvg-name="Probashi TV News" tvg-logo="" group-title="news",Probashi TV News
+http://158.69.24.53:8080/probashi_tv/index.m3u8
+#EXTINF:-1 tvg-id="PrimeCanadaTV.ca" tvg-name="Prime Canada TV" tvg-logo="" group-title="entertainment",Prime Canada TV
+http://cdn27.live247stream.com/primecanada/247/primecanada/stream1/playlist.m3u8
+#EXTINF:-1 tvg-id="PrimeAsiaTV.ca" tvg-name="Prime Asia TV" tvg-logo="" group-title="",Prime Asia TV
+http://primeasia.selfip.net/Samsung/index.m3u8
+#EXTINF:-1 tvg-id="PlymouthRockTV.ca" tvg-name="Plymouth Rock TV" tvg-logo="" group-title="",Plymouth Rock TV
+https://d30au7974f7qoa.cloudfront.net/scheduler/scheduleMaster/419.m3u8
+#EXTINF:-1 tvg-id="NETVToronto.ca" tvg-name="NETV Toronto" tvg-logo="" group-title="movies",NETV Toronto
+https://eu1.vectromdigital.com:1936/netvtoronto/netvtoronto/playlist.m3u8
+#EXTINF:-1 tvg-id="NACTV.ca" tvg-name="NACTV" tvg-logo="" group-title="general",NACTV
+https://stream2.pivotalelements.com/memfs/2d2e1038-9eb2-44df-a9b9-109de5752f3b_output_0.m3u8
+#EXTINF:-1 tvg-id="MontrealGreekTV.ca" tvg-name="Montreal Greek TV" tvg-logo="" group-title="culture",Montreal Greek TV
+http://live.greektv.ca/hls1/greektv.m3u8
+#EXTINF:-1 tvg-id="MHZ.ca" tvg-name="MHZ" tvg-logo="" group-title="entertainment",MHZ
+https://mhz-samsung-linear-ca.samsung.wurl.tv/playlist.m3u8
+#EXTINF:-1 tvg-id="LegislativeAssemblyofOntario.ca" tvg-name="Legislative Assembly of Ontario" tvg-logo="" group-title="legislative",Legislative Assembly of Ontario
+https://temp3.isilive.ca/live/_definst_/ontla/house-en/playlist.m3u8
+#EXTINF:-1 tvg-id="LegislativeAssemblyofBritishColumbiaCommitteeA.ca" tvg-name="Legislative Assembly of British Columbia Committee A" tvg-logo="" group-title="legislative",Legislative Assembly of British Columbia Committee A
+https://cdn3.wowza.com/5/YldIU1hsTlljRWZF/hbs-prim-dougfir-httpo/DougFirP.smil/playlist.m3u8
+#EXTINF:-1 tvg-id="LegislativeAssemblyofBritishColumbia.ca" tvg-name="Legislative Assembly of British Columbia" tvg-logo="" group-title="legislative",Legislative Assembly of British Columbia
+https://cdn3.wowza.com/5/YldIU1hsTlljRWZF/hbs-prim-house-httpo/HouseP.smil/playlist.m3u8
+#EXTINF:-1 tvg-id="ICnet2.ca" tvg-name="ICnet 2" tvg-logo="" group-title="religious",ICnet 2
+https://icnet2hls.wns.live/hls/stream.m3u8
+#EXTINF:-1 tvg-id="ICnet1.ca" tvg-name="ICnet 1" tvg-logo="" group-title="religious",ICnet 1
+https://icnet1hls.wns.live/hls/stream.m3u8
+#EXTINF:-1 tvg-id="IciRDI.ca" tvg-name="Ici RDI" tvg-logo="" group-title="news",Ici RDI
+https://rcavlive.akamaized.net/hls/live/704025/xcanrdi/master.m3u8
+#EXTINF:-1 tvg-id="HyderTV.ca" tvg-name="Hyder TV" tvg-logo="" group-title="culture",Hyder TV
+https://cdn.live247stream.com/hyder/tv/playlist.m3u8
+#EXTINF:-1 tvg-id="HulchulTVCanada.ca" tvg-name="Hulchul TV Canada" tvg-logo="" group-title="culture",Hulchul TV Canada
+http://cdn12.henico.net:8080/live/jbani/index.m3u8
+#EXTINF:-1 tvg-id="HamdardTV.ca" tvg-name="Hamdard TV" tvg-logo="" group-title="news",Hamdard TV
+https://tv.hamdardtv.com/hamdard/index.m3u8
+#EXTINF:-1 tvg-id="GurSikhSabhaTV.ca" tvg-name="GurSikh Sabha TV" tvg-logo="" group-title="religious",GurSikh Sabha TV
+http://cdn12.henico.net:8080/live/gsctv/index.m3u8
+#EXTINF:-1 tvg-id="GHCanadaTV.ca" tvg-name="GH Canada TV" tvg-logo="" group-title="general",GH Canada TV
+https://stream.bozztv.com/tvstat-tamar/tvstat-tamar/playlist.m3u8
+#EXTINF:-1 tvg-id="GaundaPunjabTV.ca" tvg-name="Gaunda Punjab TV" tvg-logo="" group-title="general",Gaunda Punjab TV
+http://cdn6.live247stream.com/gaundapunjab/tv/playlist.m3u8
+#EXTINF:-1 tvg-id="GamePlus.ca" tvg-name="Game+" tvg-logo="" group-title="sports",Game+
+https://a-cdn.klowdtv.com/live2/fntsy_720p/playlist.m3u8
+#EXTINF:-1 tvg-id="FEVATV.ca" tvg-name="FEVA TV" tvg-logo="" group-title="entertainment",FEVA TV
+https://d3c1w351ahk83d.cloudfront.net/scheduler/scheduleMaster/416.m3u8
+#EXTINF:-1 tvg-id="ErfanHalghehTV.ca" tvg-name="Erfan Halgheh TV" tvg-logo="" group-title="religious",Erfan Halgheh TV
+https://hls.erfanhalgheh.live/hls/stream.m3u8
+#EXTINF:-1 tvg-id="EETTV.ca" tvg-name="EET TV" tvg-logo="" group-title="culture",EET TV
+https://eu.streamjo.com/eetlive/eettv.m3u8
+#EXTINF:-1 tvg-id="EawazTV.ca" tvg-name="Eawaz TV" tvg-logo="" group-title="culture",Eawaz TV
+https://streamer12.vdn.dstreamone.net/saazoawaz/saazoawaz/playlist.m3u8
+#EXTINF:-1 tvg-id="DukhNivaran.ca" tvg-name="Dukh Nivaran" tvg-logo="" group-title="culture",Dukh Nivaran
+http://cdn12.henico.net:8080/live/dncal/index.m3u8
+#EXTINF:-1 tvg-id="DeshiTV.ca" tvg-name="Deshi TV" tvg-logo="" group-title="general",Deshi TV
+https://deshitv.deshitv24.net/live/myStream/playlist.m3u8
+#EXTINF:-1 tvg-id="Crave4.ca" tvg-name="Crave 4" tvg-logo="" group-title="movies",Crave 4
+https://fl3.moveonjoy.com/CRAVE_4/index.m3u8
+#EXTINF:-1 tvg-id="Crave2.ca" tvg-name="Crave 2" tvg-logo="" group-title="movies",Crave 2
+https://fl3.moveonjoy.com/CRAVE_2/index.m3u8
+#EXTINF:-1 tvg-id="CPACEnglish.ca" tvg-name="CPAC English" tvg-logo="" group-title="legislative",CPAC English
+https://d7z3qjdsxbwoq.cloudfront.net/groupa/live/f9809cea-1e07-47cd-a94d-2ddd3e1351db/live.isml/.m3u8
+#EXTINF:-1 tvg-id="CMalayalamTV.ca" tvg-name="C Malayalam TV" tvg-logo="" group-title="culture",C Malayalam TV
+https://2-fss-2.streamhoster.com/pl_120/206508-3261972-1/playlist.m3u8
+#EXTINF:-1 tvg-id="CKNOFM.ca" tvg-name="CKNO-FM" tvg-logo="" group-title="music",CKNO-FM
+https://videostream.jpbgdigital.com/NOWTV.m3u8
+#EXTINF:-1 tvg-id="CJONDT.ca" tvg-name="CJON-DT" tvg-logo="" group-title="general",CJON-DT
+https://2-fss-1.streamhoster.com/pl_122/201748-1431018-1/playlist.m3u8
+#EXTINF:-1 tvg-id="CityNewsVancouver.ca" tvg-name="CityNews Vancouver" tvg-logo="" group-title="news",CityNews Vancouver
+https://citynewsregional.akamaized.net/hls/live/1024054/Regional_Live_9/master.m3u8
+#EXTINF:-1 tvg-id="CityNewsToronto.ca" tvg-name="CityNews Toronto" tvg-logo="" group-title="news",CityNews Toronto
+https://citynewsregional.akamaized.net/hls/live/1024052/Regional_Live_7/master.m3u8
+#EXTINF:-1 tvg-id="CityNewsCalgary.ca" tvg-name="CityNews Calgary" tvg-logo="" group-title="news",CityNews Calgary
+https://citynewsregional.akamaized.net/hls/live/1024053/Regional_Live_8/master.m3u8
+#EXTINF:-1 tvg-id="CHCOTV.ca" tvg-name="CHCO-TV" tvg-logo="" group-title="general",CHCO-TV
+https://temp4.isilive.ca/live/CHCOTV/live/index.m3u8
+#EXTINF:-1 tvg-id="CHBLTV.ca" tvg-name="CHBL-TV" tvg-logo="" group-title="",CHBL-TV
+https://fl3.moveonjoy.com/CA_GLOBAL/index.m3u8
+#EXTINF:-1 tvg-id="ChannelY.ca" tvg-name="Channel Y" tvg-logo="" group-title="news",Channel Y
+http://cdn19.live247stream.com/channely/tv/playlist.m3u8
+#EXTINF:-1 tvg-id="CFTUDT.ca" tvg-name="CFTU-DT" tvg-logo="" group-title="education",CFTU-DT
+https://hls.savoir.media/live/stream.m3u8
+#EXTINF:-1 tvg-id="CFHDDT.ca" tvg-name="CFHD-DT" tvg-logo="" group-title="general",CFHD-DT
+https://amdici.akamaized.net/hls/live/873426/ICI-Live-Stream/master.m3u8
+#EXTINF:-1 tvg-id="CBCNewsNetwork.ca" tvg-name="CBC News Network" tvg-logo="" group-title="news",CBC News Network
+https://amg00788-cbc-amg00788c4-xumo-us-3045.playouts.now.amagi.tv/master.m3u8
+#EXTINF:-1 tvg-id="CanadaOne.ca" tvg-name="Canada One" tvg-logo="" group-title="",Canada One
+http://cdn8.live247stream.com/canadaone/tv/playlist.m3u8
+#EXTINF:-1 tvg-id="Cable14Hamilton.ca" tvg-name="Cable 14 Hamilton" tvg-logo="" group-title="",Cable 14 Hamilton
+https://flowcaster1-ch.cdn.clearcable.net/C14/smil:C14.smil/playlist.m3u8?iimae0UC2aendtime=1665196120&iimae0UC2ahash=NzcDbuotaJAVf1DsNxuGHBlfCXSvHDIt5sqMUMgrRMU=&iimae0UC2astarttime=1665181720
+#EXTINF:-1 tvg-id="ApnaPunjabTV.ca" tvg-name="Apna Punjab TV" tvg-logo="" group-title="entertainment",Apna Punjab TV
+https://plus.gigabitcdn.net/live-stream/apna-punjab-H3sE/playlist.m3u8
+#EXTINF:-1 tvg-id="AmazingDiscoveriesTV.ca" tvg-name="Amazing Discoveries TV" tvg-logo="" group-title="religious",Amazing Discoveries TV
+https://uni01rtmp.tulix.tv/amazingdtv/amazingdtv/playlist.m3u8
+#EXTINF:-1 tvg-id="AfghanNobelTV.ca" tvg-name="Afghan Nobel TV" tvg-logo="" group-title="general",Afghan Nobel TV
+https://live.relentlessinnovations.net:1936/afghannobeltv/afghannobeltv/playlist.m3u8
+#EXTINF:-1 tvg-id="AfghanNobelMovies.ca" tvg-name="Afghan Nobel Movies" tvg-logo="" group-title="movies",Afghan Nobel Movies
+https://live.relentlessinnovations.net:1936/afghannobel/afghannobel/playlist.m3u8
+#EXTINF:-1 tvg-id="5AABTV.ca" tvg-name="5AAB TV" tvg-logo="" group-title="entertainment",5AAB TV
+http://158.69.124.9:1935/5aabtv/5aabtv/playlist.m3u8
+#EXTINF:-1 tvg-id="UvagutTV.ca" tvg-name="Uvagut TV" tvg-logo="" group-title="",Uvagut TV
+https://dee7mwgg9dzvl.cloudfront.net/hls/uvagut/playlist.m3u8
+#EXTINF:-1 tvg-id="TVPunjab.ca" tvg-name="TV Punjab" tvg-logo="" group-title="news",TV Punjab
+https://932y483pdjv8-hls-live.5centscdn.com/stream/deb10bae362f810630ec3abedcae5894.sdp/playlist.m3u8
+#EXTINF:-1 tvg-id="TVOKids.ca" tvg-name="TVOKids" tvg-logo="" group-title="kids",TVOKids
+https://bcovlive-a.akamaihd.net/rf86f817779524249abf842af6d16f55f/us-east-1/15364602001/playlist.m3u8
+#EXTINF:-1 tvg-id="tvcTK.ca" tvg-name="tvcTK" tvg-logo="" group-title="general",tvcTK
+https://raw.githubusercontent.com/azgaresncf/strm2hls/main/streams/tvctklive.m3u8
+#EXTINF:-1 tvg-id="TV16Toronto.ca" tvg-name="TV 16 Toronto" tvg-logo="" group-title="",TV 16 Toronto
+http://rtmp.smartstream.video:1935/capco/tv29/playlist.m3u8
+#EXTINF:-1 tvg-id="TheWeatherNetwork.ca" tvg-name="The Weather Network" tvg-logo="" group-title="weather",The Weather Network
+http://cfd-v4-service-channel-stitcher-use1-1.prd.pluto.tv/stitch/hls/channel/63da370e2e477400081cf8b6/master.m3u8?appName=web&appVersion=unknown&clientTime=0&deviceDNT=0&deviceId=2c7c7782-35fc-11ef-a031-2b5d494037a2&deviceMake=Chrome&deviceModel=web&deviceType=web&deviceVersion=unknown&includeExtendedEvents=false&serverSideAds=false&sid=6b5c5f52-01b7-44d8-a06c-1f05f3169a75
+#EXTINF:-1 tvg-id="TCFTV.ca" tvg-name="TCFTV" tvg-logo="" group-title="general;culture",TCFTV
+http://66.11.33.44:8081/live/TCF/playlist.m3u8
+#EXTINF:-1 tvg-id="TamilVisionTV.ca" tvg-name="TamilVision-TV" tvg-logo="" group-title="",TamilVision-TV
+http://live.tamilvision.tv:8081/TVI/HD/playlist.m3u8
+#EXTINF:-1 tvg-id="SooriyanTV.ca" tvg-name="Sooriyan TV" tvg-logo="" group-title="entertainment",Sooriyan TV
+https://cdn.jwplayer.com/videos/1m0nMXhZ-3SDdwqdV.m3u8
+#EXTINF:-1 tvg-id="SohailTV.ca" tvg-name="Sohail TV" tvg-logo="" group-title="general",Sohail TV
+https://iptv.sohailtv.com/sohail/playlist/index.m3u8
+#EXTINF:-1 tvg-id="PardesiTV.ca" tvg-name="Pardesi TV" tvg-logo="" group-title="culture",Pardesi TV
+http://stream.pardesitv.online/pardesi/tracks-v1a1/mono.m3u8
+#EXTINF:-1 tvg-id="PamirTV.ca" tvg-name="Pamir TV" tvg-logo="" group-title="culture;music",Pamir TV
+http://live.stream.cdn.pamirtv.com/ptv/d0dbe915091d400bd8ee7f27f0791303.sdp/index.m3u8
+#EXTINF:-1 tvg-id="NBATVCanada.ca" tvg-name="NBA TV Canada" tvg-logo="" group-title="sports",NBA TV Canada
+http://user.scalecdn.co:8080/live/54706135/09221986/3092.m3u8
+#EXTINF:-1 tvg-id="Much.ca" tvg-name="Much" tvg-logo="" group-title="music",Much
+https://fl1.moveonjoy.com/MUCH/index.m3u8
+#EXTINF:-1 tvg-id="LegislativeAssemblyTVNunavut.ca" tvg-name="Legislative Assembly TV Nunavut" tvg-logo="" group-title="legislative",Legislative Assembly TV Nunavut
+http://temp2.isilive.ca/live/nunavut/live-eng/index.m3u8
+#EXTINF:-1 tvg-id="LCN.ca" tvg-name="LCN" tvg-logo="" group-title="news",LCN
+https://tvalive.akamaized.net/hls/live/2014213/tvan01/tvan01.m3u8
+#EXTINF:-1 tvg-id="FightNetwork.ca" tvg-name="Fight Network" tvg-logo="" group-title="sports",Fight Network
+https://d12a2vxqkkh1bo.cloudfront.net/hls/main.m3u8
+#EXTINF:-1 tvg-id="CTVNewsChannel.ca" tvg-name="CTV News Channel" tvg-logo="" group-title="news",CTV News Channel
+https://pe-fa-lp02a.9c9media.com/live/News1Digi/p/hls/00000201/38ef78f479b07aa0/index/0c6a10a2/live/stream/h264/v1/3500000/manifest.m3u8
+#EXTINF:-1 tvg-id="CTBTV.ca" tvg-name="CTB TV" tvg-logo="" group-title="general",CTB TV
+https://fl001.elpcinc.com/CTB-TV/index.m3u8
+#EXTINF:-1 tvg-id="Crave3.ca" tvg-name="Crave 3" tvg-logo="" group-title="movies",Crave 3
+https://fl3.moveonjoy.com/CRAVE_3/index.m3u8
+#EXTINF:-1 tvg-id="Crave1.ca" tvg-name="Crave 1" tvg-logo="" group-title="movies",Crave 1
+https://fl3.moveonjoy.com/CRAVE_1/index.m3u8
+#EXTINF:-1 tvg-id="CKTVDT.ca" tvg-name="CKTV-DT" tvg-logo="" group-title="general",CKTV-DT
+https://rcavlive.akamaized.net/hls/live/704023/cancktv/master.m3u8
+#EXTINF:-1 tvg-id="CKTMDT.ca" tvg-name="CKTM-DT" tvg-logo="" group-title="general",CKTM-DT
+https://rcavlive.akamaized.net/hls/live/704021/cancktm/master.m3u8
+#EXTINF:-1 tvg-id="CKSHDT.ca" tvg-name="CKSH-DT" tvg-logo="" group-title="general",CKSH-DT
+https://rcavlive.akamaized.net/hls/live/704016/cancksh/master.m3u8
+#EXTINF:-1 tvg-id="CJBRDT.ca" tvg-name="CJBR-DT" tvg-logo="" group-title="general",CJBR-DT
+https://rcavlive.akamaized.net/hls/live/704024/cancjbr/master.m3u8
+#EXTINF:-1 tvg-id="CIVMDT.ca" tvg-name="CIVM-DT" tvg-logo="" group-title="education",CIVM-DT
+https://bcovlive-a.akamaihd.net/4b1c462c86094bae93b65adc84e43afc/us-west-2/6101674910001/playlist.m3u8
+#EXTINF:-1 tvg-id="CFYKDT.ca" tvg-name="CFYK-DT" tvg-logo="" group-title="general",CFYK-DT
+https://cbcrclinear-tor.akamaized.net/hls/live/2042766/CBCRCLINEAR_TOR_12/master5.m3u8
+#EXTINF:-1 tvg-id="CFTMDT.ca" tvg-name="CFTM-DT" tvg-logo="" group-title="general",CFTM-DT
+https://tvalive-dai01.akamaized.net/Content/HLS/Live/channel(575b93c5-be31-ee34-6285-14620fd14048)/index.m3u8
+#EXTINF:-1 tvg-id="CBXTDT.ca" tvg-name="CBXT-DT" tvg-logo="" group-title="general",CBXT-DT
+https://cbcrclinear-tor.akamaized.net/hls/live/2042765/CBCRCLINEAR_TOR_11/master5.m3u8
+#EXTINF:-1 tvg-id="CBXFTDT.ca" tvg-name="CBXFT-DT" tvg-logo="" group-title="general",CBXFT-DT
+https://rcavlive.akamaized.net/hls/live/704020/cancbxft/master.m3u8
+#EXTINF:-1 tvg-id="CBWTDT.ca" tvg-name="CBWT-DT" tvg-logo="" group-title="general",CBWT-DT
+https://cbcrclinear-tor.akamaized.net/hls/live/2042767/CBCRCLINEAR_TOR_13/master5.m3u8
+#EXTINF:-1 tvg-id="CBWFTDT.ca" tvg-name="CBWFT-DT" tvg-logo="" group-title="general",CBWFT-DT
+https://rcavlive.akamaized.net/hls/live/704018/cancbwft/master.m3u8
+#EXTINF:-1 tvg-id="CBVTDT.ca" tvg-name="CBVT-DT" tvg-logo="" group-title="general",CBVT-DT
+https://rcavlive.akamaized.net/hls/live/664045/cancbvt/master.m3u8
+#EXTINF:-1 tvg-id="CBUTDT.ca" tvg-name="CBUT-DT" tvg-logo="" group-title="general",CBUT-DT
+https://cbcrclinear-tor.akamaized.net/hls/live/2042768/CBCRCLINEAR_TOR_14/master5.m3u8
+#EXTINF:-1 tvg-id="CBUFTDT.ca" tvg-name="CBUFT-DT" tvg-logo="" group-title="general",CBUFT-DT
+https://rcavlive.akamaized.net/hls/live/704017/cancbuft/master.m3u8
+#EXTINF:-1 tvg-id="CBRTDT.ca" tvg-name="CBRT-DT" tvg-logo="" group-title="general",CBRT-DT
+https://cbcrclinear-tor.akamaized.net/hls/live/2042763/CBCRCLINEAR_TOR_9/master5.m3u8
+#EXTINF:-1 tvg-id="CBOTDT.ca" tvg-name="CBOT-DT" tvg-logo="" group-title="general",CBOT-DT
+https://cbcrclinear-tor.akamaized.net/hls/live/2042762/CBCRCLINEAR_TOR_8/master5.m3u8
+#EXTINF:-1 tvg-id="CBOFTDT.ca" tvg-name="CBOFT-DT" tvg-logo="" group-title="general",CBOFT-DT
+https://rcavlive.akamaized.net/hls/live/664046/cancboft/master.m3u8
+#EXTINF:-1 tvg-id="CBNTDT.ca" tvg-name="CBNT-DT" tvg-logo="" group-title="general",CBNT-DT
+https://cbcrclinear-tor.akamaized.net/hls/live/2042755/CBCRCLINEAR_TOR_1/master5.m3u8
+#EXTINF:-1 tvg-id="CBMTDT.ca" tvg-name="CBMT-DT" tvg-logo="" group-title="general",CBMT-DT
+https://cbcrclinear-tor.akamaized.net/hls/live/2042761/CBCRCLINEAR_TOR_7/master5.m3u8
+#EXTINF:-1 tvg-id="CBLTDT.ca" tvg-name="CBLT-DT" tvg-logo="" group-title="general",CBLT-DT
+https://cbcrclinear-tor.akamaized.net/hls/live/2042760/CBCRCLINEAR_TOR_6/master5.m3u8
+#EXTINF:-1 tvg-id="CBLFTDT.ca" tvg-name="CBLFT-DT" tvg-logo="" group-title="general",CBLFT-DT
+https://rcavlive.akamaized.net/hls/live/704022/cancblft/master.m3u8
+#EXTINF:-1 tvg-id="CBKTDT.ca" tvg-name="CBKT-DT" tvg-logo="" group-title="general",CBKT-DT
+https://cbcrclinear-tor.akamaized.net/hls/live/2042764/CBCRCLINEAR_TOR_10/master5.m3u8
+#EXTINF:-1 tvg-id="CBKFTDT.ca" tvg-name="CBKFT-DT" tvg-logo="" group-title="general",CBKFT-DT
+https://rcavlive.akamaized.net/hls/live/704019/cancbkft/master.m3u8
+#EXTINF:-1 tvg-id="CBHTDT.ca" tvg-name="CBHT-DT" tvg-logo="" group-title="general",CBHT-DT
+https://cbcrclinear-tor.akamaized.net/hls/live/2042758/CBCRCLINEAR_TOR_4/master5.m3u8
+#EXTINF:-1 tvg-id="CBFTDT.ca" tvg-name="CBFT-DT" tvg-logo="" group-title="general",CBFT-DT
+https://rcavlive-dai.akamaized.net/hls/live/696614/cancbftprem/master.m3u8
+#EXTINF:-1 tvg-id="CBETDT.ca" tvg-name="CBET-DT" tvg-logo="" group-title="general",CBET-DT
+https://cbcrclinear-tor.akamaized.net/hls/live/2042759/CBCRCLINEAR_TOR_5/master5.m3u8
+#EXTINF:-1 tvg-id="CBCTDT.ca" tvg-name="CBCT-DT" tvg-logo="" group-title="general",CBCT-DT
+https://cbcrclinear-tor.akamaized.net/hls/live/2042756/CBCRCLINEAR_TOR_2/master5.m3u8
+#EXTINF:-1 tvg-id="CBATDT.ca" tvg-name="CBAT-DT" tvg-logo="" group-title="general",CBAT-DT
+https://cbcrclinear-tor.akamaized.net/hls/live/2042757/CBCRCLINEAR_TOR_3/master5.m3u8
+#EXTINF:-1 tvg-id="CBAFTDT.ca" tvg-name="CBAFT-DT" tvg-logo="" group-title="general",CBAFT-DT
+https://rcavlive.akamaized.net/hls/live/704014/cancbaft/master.m3u8
+#EXTINF:-1 tvg-id="CanaldelAssemblee.ca" tvg-name="Canal de l'Assemblee" tvg-logo="" group-title="",Canal de l'Assemblee
+https://cdn3.wowza.com/5/SVEySlNEQ0FOWXlS/diffusion/canal17/playlist.m3u8
+#EXTINF:-1 tvg-id="CanadaStarTV.ca" tvg-name="Canada Star TV" tvg-logo="" group-title="",Canada Star TV
+https://main.clickstreamcdn.com/agm/star-canada/playlist.m3u8
+#EXTINF:-1 tvg-id="BNNBloomberg.ca" tvg-name="BNN Bloomberg" tvg-logo="" group-title="business",BNN Bloomberg
+https://pe-ak-lp01a-9c9media.akamaized.net/live/News1BNNDigi/p/dash/00000001/1bba52dc66e4c68e/manifest.mpd

@@ -18,11 +18,11 @@ if (!country) {
 	process.exit(1);
 }
 
-console.log("country:", country);
-if (country.length !== 2) {
-	console.error("ulke kodu 2 karekter olmali");
-	process.exit(2);
-}
+// console.log("country:", country);
+// if (country.length !== 2) {
+// 	console.error("ulke kodu 2 karekter olmali");
+// 	process.exit(2);
+// }
 
 const defaultLink = `https://raw.githubusercontent.com/iptv-org/iptv/refs/heads/gh-pages/countries/${country}.m3u`;
 const liveTVCollectorLink = await GetLiveTVCollectorLink(country);
