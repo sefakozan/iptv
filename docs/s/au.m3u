@@ -1,0 +1,71 @@
+#EXTM3U
+#EXTINF:-1 tvg-id="2GB.au" tvg-logo="https://i.ibb.co/jwM8DFG/2GB-1.png" group-title="News",2GB Sydney (1080p)
+https://2gblive.akamaized.net/hls/live/2033805/2GB/index.m3u8
+#EXTINF:-1 tvg-id="3AW.au" tvg-logo="https://i.imgur.com/Z4MdB0S.png" group-title="News",3AW Melbourne (1080p)
+https://3awlive.akamaized.net/hls/live/2032295/3AW/index.m3u8
+#EXTINF:-1 tvg-id="6PR.au" tvg-logo="https://i.imgur.com/Q9iCxg1.png" group-title="News",6PR Perth (1080p)
+https://6prlive.akamaized.net/hls/live/2033806/6PR/index.m3u8
+#EXTINF:-1 tvg-id="ABCAustralia.au" tvg-logo="https://i.imgur.com/qQ33TVM.png" group-title="General",ABC Australia
+https://abc-news-dmd-streams-1.akamaized.net/out/v1/701126012d044971b3fa89406a440133/index.m3u8
+#EXTINF:-1 tvg-id="ABCME.au@Sydney" tvg-logo="https://i.imgur.com/6NyFLAm.png" group-title="Education;Kids",ABC Me (720p)
+https://abc-iview-mediapackagestreams-1.akamaized.net/out/v1/33225e24c0e543af922929ede7b6941f/index.m3u8?hdnea=st=1754493729~exp=1754494629~acl=/*~hmac=3bc4ffd151bd6ae2f99db69a58952677191bc44bd04cf7833f3bb02af04ff87e
+#EXTINF:-1 tvg-id="ABCNews.au" tvg-logo="https://i.imgur.com/BrW7gk8.png" group-title="News",ABC News
+https://abc-iview-mediapackagestreams-2.akamaized.net/out/v1/7c7a6abe4d604faca4d6b91f6567558f/index.m3u8?hdnea=st=1754493297~exp=1754494197~acl=/*~hmac=2ecfc4f7ab0e023d6cb1399ead22c1b0ac524fd2e11beeffa11a19ad4a0f2b84
+#EXTINF:-1 tvg-id="ABCTV.au@Adelaide" tvg-logo="https://i.imgur.com/DPVQSjM.png" group-title="General",ABC TV Adelaide (720p)
+https://abc-iview-mediapackagestreams-1.akamaized.net/out/v1/fc2edf6e905e4fbbabb0df82faf306c3/index.m3u8?hdnea=st=1754493510~exp=1754494410~acl=/*~hmac=0956fe7fb54b672815fcd305c09d9b091cea97cd13a461f4aefbe9824d5d81ee
+#EXTINF:-1 tvg-id="ABCTV.au@Brisbane" tvg-logo="https://i.imgur.com/DPVQSjM.png" group-title="General",ABC TV Brisbane (720p)
+https://abc-iview-mediapackagestreams-1.akamaized.net/out/v1/23fd2612d8804b2690b026f92cead114/index.m3u8?hdnea=st=1754493378~exp=1754494278~acl=/*~hmac=9a716a146b53ed8a37b48db669075ab0ab6de4e3f2123434fe8db1e6a3577c2a
+#EXTINF:-1 tvg-id="ABCTV.au" tvg-logo="https://i.imgur.com/DPVQSjM.png" group-title="General",ABC TV Canberra (720p)
+https://abc-iview-mediapackagestreams-1.akamaized.net/out/v1/e54bf1897e004fb59b82e0303f25ada3/index.m3u8?hdnea=st=1754493385~exp=1754494285~acl=/*~hmac=3fced6a60268f4eda232e211d6f81a7fb98a90b6f5f1048cb2e2e2c0a6ccc79f
+#EXTINF:-1 tvg-id="ABCTV.au@Hobart" tvg-logo="https://i.imgur.com/DPVQSjM.png" group-title="General",ABC TV Hobart (720p)
+https://abc-iview-mediapackagestreams-1.akamaized.net/out/v1/42c4e613595341498e3a4bba500ddd0e/index.m3u8?hdnea=st=1754493096~exp=1754493996~acl=/*~hmac=30f468838a6f85c78e229a70a00032f4ed707e0c7dfdcd1da739a21a0e8afac5
+#EXTINF:-1 tvg-id="ABCTV.au@Melbourne" tvg-logo="https://i.imgur.com/DPVQSjM.png" group-title="General",ABC TV Melbourne (720p)
+https://abc-iview-mediapackagestreams-1.akamaized.net/out/v1/3198d7aadc42410abd6a68b1ac2f4e36/index.m3u8?hdnea=st=1754493541~exp=1754494441~acl=/*~hmac=5595a318a461fdace09e1799f5f51807c0ff03b5b0018977d77ae0dcf7a50ed5
+#EXTINF:-1 tvg-id="ABCTV.au@Perth" tvg-logo="https://i.imgur.com/DPVQSjM.png" group-title="General",ABC TV Perth (720p)
+https://abc-iview-mediapackagestreams-2.akamaized.net/out/v1/15fc7f5e0e344b368ecf677f8d687c5c/index.m3u8?hdnea=st=1754493878~exp=1754494778~acl=/*~hmac=41d9c84db5c5dc63e38290f8954bd7cc384364534a9c4bdeae27ffdc344d6be2
+#EXTINF:-1 tvg-id="ABCTVPlus.au@Sydney" tvg-logo="https://upload.wikimedia.org/wikipedia/en/thumb/0/0f/ABC_TV_Plus_logo_2021.svg/512px-ABC_TV_Plus_logo_2021.svg.png" group-title="Entertainment",ABC TV Plus (720p)
+https://abc-iview-mediapackagestreams-2.akamaized.net/out/v1/c392d1efb61f48af830ade77d9073b6c/index.m3u8?hdnea=st=1754493681~exp=1754494581~acl=/*~hmac=e804b9b6935d604265cbf43256582425c57320bf742149816c7702f5e070d266
+#EXTINF:-1 tvg-id="AusbizTV.au" tvg-logo="https://i.imgur.com/8vGGdB0.png" group-title="Business",ausbiz TV (720p) [Not 24/7]
+https://d9quh89lh7dtw.cloudfront.net/public-output/index.m3u8
+#EXTINF:-1 tvg-id="BBCNews.uk@AsiaPacific" tvg-logo="https://i.imgur.com/vSz2WEp.png" group-title="News",BBC News Asia Pacific (1080p)
+https://hls.mskycdn.online/tv/hls403/index.m3u8
+#EXTINF:-1 tvg-id="BloombergTV.us@Asia" tvg-logo="https://i.imgur.com/OuogLHx.png" group-title="Business",Bloomberg TV Asia (720p)
+https://www.bloomberg.com/media-manifest/streams/asia.m3u8
+#EXTINF:-1 tvg-id="BloombergTV.us@AsiaLiveEvent" tvg-logo="https://i.imgur.com/OuogLHx.png" group-title="Business",Bloomberg TV Asia Live Event (720p)
+https://www.bloomberg.com/media-manifest/streams/asia-event.m3u8
+#EXTINF:-1 tvg-id="BloombergTV.us@Australia" tvg-logo="https://i.imgur.com/OuogLHx.png" group-title="Business",Bloomberg TV Australia (270p)
+https://www.bloomberg.com/media-manifest/streams/aus.m3u8
+#EXTINF:-1 tvg-id="CTBPerth.au" tvg-logo="https://i.imgur.com/VB8gtCy.jpeg" group-title="General",CTB Perth (720p)
+https://live.ctbperth.net.au/hls/0/stream.m3u8
+#EXTINF:-1 tvg-id="CTBPerthMoviesChannel.au" tvg-logo="https://i.imgur.com/VB8gtCy.jpeg" group-title="Movies",CTB Perth Movies (720p)
+https://movies.ctbperth.net.au/hls/stream.m3u8
+#EXTINF:-1 tvg-id="EWTN.us@AsiaPacific" tvg-logo="https://i.imgur.com/sua70RO.png" group-title="Religious",EWTN Asia-Pacific (720p) [Not 24/7]
+https://cdn3.wowza.com/1/QmVNUVhTNTZSS3Uz/YWQ0aHpi/hls/live/playlist.m3u8
+#EXTINF:-1 tvg-id="ExpoChannel.au" tvg-logo="https://i.imgur.com/2KzCShW.png" group-title="Shop",Expo Channel (360p)
+https://tvsnhlslivetest.akamaized.net/hls/live/2034711/EXPO-MSL4/master.m3u8
+#EXTINF:-1 tvg-id="HorseCountryTV.uk" tvg-logo="https://i.imgur.com/1x6zYZr.png" group-title="Outdoor",Horse and Country (720p)
+https://hncfree-samsungau.amagi.tv/playlist.m3u8
+#EXTINF:-1 tvg-id="IndoOzTV.au" tvg-logo="https://i.imgur.com/4LECwDh.png" group-title="Entertainment",Indo Oz TV (720p)
+https://stream.e2is.in/hls/indoztv.m3u8
+#EXTINF:-1 tvg-id="JuiceTV.nz" tvg-logo="https://i.imgur.com/WaaaW0w.png" group-title="Music",Juice TV (1080p) [Not 24/7]
+https://juicex.nz/hls/mystream.m3u8
+#EXTINF:-1 tvg-id="KordiaTV.nz" tvg-logo="https://i.imgur.com/BQ0qWzX.png" group-title="Undefined",Kordia TV (1080p)
+https://ptvlive.kordia.net.nz/out/v1/3fc2254c865a457c8d7fbbce227a2aae/index.m3u8
+#EXTINF:-1 tvg-id="PBCTapeshTV.us" tvg-logo="https://i.imgur.com/50JzsmH.png" group-title="General",PBC Tapesh TV (720p)
+https://iptv.tapesh.tv/tapesh/playlist.m3u8
+#EXTINF:-1 tvg-id="SkyNewsExtra1.au" tvg-logo="https://i.imgur.com/ZsPb8nL.png" group-title="News",Sky News Extra 1 (540p)
+https://skynewsau-live.akamaized.net/hls/live/2002689/skynewsau-extra1/master.m3u8
+#EXTINF:-1 tvg-id="SkyNewsExtra2.au" tvg-logo="https://i.imgur.com/ZsPb8nL.png" group-title="News",Sky News Extra 2 (540p) [Not 24/7]
+https://skynewsau-live.akamaized.net/hls/live/2002690/skynewsau-extra2/master.m3u8
+#EXTINF:-1 tvg-id="SkyNewsExtra3.au" tvg-logo="https://i.imgur.com/ZsPb8nL.png" group-title="News",Sky News Extra 3 (1080p)
+https://skynewsau-live.akamaized.net/hls/live/2002691/skynewsau-extra3/master.m3u8
+#EXTINF:-1 tvg-id="StarChannelInternational.gr" tvg-logo="https://i.imgur.com/6NUpxhr.png" group-title="Entertainment",STAR International (720p)
+https://livestar.siliconweb.com/starvod/star_int/star_int.m3u8
+#EXTINF:-1 tvg-id="SwamijiTVAustralian.at" tvg-logo="https://i.imgur.com/nrLcuzs.png" group-title="Outdoor",Swamiji TV Australian (1080p) [Not 24/7]
+https://stream.swamiji.tv/YogaIPTV/smil:YogaStreamAU.smil/playlist.m3u8
+#EXTINF:-1 tvg-id="Tastemade.us@Australia" tvg-logo="https://i.imgur.com/xP7Ehn8.png" group-title="Cooking",Tastemade Australia (1080p)
+https://tmint-aus-samsungau.amagi.tv/playlist.m3u8
+#EXTINF:-1 tvg-id="ToonGoggles.us" tvg-logo="https://i.imgur.com/JMnxswq.png" group-title="Kids",Toon Goggles (720p)
+https://stream-us-east-1.getpublica.com/playlist.m3u8?network_id=37
+#EXTINF:-1 tvg-id="TVSN.au" tvg-logo="https://i.imgur.com/lmoAFm3.png" group-title="Shop",TVSN (1080p)
+https://tvsnhlslivetest.akamaized.net/hls/live/2034711/TVSN-MSL4/master.m3u8

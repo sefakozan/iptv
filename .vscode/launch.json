@@ -32,7 +32,7 @@
 			"request": "launch",
 			"name": "check",
 			"program": "${workspaceFolder}/bin/check.js",
-			"args": [], // Komut satırı argümanları (isteğe bağlı)
+			"args": ["empty"], // Komut satırı argümanları (isteğe bağlı)
 			"console": "integratedTerminal",
 			"skipFiles": ["<node_internals>/**"]
 		}
