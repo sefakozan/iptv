@@ -146,6 +146,13 @@ label,
 .form-label {
 	color: #b0b8c1;
 	font-weight: 500;
+	display: flex;
+	align-items: center;
+}
+
+.form-label i {
+	color: #00f2fe;
+	font-size: 1.1em;
 }
 .select2-dropdown {
 	background: #23272f;
