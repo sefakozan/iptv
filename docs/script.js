@@ -59,6 +59,23 @@ $(document).ready(() => {
 
 	// Global klavye event handler'ları
 	$(document).on("keydown", (e) => {
+		// Tab tuşu ile rastgele ülke seç
+		if (e.key === "Tab") {
+			e.preventDefault();
+
+			// Ülke seçenek listesinden rastgele birini seç
+			const countrySelect = $("#countrySelect");
+			const options = countrySelect.find("option").not(":first"); // İlk boş option'ı hariç tut
+
+			if (options.length > 0) {
+				const randomOptionIndex = Math.floor(Math.random() * options.length);
+				const randomOption = options.eq(randomOptionIndex);
+				countrySelect.val(randomOption.val()).trigger("change");
+			}
+
+			return;
+		}
+
 		// Sağ-sol ok tuşları ile ülke değiştirme (global)
 		if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
 			if (countriesData.length === 0) return; // Ülke yoksa çık
@@ -107,10 +124,6 @@ $(document).ready(() => {
 			$("#channelList").val(newIndex).trigger("change");
 		}
 	});
-
-	$("#playBtn").on("click", playStream);
-	$("#playStreamBtn").on("click", playStream);
-	$("#stopBtn").on("click", stopStream);
 });
 
 // Load countries from JSON file
@@ -144,9 +157,6 @@ function handleCountryChange() {
 
 	if (selectedCountry) {
 		$("#channelList").prop("disabled", false).html('<option value="">Loading channels...</option>');
-		$("#playBtn").prop("disabled", true);
-		$("#playStreamBtn").prop("disabled", true);
-		$("#stopBtn").prop("disabled", true);
 		$("#channelInfo").html('<p class="mb-0">No channel selected</p>');
 		stopStream();
 
@@ -154,9 +164,6 @@ function handleCountryChange() {
 		loadChannels();
 	} else {
 		$("#channelList").prop("disabled", true).html('<option value="">Select a country first</option>');
-		$("#playBtn").prop("disabled", true);
-		$("#playStreamBtn").prop("disabled", true);
-		$("#stopBtn").prop("disabled", true);
 	}
 }
 
@@ -248,9 +255,6 @@ async function loadChannels() {
 		if (channelList[0].options.length > 0 && channelList[0].options[0].value !== "") {
 			channelList.val(channelList[0].options[0].value).trigger("change");
 		} else {
-			$("#playBtn").prop("disabled", true);
-			$("#playStreamBtn").prop("disabled", true);
-			$("#stopBtn").prop("disabled", true);
 			$("#channelInfo").html('<p class="mb-0">No channel selected</p>');
 			stopStream();
 		}
@@ -292,9 +296,6 @@ function handleChannelChange() {
 		// Get the first selected index (in case multiple are selected)
 		const selectedIndex = parseInt(selectedIndices);
 		const channel = channelsData[selectedIndex];
-		$("#playBtn").prop("disabled", false);
-		$("#playStreamBtn").prop("disabled", false);
-		$("#stopBtn").prop("disabled", false);
 
 		// Display channel info: logo, name, and url on the same row
 		let logoHtml = "";
@@ -310,12 +311,9 @@ function handleChannelChange() {
                 </div>
             </div>
         `);
-		// Eski kanalı durdur, ancak otomatik oynatma yapma
+		// Otomatik olarak kanalı çal
 		playStream();
 	} else {
-		$("#playBtn").prop("disabled", true);
-		$("#playStreamBtn").prop("disabled", true);
-		$("#stopBtn").prop("disabled", true);
 		$("#channelInfo").html('<p class="mb-0">No channel selected</p>');
 		stopStream();
 	}

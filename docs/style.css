@@ -1,3 +1,8 @@
+html,
+body {
+	height: 100%;
+}
+
 body {
 	padding: 0;
 	min-height: 100vh;
@@ -76,14 +81,15 @@ body {
 }
 #videoPlayer {
 	width: 100%;
-	height: 500px;
+	min-height: 400px;
+	height: 100%;
 	background: #181a1b;
 	border-radius: 0.7rem;
 	box-shadow: 0 2px 8px rgba(31, 38, 135, 0.08);
 }
 .channel-info {
 	background: rgba(255, 255, 255, 0.04);
-	padding: 1.2rem 1.5rem;
+	padding: 1rem 1.2rem;
 	border-radius: 0.7rem;
 	box-shadow: 0 2px 8px rgba(31, 38, 135, 0.04);
 	color: #eaeaea;
@@ -281,4 +287,33 @@ h2.mb-0 {
 	font-weight: 800;
 	letter-spacing: 1px;
 	font-size: 2.2rem;
+}
+
+/* Keyboard Controls Info Styling */
+.keyboard-controls {
+	background: linear-gradient(135deg, rgba(67, 233, 123, 0.08) 0%, rgba(56, 249, 215, 0.08) 100%);
+	border: 1px solid rgba(67, 233, 123, 0.25);
+	border-radius: 0.7rem;
+	box-shadow: 0 2px 8px rgba(67, 233, 123, 0.1);
+}
+
+.keyboard-controls h6 {
+	color: #38f9d7 !important;
+	font-weight: 600;
+	font-size: 0.95rem;
+}
+
+.keyboard-controls small {
+	color: #b8e6d3;
+	line-height: 1.4;
+}
+
+.keyboard-controls strong {
+	color: #38f9d7;
+	font-weight: 600;
+	font-family: "Courier New", monospace;
+	background: rgba(56, 249, 215, 0.1);
+	padding: 0.1rem 0.3rem;
+	border-radius: 0.2rem;
+	font-size: 0.85rem;
 }
