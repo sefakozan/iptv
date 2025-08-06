@@ -246,7 +246,7 @@ $(document).ready(() => {
 			if (options.length > 0) {
 				const randomOptionIndex = Math.floor(Math.random() * options.length);
 				const randomOption = options.eq(randomOptionIndex);
-				countrySelect.val(randomOption.val()).trigger("change");
+				countrySelect.val(randomOption.val()).trigger("change", [{ random: true }]);
 			}
 
 			return;
@@ -357,9 +357,16 @@ async function loadCountries() {
 }
 
 // Handle country selection change
-function handleCountryChange() {
+function handleCountryChange(event, extraData) {
+	let randomSortChannels = false;
 	const selectedCountry = $(this).val();
 	console.log("Country changed to:", selectedCountry);
+
+	// Check if this was a random selection
+	if (extraData && extraData.random) {
+		console.log("🎲 Random country selection via Tab key!");
+		randomSortChannels = true;
+	}
 
 	if (selectedCountry) {
 		$("#channelList").prop("disabled", false).html('<option value="">Loading channels...</option>');
@@ -368,14 +375,14 @@ function handleCountryChange() {
 
 		// Automatically load channels for the selected country
 		console.log("Loading channels for:", selectedCountry);
-		loadChannels();
+		loadChannels(randomSortChannels);
 	} else {
 		$("#channelList").prop("disabled", true).html('<option value="">Select a country first</option>');
 	}
 }
 
 // Load channels for selected country
-async function loadChannels() {
+async function loadChannels(randomSortChannels) {
 	const selectedCountry = $("#countrySelect").val();
 	if (!selectedCountry) return;
 
@@ -408,6 +415,11 @@ async function loadChannels() {
 
 			// Cache the channels data
 			cache.set(m3uUrl, channelsData);
+		}
+
+		// random sort channelsData
+		if (randomSortChannels) {
+			channelsData.sort(() => Math.random() - 0.5);
 		}
 
 		// Populate channel list
