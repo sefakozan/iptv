@@ -1,0 +1,284 @@
+body {
+	padding: 0;
+	min-height: 100vh;
+	background: linear-gradient(135deg, #232526 0%, #414345 100%);
+	font-family: "Inter", "Segoe UI", Arial, sans-serif;
+	color: #eaeaea;
+}
+.card {
+	background: #23272f;
+	border: none;
+	border-radius: 1.2rem;
+	box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.18);
+	margin-bottom: 2.5rem;
+	color: #eaeaea;
+}
+.container-fluid {
+	padding-top: 2.5rem;
+	padding-bottom: 2.5rem;
+	padding-left: 1.5rem;
+	padding-right: 1.5rem;
+}
+.card-header.bg-primary {
+	background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%) !important; /* Tron/cyan gradient */
+	color: #fff !important;
+	border-top-left-radius: 1.2rem;
+	border-top-right-radius: 1.2rem;
+	border-bottom: none;
+}
+.card-header.bg-info {
+	background: linear-gradient(90deg, #43e97b 0%, #38f9d7 100%) !important; /* Tron/green-cyan gradient */
+	color: #fff !important;
+	border-top-left-radius: 1.2rem;
+	border-top-right-radius: 1.2rem;
+	border-bottom: none;
+}
+.select2-container {
+	width: 100% !important;
+}
+/* Ülke seçme combobox'ını büyüt */
+#countrySelect {
+	font-size: 1.25rem;
+	min-height: 3.2rem;
+	background: #23272f;
+	color: #eaeaea;
+	border-radius: 0.7rem;
+	border: 1px solid #343a40;
+}
+/* Kanal seçme combobox'ı ve diğer .form-select'ler için koyu arka plan */
+.form-select {
+	background-color: #23272f !important;
+	color: #eaeaea !important;
+	border: 1px solid #343a40 !important;
+}
+.select2-container--default .select2-selection--single {
+	min-height: 3.2rem;
+	font-size: 1.25rem;
+	display: flex;
+	align-items: center;
+	background: #23272f;
+	color: #eaeaea;
+	border-radius: 0.7rem;
+	border: 1px solid #343a40;
+	box-shadow: 0 2px 8px rgba(31, 38, 135, 0.08);
+}
+.select2-selection__rendered {
+	color: #fff !important;
+}
+.select2-selection__rendered img {
+	margin-right: 0.5em;
+	vertical-align: middle;
+	width: 1.5em;
+	height: auto;
+	aspect-ratio: 4 / 3;
+	border-radius: 0.2em;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08);
+}
+#videoPlayer {
+	width: 100%;
+	height: 500px;
+	background: #181a1b;
+	border-radius: 0.7rem;
+	box-shadow: 0 2px 8px rgba(31, 38, 135, 0.08);
+}
+.channel-info {
+	background: rgba(255, 255, 255, 0.04);
+	padding: 1.2rem 1.5rem;
+	border-radius: 0.7rem;
+	box-shadow: 0 2px 8px rgba(31, 38, 135, 0.04);
+	color: #eaeaea;
+	min-height: 90px;
+}
+/* Kanal URL'si çok uzunsa taşmayı ve kaymayı engelle */
+#channelInfo .url-clip {
+	display: block;
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+#channelInfo p {
+	display: flex;
+	align-items: center;
+	gap: 0.5em;
+	margin-bottom: 0.5em;
+	max-width: 100%;
+}
+#channelInfo strong {
+	flex-shrink: 0;
+}
+#channelInfo .url-clip {
+	flex: 1 1 0%;
+	min-width: 0;
+}
+
+.btn-success,
+.btn-primary,
+.btn-secondary {
+	border-radius: 0.7rem;
+	font-weight: 600;
+	letter-spacing: 0.5px;
+	box-shadow: 0 2px 8px rgba(31, 38, 135, 0.08);
+	border: none;
+	transition:
+		background 0.2s,
+		color 0.2s;
+}
+.btn-success {
+	background: linear-gradient(90deg, #6c757d 0%, #495057 100%);
+}
+.btn-primary {
+	background: linear-gradient(90deg, #00f2fe 0%, #4facfe 100%);
+}
+.btn-secondary {
+	background: linear-gradient(90deg, #6c757d 0%, #495057 100%);
+}
+.btn:disabled {
+	opacity: 0.6;
+}
+label,
+.form-label {
+	color: #b0b8c1;
+	font-weight: 500;
+}
+.select2-dropdown {
+	background: #23272f;
+	color: #eaeaea;
+	border-radius: 0.7rem;
+	border: 1px solid #343a40;
+}
+.select2-results__option--highlighted {
+	background: linear-gradient(90deg, #6c757d 0%, #495057 100%) !important;
+	color: #fff !important;
+}
+/* Seçili ülkenin arka planı hover ile aynı olsun */
+.select2-results__option[aria-selected="true"] {
+	background: linear-gradient(90deg, #6c757d 0%, #495057 100%) !important;
+	color: #0c0c0c !important;
+}
+.select2-container--default .select2-results__option--selected {
+	color: #0c0c0c !important;
+}
+
+/* Select2 popup: selected but not hovered item same as hover */
+.select2-results__option[aria-selected="true"]:not(.select2-results__option--highlighted) {
+	background: linear-gradient(90deg, #6c757d 0%, #495057 100%) !important;
+	color: #181717 !important;
+}
+.select2-results__option--highlighted {
+	background: linear-gradient(90deg, #6c757d 0%, #495057 100%) !important;
+}
+.select2-results__option {
+	padding: 0.7em 1em;
+}
+/* Listbox (channelList) selected, hover, and active item green gradient like play button */
+#channelList option:checked,
+#channelList option[selected],
+#channelList option:hover,
+#channelList option:active {
+	background: linear-gradient(90deg, #6c757d 0%, #495057 100%) !important;
+	color: #fff !important;
+}
+
+/* Minimal scrollbar for Select2 dropdown */
+.select2-dropdown .select2-results__options {
+	scrollbar-width: thin;
+	scrollbar-color: #444 #23272f;
+}
+.select2-dropdown .select2-results__options::-webkit-scrollbar {
+	width: 7px;
+	background: #23272f;
+}
+.select2-dropdown .select2-results__options::-webkit-scrollbar-thumb {
+	background: #444;
+	border-radius: 6px;
+}
+.select2-dropdown .select2-results__options::-webkit-scrollbar-thumb:hover {
+	background: #666;
+}
+::selection {
+	background: #00f2fe;
+	color: #23272f;
+}
+
+h2.mb-0 {
+	font-family: "Inter", "Segoe UI", Arial, sans-serif;
+	font-weight: 800;
+	letter-spacing: 1px;
+	font-size: 2.2rem;
+}
+
+/* --- UX Polish: focus, pointer, accessibility, transitions --- */
+.btn,
+button,
+select,
+.form-select,
+.select2-selection--single {
+	cursor: pointer;
+}
+.btn:disabled {
+	opacity: 0.6;
+	cursor: not-allowed !important;
+}
+.btn:focus,
+.btn:active,
+.btn-success:focus,
+.btn-primary:focus,
+.btn-secondary:focus {
+	outline: 2px solid #00f2fe !important;
+	outline-offset: 2px;
+	box-shadow: 0 0 0 2px #00f2fe33 !important;
+}
+.btn:hover:not(:disabled),
+.btn:focus-visible:not(:disabled) {
+	filter: brightness(1.08);
+	opacity: 0.95;
+}
+.form-select {
+	transition:
+		border-color 0.2s,
+		box-shadow 0.2s;
+}
+.form-select:focus {
+	border-color: #00f2fe !important;
+	box-shadow: 0 0 0 2px #00f2fe33 !important;
+	outline: none !important;
+}
+.select2-container--default .select2-selection--single {
+	transition:
+		border-color 0.2s,
+		box-shadow 0.2s;
+}
+.select2-container--default .select2-selection--single:focus,
+.select2-container--default .select2-selection--single.select2-selection--focus {
+	border-color: #00f2fe !important;
+	box-shadow: 0 0 0 2px #00f2fe33 !important;
+	outline: none !important;
+}
+.select2-results__option {
+	transition:
+		background 0.15s,
+		color 0.15s;
+}
+#channelList:focus {
+	outline: 2px solid #00f2fe !important;
+	outline-offset: 2px;
+}
+/* Visually hide but keep accessible for screen readers */
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	border: 0;
+}
+
+h2.mb-0 {
+	font-family: "Inter", "Segoe UI", Arial, sans-serif;
+	font-weight: 800;
+	letter-spacing: 1px;
+	font-size: 2.2rem;
+}
