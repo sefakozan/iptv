@@ -575,6 +575,31 @@ h2.mb-0 {
 	min-width: 200px;
 }
 
+/* Responsive: Hide keyboard controls on smaller screens and make channel info full width */
+@media (max-width: 1199.98px) {
+	.col-12 {
+		width: 100% !important;
+		flex: 0 0 auto !important;
+	}
+
+	.keyboard-controls-parent {
+		display: none !important;
+	}
+}
+
+/* Responsive: Ensure proper spacing on extra large screens */
+@media (min-width: 1200px) {
+	.col-xl-9 {
+		width: 75% !important;
+		flex: 0 0 auto !important;
+	}
+
+	.col-xl-3 {
+		width: 25% !important;
+		flex: 0 0 auto !important;
+	}
+}
+
 /* Settings Panel Styling */
 #settingsPanel {
 	border: 2px solid #e5e7eb;
