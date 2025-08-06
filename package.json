@@ -15,7 +15,8 @@
 		"lint": "biome lint ."
 	},
 	"bin": {
-		"generate": "./bin/generate.js"
+		"generate": "./bin/generate.js",
+		"check": "./bin/check.js"
 	},
 	"author": "",
 	"license": "Apache-2.0",

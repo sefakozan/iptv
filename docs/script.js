@@ -331,7 +331,8 @@ async function loadCountries() {
 		for (const country of countriesData) {
 			if (country.disabled) continue;
 			// Bayrak url'si flagcdn.io üzerinden
-			const code = country.code.toLowerCase();
+			let code = country.code.toLowerCase();
+			if (code.length > 2) code = country.flag.toLowerCase();
 			// UK için özel flag
 			const flagCode = code === "uk" ? "gb" : code;
 			const flagUrl = `https://flagcdn.com/w20/${flagCode}.png`;
