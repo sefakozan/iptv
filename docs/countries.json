@@ -90,7 +90,7 @@
 	{ "name": "Guadeloupe", "code": "GP", "languages": ["fra"], "flag": "🇬🇵" },
 	{ "name": "Guam", "code": "GU", "languages": ["cha", "eng", "spa"], "flag": "🇬🇺" },
 	{ "name": "Guatemala", "code": "GT", "languages": ["spa"], "flag": "🇬🇹" },
-	{ "name": "Guernsey", "code": "GG", "languages": ["eng", "fra", "nfr"], "flag": "🇬🇬" },
+	{ "name": "Guernsey", "code": "GG", "languages": ["eng", "fra", "nfr"], "flag": "🇬🇬", "disabled": true },
 	{ "name": "Guinea", "code": "GN", "languages": ["fra"], "flag": "🇬🇳" },
 	{ "name": "Guinea-Bissau", "code": "GW", "languages": ["por", "pov"], "flag": "🇬🇼" },
 	{ "name": "Guyana", "code": "GY", "languages": ["eng"], "flag": "🇬🇾" },
