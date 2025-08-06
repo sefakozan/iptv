@@ -596,8 +596,17 @@ h2.mb-0 {
 	transition: all 0.2s ease;
 }
 
+#settingsBtn i {
+	color: #6c757d;
+	font-size: 1rem;
+	transition: color 0.2s ease;
+}
+
 #settingsBtn:hover {
 	background-color: #f3f4f6;
-	border-color: #d1d5db;
 	transform: translateY(-1px);
+}
+
+#settingsBtn:hover i {
+	color: #4f46e5;
 }
