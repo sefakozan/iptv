@@ -327,7 +327,9 @@ async function loadCountries() {
 
 		// Populate country select
 		const countrySelect = $("#countrySelect");
-		countriesData.forEach((country) => {
+
+		for (const country of countriesData) {
+			if (countriesData.disabled) continue;
 			// Bayrak url'si flagcdn.io üzerinden
 			const code = country.code.toLowerCase();
 			// UK için özel flag
@@ -336,7 +338,7 @@ async function loadCountries() {
 			countrySelect.append(new Option(`${country.name} (${country.code.toUpperCase()})`, code));
 			// Option elementine data-flag ekle
 			countrySelect.find(`option[value='${code}']`).attr("data-flag", flagUrl);
-		});
+		}
 
 		// Populate settings panel default country select
 		console.log("Populating default country select...");
