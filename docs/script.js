@@ -107,21 +107,36 @@ $(document).ready(() => {
 		}
 		// Alt-üst ok tuşları ile kanal değiştirme (global)
 		else if (e.key === "ArrowUp" || e.key === "ArrowDown") {
-			if (channelsData.length === 0) return; // Kanal yoksa çık
+			const channelList = $("#channelList");
+			const availableOptions = channelList.find("option").filter(function () {
+				return $(this).val() !== "";
+			});
+
+			if (availableOptions.length === 0) return; // Kanal yoksa çık
 
 			e.preventDefault();
-			const currentIndex = parseInt($("#channelList").val()) || 0;
-			let newIndex;
+			const currentValue = channelList.val();
+			let currentIndex = -1;
 
+			// Mevcut seçili kanalın filtrelenmiş listede index'ini bul
+			availableOptions.each(function (index) {
+				if ($(this).val() === currentValue) {
+					currentIndex = index;
+					return false;
+				}
+			});
+
+			let newIndex;
 			if (e.key === "ArrowUp") {
 				// Yukarı ok: önceki kanal
-				newIndex = currentIndex > 0 ? currentIndex - 1 : channelsData.length - 1;
+				newIndex = currentIndex > 0 ? currentIndex - 1 : availableOptions.length - 1;
 			} else {
 				// Aşağı ok: sonraki kanal
-				newIndex = currentIndex < channelsData.length - 1 ? currentIndex + 1 : 0;
+				newIndex = currentIndex < availableOptions.length - 1 ? currentIndex + 1 : 0;
 			}
 
-			$("#channelList").val(newIndex).trigger("change");
+			const newValue = availableOptions.eq(newIndex).val();
+			channelList.val(newValue).trigger("change");
 		}
 	});
 });
@@ -337,14 +352,14 @@ function playStream() {
 		hls.loadSource(channel.url);
 		hls.attachMedia(video);
 		hls.on(Hls.Events.MANIFEST_PARSED, () => {
-			const aaa = video
+			video
 				.play()
 				.then(() => {})
 				.catch((error) => {
 					console.error("Error playing video:", error);
 				});
 		});
-		hls.on(Hls.Events.ERROR, (event, data) => {
+		hls.on(Hls.Events.ERROR, (_, data) => {
 			console.error("HLS error:", data);
 			console.error(`Streaming error: ${data.type} - ${data.details}`);
 		});
