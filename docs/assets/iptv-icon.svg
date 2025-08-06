@@ -1,0 +1,35 @@
+<svg width="512" height="512" id="iconSvg" xmlns="http://www.w3.org/2000/svg">
+                <!-- Background gradient -->
+                <defs>
+                    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#4f46e5;stop-opacity:1"/>
+                        <stop offset="100%" style="stop-color:#7c3aed;stop-opacity:1"/>
+                    </linearGradient>
+                    <linearGradient id="tvGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1"/>
+                        <stop offset="100%" style="stop-color:#f8fafc;stop-opacity:1"/>
+                    </linearGradient>
+                    <linearGradient id="screenGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#1e293b;stop-opacity:1"/>
+                        <stop offset="100%" style="stop-color:#334155;stop-opacity:1"/>
+                    </linearGradient>
+                    <linearGradient id="playGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#10b981;stop-opacity:1"/>
+                        <stop offset="100%" style="stop-color:#059669;stop-opacity:1"/>
+                    </linearGradient>
+                </defs>
+                
+                <!-- Background circle -->
+                <circle cx="256" cy="256" r="240" fill="url(#bgGradient)"/>
+                
+                <!-- Ultra Minimal TV Design -->
+                <!-- Main TV Body - Clean Rectangle -->
+                <rect x="120" y="160" width="272" height="154" rx="8" fill="url(#tvGradient)" stroke="#f8fafc" stroke-width="3"/>
+                
+                <!-- TV Screen - Empty Black Screen -->
+                <rect x="140" y="180" width="232" height="104" rx="4" fill="url(#bgGradient)" fill-opacity="0.8"/>
+                
+                <!-- TV Stand - Minimal Design -->
+                <!--<rect x="230" y="320" width="52" height="16" rx="8" fill="#f8fafc"/>-->
+                <rect x="170" y="340" width="172" height="20" rx="8" fill="#f8fafc"/>
+            </svg>
