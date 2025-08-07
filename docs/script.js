@@ -218,43 +218,13 @@ const ErrorManager = {
 
 		// Show user notification if requested
 		if (showUser) {
-			this.showUserNotification(errorInfo);
+			SettingsManager.showToast('error', 'Error Message', errorInfo.message);
 		}
 
 		// Report to analytics/monitoring service
 		this.reportError(errorInfo);
 
 		return errorInfo;
-	},
-
-	showUserNotification(errorInfo) {
-		const { type, message } = errorInfo;
-
-		// Create notification element
-		const notification = document.createElement('div');
-		notification.className = `alert alert-danger alert-dismissible fade show`;
-		notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 9999;
-            max-width: 400px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        `;
-
-		notification.innerHTML = `
-            <strong>${type.charAt(0).toUpperCase() + type.slice(1)} Error:</strong> ${Utils.sanitizeHtml(message)}
-            <button type="button" class="btn-close" onclick="this.parentElement.remove()"></button>
-        `;
-
-		document.body.appendChild(notification);
-
-		// Auto remove after 5 seconds
-		setTimeout(() => {
-			if (notification.parentElement) {
-				notification.remove();
-			}
-		}, 5000);
 	},
 
 	reportError(errorInfo) {
@@ -1034,33 +1004,25 @@ const SettingsManager = {
 			window.deferredPrompt.userChoice.then((choiceResult) => {
 				if (choiceResult.outcome === 'accepted') {
 					console.log('PWA installation accepted');
+					this.showToast('success', 'Installation Started', 'IPTV Player is being installed...');
 					// Update status after installation
 					setTimeout(() => this.updateModalStatus(), 1000);
+				} else {
+					this.showToast('info', 'Installation Cancelled', 'You can install the app later from browser menu.');
 				}
 				window.deferredPrompt = null;
 			});
 		} else {
 			// Show manual installation instructions
-			const toast = $(`
-				<div class="toast align-items-center text-white bg-info border-0 position-fixed" 
-					 style="top: 20px; right: 20px; z-index: 9999; max-width: 350px;" role="alert">
-					<div class="d-flex">
-						<div class="toast-body">
-							<i class="fas fa-info-circle me-2"></i>
-							<strong>Manual Installation:</strong><br>
-							1. Click browser menu (⋮)<br>
-							2. Select "Install App" or "Add to Home Screen"
-						</div>
-						<button type="button" class="btn-close btn-close-white me-2 m-auto" 
-								data-bs-dismiss="toast"></button>
-					</div>
-				</div>
-			`);
-
-			$('body').append(toast);
-			const bsToast = new bootstrap.Toast(toast[0], { delay: 8000 });
-			bsToast.show();
-			toast[0].addEventListener('hidden.bs.toast', () => toast.remove());
+			this.showToast(
+				'info',
+				'Manual Installation',
+				`To install IPTV Player manually:<br>
+				1. Click browser menu (⋮)<br>
+				2. Select "Install App" or "Add to Home Screen"<br>
+				3. Follow the installation prompts`,
+				8000,
+			);
 		}
 	},
 
@@ -1075,27 +1037,10 @@ const SettingsManager = {
 						registration.waiting.postMessage({ type: 'SKIP_WAITING' });
 
 						// Show update message
-						const toast = $(`
-							<div class="toast align-items-center text-white bg-success border-0 position-fixed" 
-								 style="top: 20px; right: 20px; z-index: 9999;" role="alert">
-								<div class="d-flex">
-									<div class="toast-body">
-										<i class="fas fa-sync-alt me-2"></i>App updated! Refresh to apply changes.
-									</div>
-									<button type="button" class="btn-close btn-close-white me-2 m-auto" 
-											data-bs-dismiss="toast"></button>
-								</div>
-							</div>
-						`);
+						this.showToast('success', 'App Updated!', 'App updated successfully! Changes will be applied on next reload.', 5000);
 
-						$('body').append(toast);
-						const bsToast = new bootstrap.Toast(toast[0], { delay: 5000 });
-						bsToast.show();
-						toast[0].addEventListener('hidden.bs.toast', () => {
-							toast.remove();
-							// Refresh page after toast is hidden
-							setTimeout(() => window.location.reload(), 500);
-						});
+						// Refresh page after a delay
+						setTimeout(() => window.location.reload(), 2000);
 					} else {
 						// Force update check
 						registration.update().then(() => {
@@ -1107,7 +1052,111 @@ const SettingsManager = {
 		}
 	},
 
-	// Save current settings from modal UI
+	// Create and show Bootstrap toast
+	showToast(type = 'info', title = '', message = '', delay = 5000, actions = null) {
+		const toastId = `toast-${Date.now()}`;
+
+		// Toast type classes
+		const typeClasses = {
+			success: 'bg-success text-white',
+			error: 'bg-danger text-white',
+			warning: 'bg-warning text-dark',
+			info: 'bg-info text-white',
+			primary: 'bg-primary text-white',
+		};
+
+		// Toast icons
+		const typeIcons = {
+			success: 'fas fa-check-circle',
+			error: 'fas fa-exclamation-triangle',
+			warning: 'fas fa-exclamation-circle',
+			info: 'fas fa-info-circle',
+			primary: 'fas fa-bell',
+		};
+
+		const closeButtonClass = type === 'warning' ? 'btn-close' : 'btn-close btn-close-white';
+
+		let actionsHtml = '';
+		const actionHandlers = {};
+		if (actions && actions.length > 0) {
+			actionsHtml = `
+				<div class="mt-2 pt-2 border-top">
+					${actions
+						.map((action, index) => {
+							const actionId = `${toastId}-action-${index}`;
+							if (action.action && typeof action.action === 'function') {
+								actionHandlers[actionId] = action.action;
+							}
+							return `
+						<button type="button" class="btn btn-sm ${action.class || 'btn-outline-light'} me-2" 
+								id="${actionId}">${action.text}</button>
+					`;
+						})
+						.join('')}
+				</div>
+			`;
+		}
+
+		const toastHtml = `
+			<div id="${toastId}" class="toast align-items-center ${typeClasses[type] || typeClasses.info} border-0 position-fixed" 
+				 style="top: 20px; right: 20px; z-index: 9999; max-width: 400px; min-width: 300px;" role="alert" aria-live="assertive" aria-atomic="true">
+				<div class="d-flex">
+					<div class="toast-body">
+						<div class="d-flex align-items-start">
+							<i class="${typeIcons[type] || typeIcons.info} me-2 mt-1"></i>
+							<div class="flex-grow-1">
+								${title ? `<strong>${title}</strong><br>` : ''}
+								${message}
+								${actionsHtml}
+							</div>
+						</div>
+					</div>
+					<button type="button" class="${closeButtonClass} me-2 m-auto" 
+							data-bs-dismiss="toast" aria-label="Close"></button>
+				</div>
+			</div>
+		`;
+
+		// Remove existing toasts of same type to prevent spam
+		$(`.toast.${typeClasses[type].split(' ')[0]}`).each(function () {
+			const existingToast = bootstrap.Toast.getInstance(this);
+			if (existingToast) {
+				existingToast.hide();
+			}
+		});
+
+		$('body').append(toastHtml);
+		const toastElement = document.getElementById(toastId);
+
+		// Add action button event handlers
+		Object.keys(actionHandlers).forEach((actionId) => {
+			const button = document.getElementById(actionId);
+			if (button) {
+				button.addEventListener('click', () => {
+					actionHandlers[actionId]();
+					// Close the toast after action
+					const toast = bootstrap.Toast.getInstance(toastElement);
+					if (toast) {
+						toast.hide();
+					}
+				});
+			}
+		});
+
+		const bsToast = new bootstrap.Toast(toastElement, {
+			delay: delay,
+			autohide: delay > 0,
+		});
+
+		bsToast.show();
+
+		// Clean up after hidden
+		toastElement.addEventListener('hidden.bs.toast', () => {
+			toastElement.remove();
+		});
+
+		return bsToast;
+	}, // Save current settings from modal UI
 	saveCurrentSettings() {
 		const defaultCountry = $('#defaultCountrySelect').val();
 		const autoplayMuted = $('#autoplayMuted').is(':checked');
@@ -1121,62 +1170,25 @@ const SettingsManager = {
 		});
 
 		if (success) {
-			// Show success message
-			const toast = $(`
-				<div class="toast align-items-center text-white bg-success border-0 position-fixed" 
-					 style="top: 20px; right: 20px; z-index: 9999;" role="alert">
-					<div class="d-flex">
-						<div class="toast-body">
-							<i class="fas fa-check me-2"></i>Settings saved successfully!
-						</div>
-						<button type="button" class="btn-close btn-close-white me-2 m-auto" 
-								data-bs-dismiss="toast"></button>
-					</div>
-				</div>
-			`);
-
-			$('body').append(toast);
-			const bsToast = new bootstrap.Toast(toast[0]);
-			bsToast.show();
-
-			// Remove toast after it's hidden
-			toast[0].addEventListener('hidden.bs.toast', () => toast.remove());
+			this.showToast('success', '', 'Settings saved successfully!');
 		}
 	},
 
 	// Reset settings to defaults
 	resetToDefaults() {
-		if (confirm('Are you sure you want to reset all settings to defaults? This action cannot be undone.')) {
-			try {
-				localStorage.removeItem(this.STORAGE_KEY);
+		try {
+			throw `test error`;
+			localStorage.removeItem(this.STORAGE_KEY);
 
-				// Reset UI
-				$('#defaultCountrySelect').val('');
-				$('#autoplayMuted').prop('checked', true);
-				$('#rememberVolume').prop('checked', false);
+			// Reset UI
+			$('#defaultCountrySelect').val('');
+			$('#autoplayMuted').prop('checked', true);
+			$('#rememberVolume').prop('checked', false);
 
-				// Show success message
-				const toast = $(`
-					<div class="toast align-items-center text-white bg-info border-0 position-fixed" 
-						 style="top: 20px; right: 20px; z-index: 9999;" role="alert">
-						<div class="d-flex">
-							<div class="toast-body">
-								<i class="fas fa-undo me-2"></i>Settings reset to defaults!
-							</div>
-							<button type="button" class="btn-close btn-close-white me-2 m-auto" 
-									data-bs-dismiss="toast"></button>
-						</div>
-					</div>
-				`);
-
-				$('body').append(toast);
-				const bsToast = new bootstrap.Toast(toast[0]);
-				bsToast.show();
-
-				toast[0].addEventListener('hidden.bs.toast', () => toast.remove());
-			} catch (error) {
-				ErrorManager.handle(error, ErrorManager.ERROR_TYPES.STORAGE, 'Resetting settings');
-			}
+			// Show success message
+			this.showToast('success', '', 'Settings reset to defaults!');
+		} catch (error) {
+			ErrorManager.handle(error, ErrorManager.ERROR_TYPES.STORAGE, 'Resetting settings', true);
 		}
 	},
 
@@ -1235,6 +1247,111 @@ const SettingsManager = {
 			ErrorManager.handle(error, ErrorManager.ERROR_TYPES.VALIDATION, 'Loading default settings');
 			// Fallback to US
 			$('#countrySelect').val('us').trigger('change');
+		}
+	},
+
+	// Initialize automatic PWA update checking
+	initializeAutoUpdate() {
+		// Check for updates every 30 seconds
+		this.updateCheckInterval = setInterval(() => {
+			this.checkForPWAUpdates();
+		}, 30000);
+
+		// Check immediately when the app becomes visible again
+		document.addEventListener('visibilitychange', () => {
+			if (!document.hidden) {
+				setTimeout(() => this.checkForPWAUpdates(), 1000);
+			}
+		});
+
+		// Initial check after 5 seconds
+		setTimeout(() => this.checkForPWAUpdates(), 5000);
+	},
+
+	// Check for PWA updates automatically
+	async checkForPWAUpdates() {
+		try {
+			if (!('serviceWorker' in navigator)) return;
+
+			const registration = await navigator.serviceWorker.getRegistration();
+			if (!registration) return;
+
+			// Force update check
+			await registration.update();
+
+			// Check if there's a waiting service worker
+			if (registration.waiting) {
+				this.handleAvailableUpdate(registration);
+			}
+
+			// Listen for new service worker installing
+			registration.addEventListener('updatefound', () => {
+				const newWorker = registration.installing;
+				if (!newWorker) return;
+
+				newWorker.addEventListener('statechange', () => {
+					if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+						this.handleAvailableUpdate(registration);
+					}
+				});
+			});
+		} catch (error) {
+			console.log('PWA update check failed:', error);
+		}
+	},
+
+	// Handle available PWA update
+	handleAvailableUpdate(registration) {
+		// Prevent multiple notifications for the same update
+		if (this.updateNotificationShown) return;
+		this.updateNotificationShown = true;
+
+		this.showToast('primary', 'Update Available', 'A new version of the app is available!', 0, [
+			{
+				text: 'Update Now',
+				action: () => {
+					this.applyPWAUpdate(registration);
+				},
+			},
+			{
+				text: 'Later',
+				action: () => {
+					this.updateNotificationShown = false; // Allow notification again later
+				},
+			},
+		]);
+	},
+
+	// Apply PWA update
+	async applyPWAUpdate(registration) {
+		try {
+			if (registration.waiting) {
+				// Tell the service worker to skip waiting and become active
+				registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+
+				// Listen for the service worker to become active
+				navigator.serviceWorker.addEventListener('controllerchange', () => {
+					this.showToast('success', 'Update Complete', 'App updated successfully! The new version is now active.', 0, [
+						{
+							text: 'Reload Page',
+							action: () => {
+								window.location.reload();
+							},
+						},
+					]);
+				});
+			}
+		} catch (error) {
+			console.error('PWA update application failed:', error);
+			this.showToast('error', 'Update Failed', 'Update failed. Please refresh the page manually.');
+		}
+	},
+
+	// Stop automatic update checking (cleanup)
+	stopAutoUpdate() {
+		if (this.updateCheckInterval) {
+			clearInterval(this.updateCheckInterval);
+			this.updateCheckInterval = null;
 		}
 	},
 };
@@ -1296,6 +1413,9 @@ const IPTVApp = {
 			Select2Manager.initialize();
 			KeyboardManager.initialize();
 
+			// Initialize automatic PWA update checking
+			SettingsManager.initializeAutoUpdate();
+
 			// Attach event handlers
 			this.attachEventHandlers();
 
@@ -1344,6 +1464,7 @@ const IPTVApp = {
 		try {
 			VideoManager.stopPlayback();
 			$(document).off('.iptvKeyboard');
+			SettingsManager.stopAutoUpdate();
 			appState.clearCache();
 			console.log('Application cleanup completed');
 		} catch (error) {
