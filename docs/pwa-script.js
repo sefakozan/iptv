@@ -588,7 +588,7 @@ class InstallPromptManager {
 			window.deferredPrompt = e; // Make it globally accessible
 			this.isInstallable = true;
 
-			this.showInstallUI();
+			//this.showInstallUI();
 
 			// Trigger installable event
 			const event = new CustomEvent('pwa:installable', {

@@ -953,6 +953,7 @@ const SettingsManager = {
 			} else {
 				$installStatus.removeClass('bg-success bg-warning').addClass('bg-secondary').html('<i class="fas fa-download me-1"></i>Not Installed');
 				// Show install button if PWA installation is available
+				// TODO  burasi ne yapiyor
 				if (window.deferredPrompt || window.BeforeInstallPromptEvent) {
 					$installBtn.removeClass('d-none');
 				}
