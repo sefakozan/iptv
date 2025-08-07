@@ -464,6 +464,11 @@ class ServiceWorkerManager {
 					if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
 						console.log('🔄 New version available');
 						this.showUpdateNotification();
+						try {
+							window.location.reload();
+						} catch (error) {
+							this.errorManager.logError(error, 'New version intalled!.. Auto relode not working!...');
+						}
 
 						// Trigger update event
 						const event = new CustomEvent('pwa:update-available', {
