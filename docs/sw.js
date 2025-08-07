@@ -79,7 +79,7 @@ async function handleFetch(event) {
 	const cachedResponse = await cache.match(event.request);
 	if (cachedResponse) {
 		//  check header, video/mp2t
-		return cachedResponse;
+		//return cachedResponse;
 	}
 
 	const response = await fetch(event.request);

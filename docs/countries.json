@@ -57,7 +57,7 @@
 	{ "name": "Curacao", "code": "CW", "languages": ["eng", "nld", "pap"], "flag": "🇨🇼" },
 	{ "name": "Cyprus", "code": "CY", "languages": ["ell", "tur"], "flag": "🇨🇾" },
 	{ "name": "Czech Republic", "code": "CZ", "languages": ["ces", "slk"], "flag": "🇨🇿" },
-	{ "name": "Democratic Republic of the Congo", "code": "CD", "languages": ["fra", "kon", "lin", "lua", "swa"], "flag": "🇨🇩" },
+	{ "name": "Congo", "code": "CD", "languages": ["fra", "kon", "lin", "lua", "swa"], "flag": "🇨🇩" },
 	{ "name": "Denmark", "code": "DK", "languages": ["dan"], "flag": "🇩🇰" },
 	{ "name": "Djibouti", "code": "DJ", "languages": ["ara", "fra"], "flag": "🇩🇯" },
 	{ "name": "Dominica", "code": "DM", "languages": ["eng"], "flag": "🇩🇲" },
@@ -189,8 +189,8 @@
 	{ "name": "Saint Kitts and Nevis", "code": "KN", "languages": ["eng"], "flag": "🇰🇳" },
 	{ "name": "Saint Lucia", "code": "LC", "languages": ["eng"], "flag": "🇱🇨" },
 	{ "name": "Saint Martin", "code": "MF", "languages": ["fra"], "flag": "🇲🇫" },
-	{ "name": "Saint Pierre and Miquelon", "code": "PM", "languages": ["fra"], "flag": "🇵🇲" },
-	{ "name": "Saint Vincent and the Grenadines", "code": "VC", "languages": ["eng"], "flag": "🇻🇨" },
+	{ "name": "Saint Pierre", "code": "PM", "languages": ["fra"], "flag": "🇵🇲" },
+	{ "name": "Saint Vincent", "code": "VC", "languages": ["eng"], "flag": "🇻🇨" },
 	{ "name": "Samoa", "code": "WS", "languages": ["eng", "smo"], "flag": "🇼🇸" },
 	{ "name": "San Marino", "code": "SM", "languages": ["ita"], "flag": "🇸🇲" },
 	{ "name": "Saudi Arabia", "code": "SA", "languages": ["ara"], "flag": "🇸🇦" },
@@ -205,7 +205,7 @@
 	{ "name": "Solomon Islands", "code": "SB", "languages": ["eng"], "flag": "🇸🇧" },
 	{ "name": "Somalia", "code": "SO", "languages": ["ara", "som"], "flag": "🇸🇴" },
 	{ "name": "South Africa", "code": "ZA", "languages": ["afr", "eng", "nbl", "nso", "sot", "ssw", "tsn", "tso", "ven", "xho", "zul"], "flag": "🇿🇦" },
-	{ "name": "South Georgia and the South Sandwich Islands", "code": "GS", "languages": ["eng"], "flag": "🇬🇸" },
+	{ "name": "South Georgia", "code": "GS", "languages": ["eng"], "flag": "🇬🇸" },
 	{ "name": "South Korea", "code": "KR", "languages": ["kor"], "flag": "🇰🇷" },
 	{ "name": "South Sudan", "code": "SS", "languages": ["eng"], "flag": "🇸🇸" },
 	{ "name": "Spain", "code": "ES", "languages": ["spa"], "flag": "🇪🇸" },
@@ -249,5 +249,5 @@
 	{ "name": "Yemen", "code": "YE", "languages": ["ara"], "flag": "🇾🇪" },
 	{ "name": "Zambia", "code": "ZM", "languages": ["eng"], "flag": "🇿🇲" },
 	{ "name": "Zimbabwe", "code": "ZW", "languages": ["bwg", "eng", "kck", "hio", "ndc", "nde", "nya", "sna", "sot", "toi", "tsn", "tso", "ven", "xho", "zib"], "flag": "🇿🇼" },
-	{ "name": "The Others", "code": "undefined", "languages": ["eng"], "flag": "um", "alternatives": ["Mixed"] }
+	{ "name": "The Others", "code": "undefined", "languages": ["eng"], "flag": "🇱🇨", "alternatives": ["Mixed"] }
 ]

@@ -190,7 +190,7 @@ $(document).ready(() => {
 			if (!state.id) return state.text;
 			const flagUrl = $(state.element).data('flag');
 			if (flagUrl) {
-				return $('<span><img src="' + flagUrl + '" /> ' + state.text + '</span>');
+				return $(`<span><img src="${flagUrl}" style="width:3em;height:auto;aspect-ratio:4/3;vertical-align:middle;margin-right:0.5em;border-radius:0.2em;box-shadow:0 1px 2px rgba(0,0,0,0.08);" /> ${state.text}</span>`);
 			}
 			return state.text;
 		},
@@ -199,7 +199,7 @@ $(document).ready(() => {
 			const flagUrl = $(state.element).data('flag');
 			if (flagUrl) {
 				// Aspect ratio bozulmasın diye style ekliyoruz
-				return $('<span><img src="' + flagUrl + '" style="width:1.5em;height:auto;aspect-ratio:4/3;vertical-align:middle;margin-right:0.5em;border-radius:0.2em;box-shadow:0 1px 2px rgba(0,0,0,0.08);" /> ' + state.text + '</span>');
+				return $(`<span><img src="${flagUrl}" style="width:3em;height:auto;aspect-ratio:4/3;vertical-align:middle;margin-right:0.5em;border-radius:0.2em;box-shadow:0 1px 2px rgba(0,0,0,0.08);" /> ${state.text}</span>`);
 			}
 			return state.text;
 		},
@@ -322,17 +322,33 @@ async function loadCountries() {
 		// Populate country select
 		const countrySelect = $('#countrySelect');
 
+		// for (const country of countriesData) {
+		// 	if (country.disabled) continue;
+		// 	// Bayrak url'si flagcdn.io üzerinden
+		// 	let code = country.code.toLowerCase();
+		// 	if (code.length > 2) code = country.flag.toLowerCase();
+		// 	// UK için özel flag
+		// 	const flagCode = code === 'uk' ? 'gb' : code;
+		// 	const flagUrl = `https://flagcdn.com/w20/${flagCode}.png`;
+		// 	countrySelect.append(new Option(`${country.name} (${country.code.toUpperCase()})`, code));
+		// 	// Option elementine data-flag ekle
+		// 	countrySelect.find(`option[value='${code}']`).attr('data-flag', flagUrl);
+		// }
+
 		for (const country of countriesData) {
 			if (country.disabled) continue;
-			// Bayrak url'si flagcdn.io üzerinden
-			let code = country.code.toLowerCase();
-			if (code.length > 2) code = country.flag.toLowerCase();
-			// UK için özel flag
-			const flagCode = code === 'uk' ? 'gb' : code;
-			const flagUrl = `https://flagcdn.com/w20/${flagCode}.png`;
-			countrySelect.append(new Option(`${country.name} (${country.code.toUpperCase()})`, code));
-			// Option elementine data-flag ekle
-			countrySelect.find(`option[value='${code}']`).attr('data-flag', flagUrl);
+
+			const code = country.code.toLowerCase();
+
+			// Convert flag emoji to array of code points
+			const codePoints = Array.from(country.flag).map((char) => char.codePointAt(0).toString(16));
+
+			// Join with hyphens for Twitter URL format
+			const flagUrl = `https://abs-0.twimg.com/emoji/v2/svg/${codePoints.join('-')}.svg`;
+
+			const option = new Option(`${country.name} (${country.code})`, code);
+			option.setAttribute('data-flag', flagUrl);
+			countrySelect.append(option);
 		}
 
 		// Populate settings panel default country select
@@ -357,7 +373,7 @@ function handleCountryChange(event, extraData) {
 	console.log('Country changed to:', selectedCountry);
 
 	// Check if this was a random selection
-	if (extraData && extraData.random) {
+	if (extraData?.random) {
 		console.log('🎲 Random country selection via Tab key!');
 		randomSortChannels = true;
 	}

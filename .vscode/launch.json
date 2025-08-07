@@ -35,6 +35,15 @@
 			"args": ["empty"], // Komut satırı argümanları (isteğe bağlı)
 			"console": "integratedTerminal",
 			"skipFiles": ["<node_internals>/**"]
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "flags",
+			"program": "${workspaceFolder}/bin/flags.js",
+			"args": [], // Komut satırı argümanları (isteğe bağlı)
+			"console": "integratedTerminal",
+			"skipFiles": ["<node_internals>/**"]
 		}
 	]
 }
