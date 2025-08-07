@@ -975,24 +975,44 @@ const SettingsManager = {
 			const isInstalled = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone || document.referrer.includes('android-app://');
 
 			const $installStatus = $('#installStatus');
+			const $installBtn = $('#installAppBtn');
+
 			if (isInstalled) {
 				$installStatus.removeClass('bg-secondary bg-warning').addClass('bg-success').html('<i class="fas fa-check me-1"></i>Installed');
+				$installBtn.addClass('d-none');
 			} else {
 				$installStatus.removeClass('bg-success bg-warning').addClass('bg-secondary').html('<i class="fas fa-download me-1"></i>Not Installed');
+				// Show install button if PWA installation is available
+				if (window.deferredPrompt || window.BeforeInstallPromptEvent) {
+					$installBtn.removeClass('d-none');
+				}
 			}
 
 			// Check Service Worker status
 			const $swStatus = $('#swStatus');
+			const $updateBtn = $('#updateSwBtn');
+
 			if ('serviceWorker' in navigator) {
 				navigator.serviceWorker.getRegistrations().then((registrations) => {
 					if (registrations.length > 0) {
-						$swStatus.removeClass('bg-secondary bg-warning').addClass('bg-success').html('<i class="fas fa-check me-1"></i>Active');
+						const registration = registrations[0];
+
+						// Check if there's an update available
+						if (registration.waiting) {
+							$swStatus.removeClass('bg-secondary bg-success').addClass('bg-warning').html('<i class="fas fa-exclamation me-1"></i>Update Available');
+							$updateBtn.removeClass('d-none');
+						} else {
+							$swStatus.removeClass('bg-secondary bg-warning').addClass('bg-success').html('<i class="fas fa-check me-1"></i>Active');
+							$updateBtn.addClass('d-none');
+						}
 					} else {
 						$swStatus.removeClass('bg-success bg-warning').addClass('bg-warning').html('<i class="fas fa-exclamation me-1"></i>Not Active');
+						$updateBtn.addClass('d-none');
 					}
 				});
 			} else {
 				$swStatus.removeClass('bg-success bg-warning').addClass('bg-secondary').html('<i class="fas fa-times me-1"></i>Not Supported');
+				$updateBtn.addClass('d-none');
 			}
 
 			// Update last updated time
@@ -1004,6 +1024,86 @@ const SettingsManager = {
 			$('#lastUpdated').text(lastUpdate);
 		} catch (error) {
 			console.warn('Error updating modal status:', error);
+		}
+	},
+
+	// Handle PWA installation
+	installPWA() {
+		if (window.deferredPrompt) {
+			window.deferredPrompt.prompt();
+			window.deferredPrompt.userChoice.then((choiceResult) => {
+				if (choiceResult.outcome === 'accepted') {
+					console.log('PWA installation accepted');
+					// Update status after installation
+					setTimeout(() => this.updateModalStatus(), 1000);
+				}
+				window.deferredPrompt = null;
+			});
+		} else {
+			// Show manual installation instructions
+			const toast = $(`
+				<div class="toast align-items-center text-white bg-info border-0 position-fixed" 
+					 style="top: 20px; right: 20px; z-index: 9999; max-width: 350px;" role="alert">
+					<div class="d-flex">
+						<div class="toast-body">
+							<i class="fas fa-info-circle me-2"></i>
+							<strong>Manual Installation:</strong><br>
+							1. Click browser menu (⋮)<br>
+							2. Select "Install App" or "Add to Home Screen"
+						</div>
+						<button type="button" class="btn-close btn-close-white me-2 m-auto" 
+								data-bs-dismiss="toast"></button>
+					</div>
+				</div>
+			`);
+
+			$('body').append(toast);
+			const bsToast = new bootstrap.Toast(toast[0], { delay: 8000 });
+			bsToast.show();
+			toast[0].addEventListener('hidden.bs.toast', () => toast.remove());
+		}
+	},
+
+	// Handle Service Worker update
+	updateServiceWorker() {
+		if ('serviceWorker' in navigator) {
+			navigator.serviceWorker.getRegistrations().then((registrations) => {
+				if (registrations.length > 0) {
+					const registration = registrations[0];
+					if (registration.waiting) {
+						// Tell the waiting SW to skip waiting
+						registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+
+						// Show update message
+						const toast = $(`
+							<div class="toast align-items-center text-white bg-success border-0 position-fixed" 
+								 style="top: 20px; right: 20px; z-index: 9999;" role="alert">
+								<div class="d-flex">
+									<div class="toast-body">
+										<i class="fas fa-sync-alt me-2"></i>App updated! Refresh to apply changes.
+									</div>
+									<button type="button" class="btn-close btn-close-white me-2 m-auto" 
+											data-bs-dismiss="toast"></button>
+								</div>
+							</div>
+						`);
+
+						$('body').append(toast);
+						const bsToast = new bootstrap.Toast(toast[0], { delay: 5000 });
+						bsToast.show();
+						toast[0].addEventListener('hidden.bs.toast', () => {
+							toast.remove();
+							// Refresh page after toast is hidden
+							setTimeout(() => window.location.reload(), 500);
+						});
+					} else {
+						// Force update check
+						registration.update().then(() => {
+							this.updateModalStatus();
+						});
+					}
+				}
+			});
 		}
 	},
 
@@ -1222,6 +1322,10 @@ const IPTVApp = {
 			// Modal event handlers
 			$('#settingsModal').on('show.bs.modal', () => SettingsManager.showSettingsModal());
 			$('#settingsModal').on('hidden.bs.modal', () => SettingsManager.hideSettingsModal());
+
+			// PWA action buttons
+			$('#installAppBtn').on('click', () => SettingsManager.installPWA());
+			$('#updateSwBtn').on('click', () => SettingsManager.updateServiceWorker());
 
 			// Application state change listener
 			document.addEventListener('appStateChange', (event) => {

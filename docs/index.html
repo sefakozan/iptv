@@ -271,17 +271,27 @@
 												<div class="col-12">
 													<div class="d-flex justify-content-between align-items-center py-2 border-bottom">
 														<span class="fw-semibold">Installation:</span>
-														<span class="badge" id="installStatus">
-															<i class="fas fa-download me-1"></i>Not Installed
-														</span>
+														<div class="d-flex align-items-center gap-2">
+															<span class="badge" id="installStatus">
+																<i class="fas fa-download me-1"></i>Not Installed
+															</span>
+															<button class="btn btn-sm btn-primary d-none" id="installAppBtn" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">
+																<i class="fas fa-download me-1"></i>Install
+															</button>
+														</div>
 													</div>
 												</div>
 												<div class="col-12">
 													<div class="d-flex justify-content-between align-items-center py-2 border-bottom">
 														<span class="fw-semibold">Service Worker:</span>
-														<span class="badge" id="swStatus">
-															<i class="fas fa-spinner fa-spin me-1"></i>Checking...
-														</span>
+														<div class="d-flex align-items-center gap-2">
+															<span class="badge" id="swStatus">
+																<i class="fas fa-spinner fa-spin me-1"></i>Checking...
+															</span>
+															<button class="btn btn-sm btn-warning d-none" id="updateSwBtn" style="font-size: 0.75rem; padding: 0.25rem 0.5rem;">
+																<i class="fas fa-sync-alt me-1"></i>Update
+															</button>
+														</div>
 													</div>
 												</div>
 												<div class="col-12">

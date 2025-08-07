@@ -585,6 +585,7 @@ class InstallPromptManager {
 			e.preventDefault();
 
 			this.deferredPrompt = e;
+			window.deferredPrompt = e; // Make it globally accessible
 			this.isInstallable = true;
 
 			this.showInstallUI();

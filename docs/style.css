@@ -761,11 +761,13 @@ kbd {
 .modal .btn-primary {
 	background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
 	border: none;
+	color: #ffffff !important;
 }
 
 .modal .btn-primary:hover {
 	transform: translateY(-1px);
 	box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+	color: #ffffff !important;
 }
 
 .modal .btn-outline-primary {
@@ -777,6 +779,7 @@ kbd {
 	background: #4f46e5;
 	border-color: #4f46e5;
 	transform: translateY(-1px);
+	color: #ffffff !important;
 }
 
 /* Feature Icons */
