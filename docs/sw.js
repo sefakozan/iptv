@@ -60,11 +60,11 @@ class ServiceWorkerConfig {
 		this.externalResources = [
 			'https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css',
 			'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css',
-			'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css',
+			'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.0.0/css/all.min.css',
 			'https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js',
-			'https://code.jquery.com/jquery-3.6.0.min.js',
+			'https://code.jquery.com/jquery-3.7.1.min.js',
 			'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js',
-			'https://cdn.jsdelivr.net/npm/hls.js@1.1.5/dist/hls.min.js',
+			'https://cdn.jsdelivr.net/npm/hls.js@1.6.9/dist/hls.min.js',
 			'https://cdn.jsdelivr.net/npm/iptv-util@latest/rollup/iptv-util-min.js',
 		];
 
