@@ -993,8 +993,45 @@ const SettingsManager = {
 				day: 'numeric',
 			});
 			$('#lastUpdated').text(lastUpdate);
+
+			// Update header install button
+			this.updateHeaderInstallButton(isInstalled);
 		} catch (error) {
 			console.warn('Error updating modal status:', error);
+		}
+	},
+
+	// Update header install button based on installation status
+	updateHeaderInstallButton(isInstalled) {
+		try {
+			const $headerInstallBtn = $('#headerInstallBtn');
+			const $btnIcon = $headerInstallBtn.find('i');
+			const $btnText = $headerInstallBtn.find('.btn-text');
+
+			if (isInstalled) {
+				// App is installed - show version
+				$btnIcon.removeClass('fas fa-download').addClass('fas fa-check-circle');
+				$btnText.text('v2.1.3');
+				$headerInstallBtn.removeClass('btn-outline-light').addClass('btn-outline-success');
+				$headerInstallBtn.prop('disabled', true);
+				$headerInstallBtn.attr('title', 'App is installed');
+			} else {
+				// App is not installed - show install button
+				$btnIcon.removeClass('fas fa-check-circle').addClass('fas fa-download');
+				$btnText.text('Install App');
+				$headerInstallBtn.removeClass('btn-outline-success').addClass('btn-outline-light');
+				$headerInstallBtn.prop('disabled', false);
+				$headerInstallBtn.attr('title', 'Install IPTV Player as PWA');
+
+				// Show button only if installation is available
+				if (window.deferredPrompt || window.BeforeInstallPromptEvent) {
+					$headerInstallBtn.show();
+				} else {
+					$headerInstallBtn.hide();
+				}
+			}
+		} catch (error) {
+			console.warn('Error updating header install button:', error);
 		}
 	},
 
@@ -1178,7 +1215,6 @@ const SettingsManager = {
 	// Reset settings to defaults
 	resetToDefaults() {
 		try {
-			throw `test error`;
 			localStorage.removeItem(this.STORAGE_KEY);
 
 			// Reset UI
@@ -1447,6 +1483,7 @@ const IPTVApp = {
 			// PWA action buttons
 			$('#installAppBtn').on('click', () => SettingsManager.installPWA());
 			$('#updateSwBtn').on('click', () => SettingsManager.updateServiceWorker());
+			$('#headerInstallBtn').on('click', () => SettingsManager.installPWA());
 
 			// Application state change listener
 			document.addEventListener('appStateChange', (event) => {
