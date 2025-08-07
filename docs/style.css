@@ -661,10 +661,47 @@ h2.mb-0 {
 .card-header.bg-light {
 	background: rgba(255, 255, 255, 0.9) !important;
 	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+	border-top-left-radius: 24px;
+	border-top-right-radius: 24px;
 }
 
 .card-body {
 	background: rgba(255, 255, 255, 0.95);
+	border-bottom-left-radius: 24px;
+	border-bottom-right-radius: 24px;
+}
+
+/* Header'ı olmayan kartların body'leri için üst radius */
+.card:not(:has(.card-header)) .card-body {
+	border-top-left-radius: 24px;
+	border-top-right-radius: 24px;
+	border-bottom-left-radius: 24px;
+	border-bottom-right-radius: 24px;
+}
+
+/* Alternatif olarak, sağ kolondaki özel kartlar için */
+.col-md-7 .card .card-body {
+	border-top-left-radius: 24px;
+	border-top-right-radius: 24px;
+	border-bottom-left-radius: 24px;
+	border-bottom-right-radius: 24px;
+	padding: 0;
+}
+
+/* Modal specific card styling */
+.modal .card {
+	border-radius: 24px;
+	overflow: hidden;
+}
+
+.modal .card-header {
+	border-top-left-radius: 24px;
+	border-top-right-radius: 24px;
+}
+
+.modal .card-body {
+	border-bottom-left-radius: 24px;
+	border-bottom-right-radius: 24px;
 }
 
 /* Keyboard Key Styling */
