@@ -1002,16 +1002,20 @@ const SettingsManager = {
 	},
 
 	// Update header install button based on installation status
-	updateHeaderInstallButton(isInstalled) {
+	async updateHeaderInstallButton(isInstalled) {
 		try {
 			const $headerInstallBtn = $('#headerInstallBtn');
 			const $btnIcon = $headerInstallBtn.find('i');
 			const $btnText = $headerInstallBtn.find('.btn-text');
 
 			if (isInstalled) {
-				// App is installed - show version
+				// App is installed - show version from service worker
 				$btnIcon.removeClass('fas fa-download').addClass('fas fa-check-circle');
-				$btnText.text('v2.1.3');
+
+				// Get current version from service worker
+				const currentVersion = await this.getServiceWorkerVersion();
+				$btnText.text(currentVersion || 'v2.1.3');
+
 				$headerInstallBtn.removeClass('btn-outline-light').addClass('btn-outline-success');
 				$headerInstallBtn.prop('disabled', true);
 				$headerInstallBtn.attr('title', 'App is installed');
@@ -1367,8 +1371,11 @@ const SettingsManager = {
 				registration.waiting.postMessage({ type: 'SKIP_WAITING' });
 
 				// Listen for the service worker to become active
-				navigator.serviceWorker.addEventListener('controllerchange', () => {
-					this.showToast('success', 'Update Complete', 'App updated successfully! The new version is now active.', 0, [
+				navigator.serviceWorker.addEventListener('controllerchange', async () => {
+					// Get new version from service worker
+					const newVersion = await this.getServiceWorkerVersion();
+
+					this.showToast('success', 'Update Complete', `App updated successfully to ${newVersion || 'new version'}! The new version is now active.`, 0, [
 						{
 							text: 'Reload Page',
 							action: () => {
@@ -1376,11 +1383,56 @@ const SettingsManager = {
 							},
 						},
 					]);
+
+					// Update header button with new version
+					setTimeout(() => {
+						this.updateHeaderInstallButtonVersion(newVersion);
+					}, 1000);
 				});
 			}
 		} catch (error) {
 			console.error('PWA update application failed:', error);
 			this.showToast('error', 'Update Failed', 'Update failed. Please refresh the page manually.');
+		}
+	},
+
+	// Get current service worker version
+	async getServiceWorkerVersion() {
+		try {
+			if (!('serviceWorker' in navigator)) return null;
+
+			const registration = await navigator.serviceWorker.getRegistration();
+			if (!registration || !registration.active) return null;
+
+			return new Promise((resolve) => {
+				const messageChannel = new MessageChannel();
+				messageChannel.port1.onmessage = (event) => {
+					resolve(event.data?.version || null);
+				};
+
+				registration.active.postMessage({ type: 'GET_VERSION' }, [messageChannel.port2]);
+
+				// Timeout after 2 seconds
+				setTimeout(() => resolve(null), 2000);
+			});
+		} catch (error) {
+			console.warn('Failed to get service worker version:', error);
+			return null;
+		}
+	},
+
+	// Update header install button with new version
+	updateHeaderInstallButtonVersion(version) {
+		try {
+			const $headerInstallBtn = $('#headerInstallBtn');
+			const $btnText = $headerInstallBtn.find('.btn-text');
+
+			if (version && $headerInstallBtn.hasClass('btn-outline-success')) {
+				$btnText.text(version);
+				console.log(`Header button updated with new version: ${version}`);
+			}
+		} catch (error) {
+			console.warn('Error updating header button version:', error);
 		}
 	},
 
@@ -1452,6 +1504,9 @@ const IPTVApp = {
 
 			// Initialize automatic PWA update checking
 			SettingsManager.initializeAutoUpdate();
+
+			// Initialize header install button status
+			SettingsManager.updateModalStatus();
 
 			// Attach event handlers
 			this.attachEventHandlers();
