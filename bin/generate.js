@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-import { readdir, readFile, writeFile } from "node:fs/promises";
-import { dirname, extname, join, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
-import { merger } from "iptv-util";
+import { readdir, readFile, writeFile } from 'node:fs/promises';
+import { dirname, extname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { merger } from 'iptv-util';
 
-const { default: countries } = await import("../docs/countries.json", {
-	with: { type: "json" },
+const { default: countries } = await import('../docs/countries.json', {
+	with: { type: 'json' },
 });
 
 // İlk iki elemanı atla (node ve betik yolu)
@@ -29,7 +29,7 @@ async function checkCountry(country) {
 	const isCodeExist = await isCountryExist(defaultLink);
 
 	if (!isCodeExist) {
-		console.error("ulke kodu tanimli degil");
+		console.error('ulke kodu tanimli degil');
 		process.exit(3);
 	}
 
@@ -41,10 +41,10 @@ async function checkCountry(country) {
 	// console.log("Dosya yolu:", __filename);
 	// console.log("Dizin yolu:", __dirname);
 
-	const target = resolve(__dirname, "..", "docs", "s", `${country}.m3u`);
-	const langRawFolder = resolve(__dirname, "..", "raw-streams", country);
-	const readme = resolve(langRawFolder, "README.md");
-	const sort = resolve(langRawFolder, "SORT.md");
+	const target = resolve(__dirname, '..', 'docs', 's', `${country}.m3u`);
+	const langRawFolder = resolve(__dirname, '..', 'raw-streams', country);
+	const readme = resolve(langRawFolder, 'README.md');
+	const sort = resolve(langRawFolder, 'SORT.md');
 
 	const sortArr = await getNonCommentedLines(sort);
 	const linkArr = await getNonCommentedLines(readme);
@@ -86,20 +86,20 @@ async function getM3UFileContents(directoryPath) {
 		const files = await readdir(directoryPath);
 
 		// Sadece .m3u uzantılı dosyaları filtrele
-		const m3uFiles = files.filter((file) => extname(file).toLowerCase() === ".m3u");
+		const m3uFiles = files.filter((file) => extname(file).toLowerCase() === '.m3u');
 
 		// Her .m3u dosyasının içeriğini oku
 		const results = await Promise.all(
 			m3uFiles.map(async (file) => {
 				const filePath = join(directoryPath, file);
-				const content = await readFile(filePath, "utf8");
+				const content = await readFile(filePath, 'utf8');
 				return content;
 			}),
 		);
 
 		return results;
 	} catch (error) {
-		console.error("Hata:", error.message);
+		console.error('Hata:', error.message);
 		return [];
 	}
 }
@@ -107,15 +107,15 @@ async function getM3UFileContents(directoryPath) {
 async function getNonCommentedLines(filePath) {
 	try {
 		// Dosyayı asenkron olarak oku (utf8 formatında)
-		const content = await readFile(filePath, "utf8");
+		const content = await readFile(filePath, 'utf8');
 
 		// Satırlara böl ve # ile başlamayanları filtrele
 		//const lineArr = text.split(/\s*\r*\n+\s*/gm);
-		const lines = content.split(/\s*\r*\n+\s*/gm).filter((line) => line.trim() !== "" && !line.trim().startsWith("#"));
+		const lines = content.split(/\s*\r*\n+\s*/gm).filter((line) => line.trim() !== '' && !line.trim().startsWith('#'));
 
 		return lines;
 	} catch (error) {
-		console.error("Hata:", error.message);
+		console.error('Hata:', error.message);
 		return [];
 	}
 }
@@ -123,10 +123,10 @@ async function getNonCommentedLines(filePath) {
 async function writeTarget(filePath, data) {
 	try {
 		// Dosyaya yaz (üzerine yazar)
-		await writeFile(filePath, data, "utf8");
+		await writeFile(filePath, data, 'utf8');
 		console.log(`Dosya başarıyla yazıldı: ${filePath}`);
 	} catch (error) {
-		console.error("Hata:", error.message);
+		console.error('Hata:', error.message);
 		throw error;
 	}
 }
@@ -134,10 +134,10 @@ async function writeTarget(filePath, data) {
 async function isCountryExist(url, timeout = 8000) {
 	try {
 		const response = await fetch(url, {
-			method: "HEAD",
+			method: 'HEAD',
 			signal: AbortSignal.timeout(timeout),
 			headers: {
-				"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36",
+				'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
 			},
 		});
 
@@ -149,7 +149,7 @@ async function isCountryExist(url, timeout = 8000) {
 }
 
 async function GetLiveTVCollectorLink(country) {
-	let link = "";
+	let link = '';
 
 	//https://raw.githubusercontent.com/bugsfreeweb/LiveTVCollector/refs/heads/main/LiveTV/Turkey/LiveTV.m3u
 	//const isCodeExist = await isCountryExist(defaultLink);

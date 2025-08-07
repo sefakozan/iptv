@@ -34,7 +34,7 @@ class PWAState {
 
 		// Configuration
 		this.config = {
-			serviceWorkerPath: './sw.js',
+			serviceWorkerPath: './modules/pwa-service-worker.js',
 			updateCheckInterval: 60000, // 1 minute
 			notificationTimeout: 10000,
 			installButtonTimeout: 15000,
@@ -419,7 +419,7 @@ class ServiceWorkerManager {
 	 * @param {string} swPath - Service worker file path
 	 * @returns {Promise<ServiceWorkerRegistration>} Registration promise
 	 */
-	async register(swPath = './sw.js') {
+	async register(swPath) {
 		if (!('serviceWorker' in navigator)) {
 			throw new Error('Service Worker not supported in this browser');
 		}

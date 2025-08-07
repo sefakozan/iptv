@@ -383,8 +383,20 @@
 		<script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.9/dist/hls.min.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/iptv-util@latest/rollup/iptv-util-min.js"></script>
 
-		<!-- Custom Scripts -->
-		<script src="pwa-script.js"></script>
-		<script src="script.js"></script>
+		<script src="iptv.js"></script>
+
+		<!-- Modular Application Scripts (order matters for dependencies)
+		<script src="modules/app-config.js"></script>
+		<script src="modules/app-state.js"></script>
+		<script src="modules/utils.js"></script>
+		<script src="modules/error-manager.js"></script>
+		<script src="modules/data-manager.js"></script>
+		<script src="modules/ui-manager.js"></script>
+		<script src="modules/video-manager.js"></script>
+		<script src="modules/keyboard-manager.js"></script>
+		<script src="modules/settings-manager.js"></script>
+		<script src="modules/event-handlers.js"></script>
+		<script src="modules/pwa-manager.js"></script>
+		<script src="modules/app-controller.js"></script> -->
 	</body>
 </html>

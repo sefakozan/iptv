@@ -86,7 +86,7 @@
 		<script>
         $(document).ready(function() {
             // Ülkeleri yükle ve select'e ekle
-            $.getJSON('countries.json', function(countries) {
+            $.getJSON('./countries.json', function(countries) {
                 const $select = $('#searchSelect');
                 $select.empty();
                 $select.append('<option value="">Select a country</option>');

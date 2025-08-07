@@ -56,6 +56,7 @@ class ServiceWorkerConfig {
 		this.networkTimeout = 5000;
 
 		// Static resources to cache on install
+		// TODO duzelt
 		this.staticResources = ['./', './index.html', './style.css', './script.js', './pwa-script.js', './manifest.json', './assets/icon-192x192.png', './assets/icon-512x512.png', './assets/screenshot-wide.png', './assets/screenshot-mobile.png'];
 
 		// External CDN resources
@@ -683,7 +684,7 @@ class FetchStrategyManager {
 	 * @returns {boolean} True if API request
 	 */
 	isApiRequest(url) {
-		return url.includes('/api/') || url.endsWith('.json') || url.includes('countries.json') || url.includes('languages.json');
+		return url.includes('/api/') || url.endsWith('.json') || url.includes('countries.json');
 	}
 
 	/**

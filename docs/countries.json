@@ -249,5 +249,5 @@
 	{ "name": "Yemen", "code": "YE", "languages": ["ara"], "flag": "🇾🇪" },
 	{ "name": "Zambia", "code": "ZM", "languages": ["eng"], "flag": "🇿🇲" },
 	{ "name": "Zimbabwe", "code": "ZW", "languages": ["bwg", "eng", "kck", "hio", "ndc", "nde", "nya", "sna", "sot", "toi", "tsn", "tso", "ven", "xho", "zib"], "flag": "🇿🇼" },
-	{ "name": "The Others", "code": "undefined", "languages": ["eng"], "flag": "🇱🇨", "alternatives": ["Mixed"] }
+	{ "name": "The Others", "code": "undefined", "languages": ["eng"], "flag": "", "alternatives": ["Mixed"] }
 ]

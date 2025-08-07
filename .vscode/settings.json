@@ -27,5 +27,32 @@
 	"[html]": {
 		"editor.defaultFormatter": "biomejs.biome"
 	},
-	"html.format.enable": true
+	"html.format.enable": true,
+	"github.copilot.chat.agent.autoFix": true,
+	"github.copilot.chat.localeOverride": "en",
+	"github.copilot.chat.codesearch.enabled": true,
+	"github.copilot.chat.agent.thinkingTool": true,
+	"github.copilot.enable": {
+		"*": true,
+		"plaintext": false,
+		"markdown": false,
+		"scminput": false
+	},
+	"files.exclude": {
+		"**/.git": true,
+		"**/.DS_Store": true,
+		"**/node_modules": true,
+		"**/dist": true,
+		"**/*.log": true,
+		"**/raw-streams/**": true,
+		"**/*/select.html": true,
+		//"**/*.backup": true,
+		"select.html": true,
+		"**/raw-streams": true,
+		"**/s/**": true
+	},
+	"github.copilot.advanced": {
+		"listCount": 10,
+		"inlineSuggestCount": 3
+	}
 }
