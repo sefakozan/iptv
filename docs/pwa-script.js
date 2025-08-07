@@ -588,7 +588,7 @@ class InstallPromptManager {
 			window.deferredPrompt = e; // Make it globally accessible
 			this.isInstallable = true;
 
-			//this.showInstallUI();
+			this.showInstallUI();
 
 			// Trigger installable event
 			const event = new CustomEvent('pwa:installable', {
@@ -624,11 +624,11 @@ class InstallPromptManager {
 		this.showHeaderInstallButton();
 
 		// Show floating install button after delay
-		setTimeout(() => {
-			if (this.isInstallable && !this.promptShown) {
-				this.showFloatingInstallButton();
-			}
-		}, 5000);
+		// setTimeout(() => {
+		// 	if (this.isInstallable && !this.promptShown) {
+		// 		this.showFloatingInstallButton();
+		// 	}
+		// }, 5000);
 	}
 
 	/**
