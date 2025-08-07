@@ -956,30 +956,128 @@ const SettingsManager = {
 		}
 	},
 
-	// Show settings panel
-	showSettingsPanel() {
-		$('#settingsPanel').slideDown(APP_CONFIG.ui.animationDuration);
+	// Show settings modal (now modal)
+	showSettingsModal() {
+		// Update PWA status information
+		this.updateModalStatus();
+		// Bootstrap modal will handle the show
 	},
 
-	// Hide settings panel
-	hideSettingsPanel() {
-		$('#settingsPanel').slideUp(APP_CONFIG.ui.animationDuration);
+	// Hide settings modal (now modal)
+	hideSettingsModal() {
+		// Bootstrap modal will handle the hide
 	},
 
-	// Save current settings from UI
+	// Update modal status information
+	updateModalStatus() {
+		try {
+			// Check installation status
+			const isInstalled = window.matchMedia('(display-mode: standalone)').matches || navigator.standalone || document.referrer.includes('android-app://');
+
+			const $installStatus = $('#installStatus');
+			if (isInstalled) {
+				$installStatus.removeClass('bg-secondary bg-warning').addClass('bg-success').html('<i class="fas fa-check me-1"></i>Installed');
+			} else {
+				$installStatus.removeClass('bg-success bg-warning').addClass('bg-secondary').html('<i class="fas fa-download me-1"></i>Not Installed');
+			}
+
+			// Check Service Worker status
+			const $swStatus = $('#swStatus');
+			if ('serviceWorker' in navigator) {
+				navigator.serviceWorker.getRegistrations().then((registrations) => {
+					if (registrations.length > 0) {
+						$swStatus.removeClass('bg-secondary bg-warning').addClass('bg-success').html('<i class="fas fa-check me-1"></i>Active');
+					} else {
+						$swStatus.removeClass('bg-success bg-warning').addClass('bg-warning').html('<i class="fas fa-exclamation me-1"></i>Not Active');
+					}
+				});
+			} else {
+				$swStatus.removeClass('bg-success bg-warning').addClass('bg-secondary').html('<i class="fas fa-times me-1"></i>Not Supported');
+			}
+
+			// Update last updated time
+			const lastUpdate = new Date().toLocaleDateString('en-US', {
+				year: 'numeric',
+				month: 'long',
+				day: 'numeric',
+			});
+			$('#lastUpdated').text(lastUpdate);
+		} catch (error) {
+			console.warn('Error updating modal status:', error);
+		}
+	},
+
+	// Save current settings from modal UI
 	saveCurrentSettings() {
 		const defaultCountry = $('#defaultCountrySelect').val();
+		const autoplayMuted = $('#autoplayMuted').is(':checked');
+		const rememberVolume = $('#rememberVolume').is(':checked');
 
 		const success = this.saveSettings({
 			defaultCountry: defaultCountry || null,
+			autoplayMuted: autoplayMuted,
+			rememberVolume: rememberVolume,
 			lastUpdated: Date.now(),
 		});
 
 		if (success) {
-			alert('Settings saved successfully! Default country will be applied on next load.');
-		}
+			// Show success message
+			const toast = $(`
+				<div class="toast align-items-center text-white bg-success border-0 position-fixed" 
+					 style="top: 20px; right: 20px; z-index: 9999;" role="alert">
+					<div class="d-flex">
+						<div class="toast-body">
+							<i class="fas fa-check me-2"></i>Settings saved successfully!
+						</div>
+						<button type="button" class="btn-close btn-close-white me-2 m-auto" 
+								data-bs-dismiss="toast"></button>
+					</div>
+				</div>
+			`);
 
-		this.hideSettingsPanel();
+			$('body').append(toast);
+			const bsToast = new bootstrap.Toast(toast[0]);
+			bsToast.show();
+
+			// Remove toast after it's hidden
+			toast[0].addEventListener('hidden.bs.toast', () => toast.remove());
+		}
+	},
+
+	// Reset settings to defaults
+	resetToDefaults() {
+		if (confirm('Are you sure you want to reset all settings to defaults? This action cannot be undone.')) {
+			try {
+				localStorage.removeItem(this.STORAGE_KEY);
+
+				// Reset UI
+				$('#defaultCountrySelect').val('');
+				$('#autoplayMuted').prop('checked', true);
+				$('#rememberVolume').prop('checked', false);
+
+				// Show success message
+				const toast = $(`
+					<div class="toast align-items-center text-white bg-info border-0 position-fixed" 
+						 style="top: 20px; right: 20px; z-index: 9999;" role="alert">
+						<div class="d-flex">
+							<div class="toast-body">
+								<i class="fas fa-undo me-2"></i>Settings reset to defaults!
+							</div>
+							<button type="button" class="btn-close btn-close-white me-2 m-auto" 
+									data-bs-dismiss="toast"></button>
+						</div>
+					</div>
+				`);
+
+				$('body').append(toast);
+				const bsToast = new bootstrap.Toast(toast[0]);
+				bsToast.show();
+
+				toast[0].addEventListener('hidden.bs.toast', () => toast.remove());
+			} catch (error) {
+				ErrorManager.handle(error, ErrorManager.ERROR_TYPES.STORAGE, 'Resetting settings');
+			}
+		}
 	},
 
 	// Populate default country select
@@ -1000,7 +1098,11 @@ const SettingsManager = {
 				$defaultCountrySelect.append(option);
 			});
 
-			console.log('Populated default country select');
+			// Load audio preferences
+			$('#autoplayMuted').prop('checked', currentSettings.autoplayMuted !== false); // Default to true
+			$('#rememberVolume').prop('checked', currentSettings.rememberVolume === true); // Default to false
+
+			console.log('Populated default country select and loaded audio preferences');
 		} catch (error) {
 			ErrorManager.handle(error, ErrorManager.ERROR_TYPES.UI, 'Populating settings');
 		}
@@ -1113,10 +1215,13 @@ const IPTVApp = {
 			$('#countrySelect').on('change', EventHandlers.handleCountryChange);
 			$('#channelList').on('change', EventHandlers.handleChannelChange);
 
-			// Settings panel
-			$('#settingsBtn').on('click', SettingsManager.showSettingsPanel);
-			$('#closeSettingsBtn').on('click', SettingsManager.hideSettingsPanel);
+			// Settings modal
 			$('#saveSettingsBtn').on('click', () => SettingsManager.saveCurrentSettings());
+			$('#resetSettingsBtn').on('click', () => SettingsManager.resetToDefaults());
+
+			// Modal event handlers
+			$('#settingsModal').on('show.bs.modal', () => SettingsManager.showSettingsModal());
+			$('#settingsModal').on('hidden.bs.modal', () => SettingsManager.hideSettingsModal());
 
 			// Application state change listener
 			document.addEventListener('appStateChange', (event) => {

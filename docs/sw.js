@@ -28,7 +28,7 @@
 class ServiceWorkerConfig {
 	constructor() {
 		this.development = true;
-		this.version = '2.0.0';
+		this.version = '2.1.0';
 		this.version = this.development ? `${this.version}-dev` : this.version;
 		this.cacheName = `iptv-player-v${this.version}`;
 		this.staticCacheName = `${this.cacheName}-static`;

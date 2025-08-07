@@ -634,3 +634,134 @@ h2.mb-0 {
 		flex: 0 0 auto;
 	}
 }
+
+/* =============================================================================
+   Settings Modal Styles
+   ============================================================================= */
+
+.modal-fullscreen .modal-content {
+	background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+}
+
+.modal-header.bg-primary {
+	background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%) !important;
+	border-bottom: none;
+}
+
+.modal-body {
+	padding: 2rem;
+}
+
+.modal-footer.bg-light {
+	background: rgba(248, 250, 252, 0.8) !important;
+	border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Settings Cards */
+.card-header.bg-light {
+	background: rgba(255, 255, 255, 0.9) !important;
+	border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.card-body {
+	background: rgba(255, 255, 255, 0.95);
+}
+
+/* Keyboard Key Styling */
+kbd {
+	background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+	color: #475569;
+	border: 1px solid #cbd5e1;
+	border-radius: 0.375rem;
+	padding: 0.25rem 0.5rem;
+	font-size: 0.75rem;
+	font-weight: 600;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+	min-width: 2rem;
+	text-align: center;
+	display: inline-block;
+}
+
+/* Status Badges */
+.badge.bg-success {
+	background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+}
+
+.badge.bg-primary {
+	background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+}
+
+.badge.bg-warning {
+	background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%) !important;
+	color: #ffffff !important;
+}
+
+.badge.bg-secondary {
+	background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%) !important;
+}
+
+/* Form Controls in Modal */
+.modal .form-select,
+.modal .form-control {
+	border: 1px solid #d1d5db;
+	border-radius: 0.5rem;
+	transition: all 0.2s ease;
+}
+
+.modal .form-select:focus,
+.modal .form-control:focus {
+	border-color: #4f46e5;
+	box-shadow: 0 0 0 0.2rem rgba(79, 70, 229, 0.25);
+}
+
+/* Button Styling in Modal */
+.modal .btn {
+	border-radius: 0.5rem;
+	font-weight: 500;
+	transition: all 0.2s ease;
+}
+
+.modal .btn-primary {
+	background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+	border: none;
+}
+
+.modal .btn-primary:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+}
+
+.modal .btn-outline-primary {
+	border-color: #4f46e5;
+	color: #4f46e5;
+}
+
+.modal .btn-outline-primary:hover {
+	background: #4f46e5;
+	border-color: #4f46e5;
+	transform: translateY(-1px);
+}
+
+/* Feature Icons */
+.modal .fas,
+.modal .fab {
+	width: 1.25rem;
+	text-align: center;
+}
+
+/* Animation */
+.modal.fade .modal-dialog {
+	transition: transform 0.3s ease;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+	.modal-body {
+		padding: 1rem;
+	}
+
+	.modal .row.g-4 {
+		--bs-gutter-x: 1rem;
+		--bs-gutter-y: 1rem;
+	}
+}
