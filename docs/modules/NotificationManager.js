@@ -1,0 +1,416 @@
+// NotificationManager.js
+// IPTV Player - Advanced Notification Management System
+// Optimized Bootstrap Toast Implementation with Singleton Pattern
+
+/**
+ * @typedef {Object} NotificationOptions
+ * @property {number} [delay] - Toast display duration in milliseconds
+ * @property {boolean} [autohide=true] - Whether the toast auto-hides
+ * @property {boolean} [animation=true] - Whether to use animation
+ * @property {Object} [action] - Action button configuration
+ * @property {string} action.text - Action button text
+ * @property {() => void} action.callback - Action button callback
+ */
+
+/**
+ * @typedef {Object} TypeConfig
+ * @property {string} icon - Font Awesome icon class
+ * @property {string} headerClass - Bootstrap header background class
+ */
+
+/**
+ * @typedef {Object} NotificationConfig
+ * @property {number} defaultDelay - Default toast duration
+ * @property {string} position - Toast container position
+ * @property {boolean} autohide - Default autohide setting
+ * @property {boolean} animation - Default animation setting
+ */
+
+/**
+ * @enum {string}
+ */
+const NOTIFICATION_TYPES = Object.freeze({
+	SUCCESS: 'success',
+	ERROR: 'error',
+	WARNING: 'warning',
+	INFO: 'info',
+	LOADING: 'loading',
+	PRIMARY: 'primary',
+});
+
+/**
+ * NotificationManager class - Singleton for managing Bootstrap Toasts
+ */
+
+// biome-ignore lint/correctness/noUnusedVariables: <loaded script>
+export class NotificationManager {
+	/** @type {NotificationManager|null} */
+	static #instance = null;
+
+	/** @type {HTMLElement|null} */
+	#toastContainer = null;
+
+	/** @type {NotificationConfig} */
+	#config;
+
+	/**
+	 * @param {Partial<NotificationConfig>} [config]
+	 * @private Use NotificationManager.getInstance()
+	 */
+	constructor(config = {}) {
+		if (NotificationManager.#instance) {
+			throw new Error('NotificationManager is a singleton. Use NotificationManager.getInstance()');
+		}
+		this.#config = {
+			defaultDelay: config.defaultDelay ?? 5000,
+			position: config.position ?? 'top-0 end-0',
+			autohide: config.autohide ?? true,
+			animation: config.animation ?? true,
+		};
+		this.#initialize();
+		window.NotificationManager = this;
+	}
+
+	/**
+	 * Get singleton instance
+	 * @param {Partial<NotificationConfig>} [config]
+	 * @returns {NotificationManager}
+	 */
+	static getInstance(config) {
+		if (!NotificationManager.#instance) {
+			NotificationManager.#instance = new NotificationManager(config);
+			window.iptv_nm = NotificationManager.#instance;
+		}
+		return NotificationManager.#instance;
+	}
+
+	/**
+	 * Initialize notification system
+	 * @private
+	 */
+	#initialize() {
+		try {
+			this.#createToastContainer();
+			this.#log('info', '📢 NotificationManager initialized');
+		} catch (error) {
+			this.#log('error', '❌ NotificationManager initialization failed', error);
+		}
+	}
+
+	/**
+	 * Create toast container
+	 * @private
+	 */
+	#createToastContainer() {
+		this.#toastContainer = document.getElementById('');
+		if (!this.#toastContainer) {
+			this.#toastContainer = document.createElement('div');
+			this.#toastContainer.id = 'toastContainer';
+			this.#toastContainer.className = `toast-container position-fixed ${this.#config.position} p-3`;
+			this.#toastContainer.style.zIndex = '9999';
+			document.body.appendChild(this.#toastContainer);
+		}
+	}
+
+	/**
+	 * Show a notification toast
+	 * @param {'success' | 'error' | 'warning' | 'info' | 'loading'} type
+	 * @param {string} title
+	 * @param {string} message
+	 * @param {NotificationOptions} [options={}]
+	 * @returns {bootstrap.Toast|null}
+	 */
+	show(type, title, message, options = {}) {
+		try {
+			if (!this.#isValidInput(type, title, message)) {
+				throw new TypeError('Invalid parameters: type, title, and message must be non-empty strings');
+			}
+
+			if (!this.#toastContainer) {
+				this.#createToastContainer();
+			}
+
+			const toast = this.#createToastElement(type, title, message, options);
+			this.#toastContainer.appendChild(toast);
+
+			const bsToast = new bootstrap.Toast(toast, {
+				delay: options.delay ?? this.#config.defaultDelay,
+				autohide: options.autohide ?? (type !== NOTIFICATION_TYPES.LOADING && this.#config.autohide),
+				animation: options.animation ?? this.#config.animation,
+			});
+
+			toast.addEventListener('hidden.bs.toast', () => toast.remove());
+
+			if (options.action) {
+				const actionBtn = toast.querySelector('.toast-action-btn');
+				if (actionBtn) {
+					actionBtn.addEventListener('click', () => {
+						options.action.callback?.();
+						bsToast.hide();
+					});
+				}
+			}
+
+			bsToast.show();
+			return bsToast;
+		} catch (error) {
+			this.#log('error', '❌ Failed to show notification', error);
+			this.#log('info', `[${type.toUpperCase()}] ${title}: ${message}`);
+			return null;
+		}
+	}
+
+	/**
+	 * Create toast HTML element
+	 * @param {string} type
+	 * @param {string} title
+	 * @param {string} message
+	 * @param {NotificationOptions} options
+	 * @returns {HTMLElement}
+	 * @private
+	 */
+	#createToastElement(type, title, message, options) {
+		const toastId = this.#generateId('toast');
+		const typeConfig = this.#getTypeConfig(type);
+		const actionHtml = options.action
+			? `<button type="button" class="btn btn-sm btn-outline-primary toast-action-btn ms-2">
+           ${this.#sanitizeHtml(options.action.text || 'Action')}
+         </button>`
+			: '';
+
+		const toastHtml = `
+      <div id="${toastId}" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header ${typeConfig.headerClass}">
+          <i class="${typeConfig.icon} me-2"></i>
+          <strong class="me-auto">${this.#sanitizeHtml(title)}</strong>
+          <small class="text-muted">${this.#getTimeString()}</small>
+          <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+          ${this.#sanitizeHtml(message)}
+          ${actionHtml}
+        </div>
+      </div>
+    `;
+
+		const tempDiv = document.createElement('div');
+		tempDiv.innerHTML = toastHtml;
+		return tempDiv.firstElementChild;
+	}
+
+	/**
+	 * Get type-specific configuration
+	 * @param {string} type
+	 * @returns {TypeConfig}
+	 * @private
+	 */
+	#getTypeConfig(type) {
+		const configs = {
+			[NOTIFICATION_TYPES.SUCCESS]: {
+				icon: 'fas fa-check-circle text-success',
+				headerClass: 'bg-success-subtle',
+			},
+			[NOTIFICATION_TYPES.ERROR]: {
+				icon: 'fas fa-exclamation-circle text-danger',
+				headerClass: 'bg-danger-subtle',
+			},
+			[NOTIFICATION_TYPES.WARNING]: {
+				icon: 'fas fa-exclamation-triangle text-warning',
+				headerClass: 'bg-warning-subtle',
+			},
+			[NOTIFICATION_TYPES.INFO]: {
+				icon: 'fas fa-info-circle text-info',
+				headerClass: 'bg-info-subtle',
+			},
+			[NOTIFICATION_TYPES.LOADING]: {
+				icon: 'fas fa-spinner fa-spin text-primary',
+				headerClass: 'bg-primary-subtle',
+			},
+			[NOTIFICATION_TYPES.PRIMARY]: {
+				icon: 'fas fa-bell',
+				headerClass: 'bg-primary text-white',
+			},
+		};
+		return configs[type] || configs[NOTIFICATION_TYPES.INFO];
+	}
+
+	/**
+	 * Sanitize HTML content
+	 * @param {string} str
+	 * @returns {string}
+	 * @private
+	 */
+	#sanitizeHtml(str) {
+		const div = document.createElement('div');
+		div.textContent = str;
+		return div.innerHTML;
+	}
+
+	/**
+	 * Get formatted time string
+	 * @returns {string}
+	 * @private
+	 */
+	#getTimeString() {
+		return new Date().toLocaleTimeString('en-US', {
+			hour12: false,
+			hour: '2-digit',
+			minute: '2-digit',
+		});
+	}
+
+	/**
+	 * Generate unique ID
+	 * @param {string} prefix
+	 * @returns {string}
+	 * @private
+	 */
+	#generateId(prefix) {
+		return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+	}
+
+	/**
+	 * Validate input parameters
+	 * @param {string} type
+	 * @param {string} title
+	 * @param {string} message
+	 * @returns {boolean}
+	 * @private
+	 */
+	#isValidInput(type, title, message) {
+		return typeof type === 'string' && type && typeof title === 'string' && title && typeof message === 'string' && message;
+	}
+
+	/**
+	 * Log messages with level
+	 * @param {'info' | 'error'} level
+	 * @param {string} message
+	 * @param {...any} args
+	 * @private
+	 */
+	#log(level, message, ...args) {
+		console[level](message, ...args);
+	}
+
+	/**
+	 * Show success notification
+	 * @param {string} title
+	 * @param {string} message
+	 * @param {NotificationOptions} [options={}]
+	 * @returns {bootstrap.Toast|null}
+	 */
+	success(title, message, options = {}) {
+		return this.show(NOTIFICATION_TYPES.SUCCESS, title, message, options);
+	}
+
+	/**
+	 * Show error notification
+	 * @param {string} title
+	 * @param {string} message
+	 * @param {NotificationOptions} [options={}]
+	 * @returns {bootstrap.Toast|null}
+	 */
+	error(title, message, options = {}) {
+		return this.show(NOTIFICATION_TYPES.ERROR, title, message, options);
+	}
+
+	/**
+	 * Show warning notification
+	 * @param {string} title
+	 * @param {string} message
+	 * @param {NotificationOptions} [options={}]
+	 * @returns {bootstrap.Toast|null}
+	 */
+	warning(title, message, options = {}) {
+		return this.show(NOTIFICATION_TYPES.WARNING, title, message, options);
+	}
+
+	/**
+	 * Show info notification
+	 * @param {string} title
+	 * @param {string} message
+	 * @param {NotificationOptions} [options={}]
+	 * @returns {bootstrap.Toast|null}
+	 */
+	info(title, message, options = {}) {
+		return this.show(NOTIFICATION_TYPES.INFO, title, message, options);
+	}
+
+	/**
+	 * Show loading notification
+	 * @param {string} title
+	 * @param {string} message
+	 * @param {NotificationOptions} [options={}]
+	 * @returns {bootstrap.Toast|null}
+	 */
+	loading(title, message, options = {}) {
+		return this.show(NOTIFICATION_TYPES.LOADING, title, message, {
+			...options,
+			autohide: false,
+		});
+	}
+
+	/**
+	 * Show loading notification
+	 * @param {string} title
+	 * @param {string} message
+	 * @param {NotificationOptions} [options={}]
+	 * @returns {bootstrap.Toast|null}
+	 */
+	primary(title, message, options = {}) {
+		return this.show(NOTIFICATION_TYPES.PRIMARY, title, message, {
+			...options,
+			autohide: false,
+		});
+	}
+
+	/**
+	 * Show persistent notification
+	 * @param {string} type
+	 * @param {string} title
+	 * @param {string} message
+	 * @param {NotificationOptions} [options={}]
+	 * @returns {bootstrap.Toast|null}
+	 */
+	persistent(type, title, message, options = {}) {
+		return this.show(type, title, message, { ...options, autohide: false });
+	}
+
+	/**
+	 * Clear all notifications
+	 */
+	clearAll() {
+		try {
+			const toasts = this.#toastContainer?.querySelectorAll('.toast') ?? [];
+			for (const toast of toasts) {
+				const bsToast = bootstrap.Toast.getInstance(toast);
+				bsToast ? bsToast.hide() : toast.remove();
+			}
+		} catch (error) {
+			this.#log('error', '❌ Failed to clear notifications', error);
+		}
+	}
+
+	/**
+	 * Update notification position
+	 * @param {string} position - Bootstrap position class (e.g., 'top-end')
+	 */
+	setPosition(position) {
+		try {
+			if (!this.#toastContainer) return;
+			this.#toastContainer.className = `toast-container position-fixed ${position} p-3`;
+			this.#toastContainer.style.zIndex = '9999';
+			this.#config.position = position;
+		} catch (error) {
+			this.#log('error', '❌ Failed to update notification position', error);
+		}
+	}
+
+	/**
+	 * Get current notification count
+	 * @returns {number}
+	 */
+	getCount() {
+		return this.#toastContainer?.querySelectorAll('.toast').length ?? 0;
+	}
+}

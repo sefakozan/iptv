@@ -1,4 +1,5 @@
 [
+	{ "name": "Favorites", "code": "fav", "languages": [], "flag": "📑" },
 	{ "name": "Afghanistan", "code": "AF", "languages": ["prs", "pus", "tuk"], "flag": "🇦🇫" },
 	{ "name": "Aland", "code": "AX", "languages": ["swe"], "flag": "🇦🇽", "disabled": true },
 	{ "name": "Albania", "code": "AL", "languages": ["sqi"], "flag": "🇦🇱" },
@@ -227,7 +228,33 @@
 	{ "name": "Tonga", "code": "TO", "languages": ["eng", "ton"], "flag": "🇹🇴" },
 	{ "name": "Trinidad and Tobago", "code": "TT", "languages": ["eng"], "flag": "🇹🇹" },
 	{ "name": "Tunisia", "code": "TN", "languages": ["ara"], "flag": "🇹🇳" },
-	{ "name": "Turkey", "code": "TR", "languages": ["tur"], "flag": "🇹🇷" },
+	{
+		"name": "Turkey",
+		"code": "TR",
+		"languages": ["tur"],
+		"flag": "🇹🇷",
+		"sort": [
+			"National Geographic",
+			"Habertürk",
+			"ATV",
+			"FB TV",
+			"FX",
+			"Halk",
+			"Kanal D",
+			"NTV",
+			"KRAL",
+			"NOW",
+			"Number",
+			"Power",
+			"Show TV",
+			"Sports",
+			"Star",
+			"TV 8",
+			"TV 100",
+			"Natural",
+			"Sozcu"
+		]
+	},
 	{ "name": "Turkmenistan", "code": "TM", "languages": ["rus", "tuk"], "flag": "🇹🇲" },
 	{ "name": "Turks and Caicos Islands", "code": "TC", "languages": ["eng"], "flag": "🇹🇨" },
 	{ "name": "Tuvalu", "code": "TV", "languages": ["eng", "tvl"], "flag": "🇹🇻" },
@@ -237,7 +264,15 @@
 	{ "name": "Ukraine", "code": "UA", "languages": ["ukr"], "flag": "🇺🇦" },
 	{ "name": "United Arab Emirates", "code": "AE", "languages": ["ara"], "flag": "🇦🇪" },
 	{ "name": "United Kingdom", "code": "UK", "languages": ["eng"], "flag": "🇬🇧", "alternatives": ["UK"] },
-	{ "name": "United States", "code": "US", "languages": ["eng", "spa"], "flag": "🇺🇸", "alternatives": ["USA"] },
+	{
+		"name": "United States",
+		"code": "US",
+		"languages": ["eng", "spa"],
+		"flag": "🇺🇸",
+		"alternatives": ["USA"],
+		"default": true,
+		"sort": ["CNN", "Fox News", "NBC", "ABC", "CBS", "CNBC", "ACCN", "BBC America", "Scripps News"]
+	},
 	{ "name": "Uruguay", "code": "UY", "languages": ["spa"], "flag": "🇺🇾" },
 	{ "name": "Uzbekistan", "code": "UZ", "languages": ["rus", "uzb"], "flag": "🇺🇿" },
 	{ "name": "Vanuatu", "code": "VU", "languages": ["bis", "eng", "fra"], "flag": "🇻🇺" },
@@ -249,5 +284,5 @@
 	{ "name": "Yemen", "code": "YE", "languages": ["ara"], "flag": "🇾🇪" },
 	{ "name": "Zambia", "code": "ZM", "languages": ["eng"], "flag": "🇿🇲" },
 	{ "name": "Zimbabwe", "code": "ZW", "languages": ["bwg", "eng", "kck", "hio", "ndc", "nde", "nya", "sna", "sot", "toi", "tsn", "tso", "ven", "xho", "zib"], "flag": "🇿🇼" },
-	{ "name": "The Others", "code": "undefined", "languages": ["eng"], "flag": "", "alternatives": ["Mixed"] }
+	{ "name": "The Others", "code": "undefined", "languages": [], "flag": "🌎", "alternatives": ["Mixed"] }
 ]

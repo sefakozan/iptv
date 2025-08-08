@@ -377,16 +377,24 @@
 		</div>
 
 		<!-- External Scripts -->
-		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 		<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/hls.js@1.6.9/dist/hls.min.js"></script>
 		<script src="https://cdn.jsdelivr.net/npm/iptv-util@latest/rollup/iptv-util-min.js"></script>
 
-		<script src="iptv.js"></script>
+		<!-- Modular Application Scripts (order matters for dependencies) -->
 
-		<!-- Modular Application Scripts (order matters for dependencies)
-		<script src="modules/app-config.js"></script>
+		<script src="modules/AppConfig.js" type="module"></script>
+		<script src="modules/EventManager.js"></script>
+		<script src="modules/NotificationManager.js"></script>
+		<script src="modules/SettingsManager.js"></script>
+		<script src="modules/PWAManager.js"></script>
+		<script src="modules/StateManager.js"></script>
+
+		<script src="iptv.js" type="module"></script>
+
+		<!--<script src="modules/app-config.js"></script>
 		<script src="modules/app-state.js"></script>
 		<script src="modules/utils.js"></script>
 		<script src="modules/error-manager.js"></script>
@@ -397,6 +405,6 @@
 		<script src="modules/settings-manager.js"></script>
 		<script src="modules/event-handlers.js"></script>
 		<script src="modules/pwa-manager.js"></script>
-		<script src="modules/app-controller.js"></script> -->
+		<script src="modules/app-controller.js"></script>-->
 	</body>
 </html>
