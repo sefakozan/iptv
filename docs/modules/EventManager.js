@@ -3,36 +3,21 @@
 // Using modern ES modules, TypeScript-ready, and optimized patterns
 
 /**
- * @typedef {Object} EventOptions
- * @property {boolean} [once=false] - Whether the listener should be called only once
- * @property {number} [priority=0] - Listener priority (higher executes first)
- */
-
-/**
  * @typedef {Object} EventData
  * @property {string} type - Event type
  * @property {any} data - Event payload
  * @property {number} timestamp - Event timestamp
- * @property {string} id - Unique event ID
  */
 
-/**
- * @typedef {Object} Listener
- * @property {Function} callback - Listener callback function
- * @property {boolean} once - Whether it's a one-time listener
- * @property {number} priority - Listener priority
- * @property {string} id - Unique listener ID
- */
-
-// biome-ignore lint/correctness/noUnusedVariables: <loaded script>
-class EventManager {
-	// Constants
-	static #MAX_HISTORY_SIZE = 100;
-	estr = Object.freeze({
+export class EventManager {
+	etype = Object.freeze({
 		COUNTRY_CHANGE: 'country:change',
 		CHANNEL_CHANGE: 'channel:change',
 		NEW_VERSION_INSTALLED: 'app:version:installed',
 		APP_INSTALLED: 'app:installed',
+		APP_BACKGROUND: 'app:background',
+		APP_FOREGROUND: 'app:foreground',
+		APP_RESIZE: 'app:resize',
 		FAVORITES_CHANGED: 'favorites:changed',
 		FAVORITES_ADDED: 'favorites:added',
 		FAVORITES_REMOVED: 'favorites:removed',
@@ -46,18 +31,13 @@ class EventManager {
 		NETWORK_ONLINE: 'network:online',
 		NETWORK_OFFLINE: 'network:offline',
 		CACHE_CLEARED: 'cache:cleared',
+		SW_REGISTERD: 'sw:registered',
 		PWA_UPDATE_AVAILABLE: 'pwa:update:available',
 		PWA_UPDATE_INSTALLED: 'pwa:update:installed',
 	});
 
 	/** @type {EventManager|null} */
 	static #instance = null;
-
-	/** @type {Map<string, Listener[]>} */
-	#listeners = new Map();
-
-	/** @type {EventData[]} */
-	#eventHistory = [];
 
 	/**
 	 * @private Use EventManager.getInstance() instead
@@ -66,7 +46,11 @@ class EventManager {
 		if (EventManager.#instance) {
 			throw new Error('EventManager is a singleton. Use EventManager.getInstance()');
 		}
-		this.initialize();
+
+		window.iptv = window.iptv || {};
+		window.iptv.em = EventManager.#instance;
+
+		this.#initialize();
 	}
 
 	/**
@@ -76,7 +60,6 @@ class EventManager {
 	static getInstance() {
 		if (!EventManager.#instance) {
 			EventManager.#instance = new EventManager();
-			window.iptv_em = EventManager.#instance;
 		}
 		return EventManager.#instance;
 	}
@@ -85,10 +68,10 @@ class EventManager {
 	 * Initialize event system
 	 * @private
 	 */
-	initialize() {
-		this.setupBrowserEvents();
+	#initialize() {
+		this.#setupBrowserEvents();
 		console.info('🎯 EventManager initialized', {
-			events: Object.values(this.estr),
+			events: Object.values(this.etype),
 		});
 	}
 
@@ -96,15 +79,17 @@ class EventManager {
 	 * Setup browser-level event listeners
 	 * @private
 	 */
-	setupBrowserEvents() {
+	#setupBrowserEvents() {
 		const emitNetworkEvent = (isOnline) => {
-			this.emit(this.estr[`NETWORK_${isOnline ? 'ONLINE' : 'OFFLINE'}`], {
+			this.emit(this.etype[`NETWORK_${isOnline ? 'ONLINE' : 'OFFLINE'}`], {
 				timestamp: Date.now(),
 				source: 'browser',
 			});
 		};
 
 		// TODO
+
+		// PWA ve Service Worker ile Async Callback
 
 		// window.addEventListener('beforeinstallprompt', (e) => {
 		// 	console.log('Yükleme istemi hazır.');
@@ -121,6 +106,7 @@ class EventManager {
 
 		window.addEventListener('online', () => emitNetworkEvent(true));
 		window.addEventListener('offline', () => emitNetworkEvent(false));
+		window.addEventListener('resize', () => this.emit(this.etype.APP_RESIZE));
 
 		document.addEventListener('visibilitychange', () => {
 			const eventData = {
@@ -128,7 +114,7 @@ class EventManager {
 				visibilityState: document.visibilityState,
 				timestamp: Date.now(),
 			};
-			this.emit(document.hidden ? 'app:background' : 'app:foreground', eventData);
+			this.emit(document.hidden ? this.etype.APP_BACKGROUND : this.etype.APP_FOREGROUND, eventData);
 		});
 	}
 
@@ -136,31 +122,23 @@ class EventManager {
 	 * Add event listener
 	 * @param {string} eventType
 	 * @param {(event: EventData) => void} callback
-	 * @param {EventOptions} [options={}]
-	 * @returns {string|null} listener ID
+	 * @returns {void}
 	 */
-	on(eventType, callback, options = {}) {
+	on(eventType, callback, once = false) {
 		try {
 			if (!this.#isValidEventParams(eventType, callback)) {
 				throw new TypeError('Invalid parameters: eventType must be string, callback must be function');
 			}
 
-			const listener = {
-				callback,
-				once: !!options.once,
-				priority: Number(options.priority) || 0,
-				id: this.#generateId('listener'),
-			};
-
-			const listeners = this.#listeners.get(eventType) || [];
-			listeners.push(listener);
-			this.#listeners.set(
+			window.addEventListener(
 				eventType,
-				listeners.sort((a, b) => b.priority - a.priority),
+				() => {
+					Promise.resolve(callback()).catch((error) => {
+						console.error('Event Callback error (sync or async):', error);
+					});
+				},
+				{ once },
 			);
-
-			console.debug(`🎯 Listener added: ${eventType} (ID: ${listener.id})`);
-			return listener.id;
 		} catch (error) {
 			console.error('❌ Failed to add listener:', error);
 			return null;
@@ -171,38 +149,10 @@ class EventManager {
 	 * Add one-time event listener
 	 * @param {string} eventType
 	 * @param {(event: EventData) => void} callback
-	 * @param {EventOptions} [options={}]
-	 * @returns {string|null}
+	 * @returns {void}
 	 */
-	once(eventType, callback, options = {}) {
-		return this.on(eventType, callback, { ...options, once: true });
-	}
-
-	/**
-	 * Remove event listener
-	 * @param {string} eventType
-	 * @param {string} listenerId
-	 * @returns {boolean}
-	 */
-	off(eventType, listenerId) {
-		try {
-			const listeners = this.#listeners.get(eventType);
-			if (!listeners) return false;
-
-			const index = listeners.findIndex((l) => l.id === listenerId);
-			if (index === -1) return false;
-
-			listeners.splice(index, 1);
-			if (listeners.length === 0) {
-				this.#listeners.delete(eventType);
-			}
-
-			console.debug(`🎯 Listener removed: ${eventType} (ID: ${listenerId})`);
-			return true;
-		} catch (error) {
-			console.error('❌ Failed to remove listener:', error);
-			return false;
-		}
+	once(eventType, callback) {
+		on(eventType, callback, true);
 	}
 
 	/**
@@ -217,25 +167,16 @@ class EventManager {
 				type: eventType,
 				data,
 				timestamp: Date.now(),
-				id: this.#generateId('event'),
 			};
 
-			this.#addToHistory(event);
-			const listeners = this.#listeners.get(eventType) || [];
+			window.dispatchEvent(
+				new CustomEvent(event.type, {
+					detail: event,
+					bubbles: false,
+					cancelable: false,
+				}),
+			);
 
-			console.debug(`🎯 Emitting: ${eventType}`, data);
-
-			const listenersToRemove = [];
-			for (const listener of listeners) {
-				try {
-					listener.callback(event);
-					if (listener.once) listenersToRemove.push(listener.id);
-				} catch (error) {
-					console.error(`❌ Listener error for ${eventType}:`, error);
-				}
-			}
-
-			listenersToRemove.forEach((id) => this.off(eventType, id));
 			return event;
 		} catch (error) {
 			console.error('❌ Failed to emit event:', error);
@@ -243,63 +184,125 @@ class EventManager {
 		}
 	}
 
+	// Specific event handler functions
+	/**
+	 * Add event listener
+	 * @param {() => void} callback
+	 * @returns {void}
+	 */
+	onOnline(callback) {
+		this.on(this.etype.NETWORK_ONLINE, callback);
+	}
+
+	/**
+	 * Add event listener
+	 * @param {() => void} callback
+	 * @returns {void}
+	 */
+	onOffline(callback) {
+		this.on(this.etype.NETWORK_OFFLINE, callback);
+	}
+
+	/**
+	 * Add event listener
+	 * @param {() => void} callback
+	 * @returns {void}
+	 */
+	onResize(callback) {
+		this.on(this.etype.APP_RESIZE, callback);
+	}
+
+	/**
+	 * Add event listener
+	 * @param {() => void} callback
+	 * @returns {void}
+	 */
+	onBackground(callback) {
+		this.on(this.etype.APP_BACKGROUND, callback);
+	}
+
+	/**
+	 * Add event listener
+	 * @param {() => void} callback
+	 * @returns {void}
+	 */
+	onForeground(callback) {
+		this.on(this.etype.APP_FOREGROUND, callback);
+	}
+
+	/**
+	 * Add event listener
+	 * @param {() => void} callback
+	 * @returns {void}
+	 */
+	onRegistered(callback) {
+		this.on(this.etype.SW_REGISTERD, callback);
+	}
+
 	// Specific event emitters
 	emitCountryChange(countryData) {
-		return this.emit(this.estr.COUNTRY_CHANGE, {
+		return this.emit(this.etype.COUNTRY_CHANGE, {
 			country: countryData,
 			source: 'user',
 		});
 	}
 
 	emitChannelChange(channelData) {
-		return this.emit(this.estr.CHANNEL_CHANGE, {
+		return this.emit(this.etype.CHANNEL_CHANGE, {
 			channel: channelData,
 			source: 'user',
 		});
 	}
 
 	emitNewVersionInstalled(versionData) {
-		return this.emit(this.estr.NEW_VERSION_INSTALLED, {
+		return this.emit(this.etype.NEW_VERSION_INSTALLED, {
 			version: versionData,
 			source: 'service-worker',
 		});
 	}
 
 	emitAppInstalled() {
-		return this.emit(this.estr.APP_INSTALLED, {
+		return this.emit(this.etype.APP_INSTALLED, {
 			installDate: new Date().toISOString(),
 			source: 'pwa',
 		});
 	}
 
 	emitFavoritesChanged(action, channelData) {
-		this.emit(this.estr.FAVORITES_CHANGED, {
+		this.emit(this.etype.FAVORITES_CHANGED, {
 			action,
 			channel: channelData,
 			source: 'user',
 		});
 
-		const specificEvent = action === 'added' ? this.estr.FAVORITES_ADDED : this.estr.FAVORITES_REMOVED;
+		const specificEvent = action === 'added' ? this.etype.FAVORITES_ADDED : this.etype.FAVORITES_REMOVED;
 
 		return this.emit(specificEvent, { channel: channelData, source: 'user' });
 	}
 
 	emitLoadingStart(message) {
-		return this.emit(this.estr.LOADING_START, {
+		return this.emit(this.etype.LOADING_START, {
 			message,
 			source: 'application',
 		});
 	}
 
 	emitLoadingEnd(message) {
-		return this.emit(this.estr.LOADING_END, {
+		return this.emit(this.etype.LOADING_END, {
 			message,
 			source: 'application',
 		});
 	}
 
+	emitRegistered(message) {
+		return this.emit(this.etype.LOADING_END, {
+			message,
+			source: 'PWAManager',
+		});
+	}
+
 	emitError(error, context) {
-		return this.emit(this.estr.ERROR_OCCURRED, {
+		return this.emit(this.etype.ERROR_OCCURRED, {
 			error: error.message || String(error),
 			context,
 			stack: error.stack,
@@ -308,75 +311,11 @@ class EventManager {
 	}
 
 	/**
-	 * Add event to history
-	 * @param {EventData} event
-	 * @private
-	 */
-	#addToHistory(event) {
-		this.#eventHistory.push(event);
-		if (this.#eventHistory.length > EventManager.#MAX_HISTORY_SIZE) {
-			this.#eventHistory.shift();
-		}
-	}
-
-	/**
-	 * Get event history
-	 * @param {string|null} eventType
-	 * @param {number} [limit=10]
-	 * @returns {EventData[]}
-	 */
-	getHistory(eventType = null, limit = 10) {
-		const history = eventType ? this.#eventHistory.filter((e) => e.type === eventType) : this.#eventHistory;
-		return history.slice(-Math.min(limit, history.length));
-	}
-
-	/**
-	 * Clear event history
-	 */
-	clearHistory() {
-		this.#eventHistory = [];
-		console.debug('🎯 Event history cleared');
-	}
-
-	/**
-	 * Get listener count for event type
+	 * Remove listener
 	 * @param {string} eventType
-	 * @returns {number}
 	 */
-	getListenerCount(eventType) {
-		return this.#listeners.get(eventType)?.length || 0;
-	}
-
-	/**
-	 * Get active event types
-	 * @returns {string[]}
-	 */
-	getActiveEventTypes() {
-		return Array.from(this.#listeners.keys());
-	}
-
-	/**
-	 * Remove all listeners for event type
-	 * @param {string} eventType
-	 * @returns {number} Number of listeners removed
-	 */
-	removeAllListeners(eventType) {
-		const count = this.getListenerCount(eventType);
-		if (count > 0) {
-			this.#listeners.delete(eventType);
-			console.debug(`🎯 Removed ${count} listeners for ${eventType}`);
-		}
-		return count;
-	}
-
-	/**
-	 * Generate unique ID
-	 * @param {string} prefix
-	 * @returns {string}
-	 * @private
-	 */
-	#generateId(prefix) {
-		return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+	removeListener(eventType, callback) {
+		window.removeEventListener(eventType, callback, { capture: false });
 	}
 
 	/**
@@ -388,36 +327,5 @@ class EventManager {
 	 */
 	#isValidEventParams(eventType, callback) {
 		return typeof eventType === 'string' && typeof callback === 'function';
-	}
-
-	/**
-	 * Get event system statistics
-	 * @returns {Object}
-	 */
-	getStats() {
-		const stats = {
-			totalListeners: 0,
-			eventTypes: this.#listeners.size,
-			historySize: this.#eventHistory.length,
-			listenersByType: {},
-		};
-
-		for (const [eventType, listeners] of this.#listeners) {
-			stats.totalListeners += listeners.length;
-			stats.listenersByType[eventType] = listeners.length;
-		}
-
-		return stats;
-	}
-
-	/**
-	 * Debug system state
-	 */
-	debug() {
-		console.group('🎯 EventManager Debug');
-		console.log('Stats:', this.getStats());
-		console.log('Active Events:', this.getActiveEventTypes());
-		console.log('Recent History:', this.getHistory(null, 5));
-		console.groupEnd();
 	}
 }

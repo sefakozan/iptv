@@ -83,7 +83,6 @@ const ErrorHandler = {
 
 // Early browser feature detection
 
-console.log(BrowserSupport);
 // Event Manager
 // country cahange
 // channel change

@@ -28,7 +28,7 @@
 class ServiceWorkerConfig {
 	constructor() {
 		this.development = false;
-		this.version = '2.1.8';
+		this.version = '2.1.9';
 		this.version = this.development ? `${this.version}-dev` : this.version;
 		this.cacheName = `iptv-player-v${this.version}`;
 		this.staticCacheName = `${this.cacheName}-static`;
@@ -57,7 +57,18 @@ class ServiceWorkerConfig {
 
 		// Static resources to cache on install
 		// TODO duzelt
-		this.staticResources = ['./', './index.html', './style.css', './script.js', './pwa-script.js', './manifest.json', './assets/icon-192x192.png', './assets/icon-512x512.png', './assets/screenshot-wide.png', './assets/screenshot-mobile.png'];
+		this.staticResources = [
+			'./',
+			'./index.html',
+			'./style.css',
+			'./script.js',
+			'./pwa-service-worker.js',
+			'./manifest.json',
+			'./assets/icon-192x192.png',
+			'./assets/icon-512x512.png',
+			'./assets/screenshot-wide.png',
+			'./assets/screenshot-mobile.png',
+		];
 
 		// External CDN resources
 		this.externalResources = [
@@ -951,6 +962,7 @@ class ServiceWorkerManager {
 
 		try {
 			await this.cacheManager.cleanupOldCaches();
+			// Yeni SW hemen aktif olsun
 			await self.clients.claim();
 
 			this.isActivated = true;
