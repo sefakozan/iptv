@@ -1005,7 +1005,7 @@ class ServiceWorkerManager {
 					await this.clearAllCache();
 					await this.errorManager.notifyMainThread('CLEAR_ALL_CACHE_OK', {});
 					break;
-				case 'SET_ENV':
+				case 'DEV_ENV':
 					await this.setEnv(data?.isDevelopment);
 					// If caches were cleared in dev mode, inform clients
 					await this.errorManager.notifyMainThread('CLEAR_ALL_CACHE_OK', {});

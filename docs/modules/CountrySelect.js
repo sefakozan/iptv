@@ -1,5 +1,5 @@
 import { appConfig } from './AppConfig.js';
-import { channelLoader } from './ChannelLoader.js';
+import { channelSelect } from './ChannelSelect.js';
 import { eventManager } from './EventManager.js';
 
 /** Country select controller: wires Select2, loads options, and reacts to selection. */
@@ -37,9 +37,7 @@ class CountrySelect {
 		this.currentCountry = selectedCountry;
 		eventManager.emit(eventManager.etype.COUNTRY_CHANGE, { prev: this.prevCountry, current: this.currentCountry });
 
-		const channels = await channelLoader.load(selectedCountry, random);
-		// UI population is handled elsewhere (UIManager) if wired
-		return channels;
+		await channelSelect.load(selectedCountry, random);
 	}
 
 	async loadDefault() {

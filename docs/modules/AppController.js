@@ -1,7 +1,7 @@
-import { AppConfig, CountryPromise } from './AppConfig.js';
+import { appConfig } from './AppConfig.js';
 import { countrySelect } from './CountrySelect.js';
-import { PWAManager } from './PWAManager.js';
-import { StateManager } from './StateManager.js';
+import { pwaManager } from './PWAManager.js';
+import { stateManager } from './StateManager.js';
 import { UIManager } from './UIManager.js';
 
 //applyState
@@ -11,16 +11,12 @@ import { UIManager } from './UIManager.js';
 // Application Entry Point
 $(document).ready(async () => {
 	try {
-		countrySelect.readyInit();
-		// load countries
-		await CountryPromise;
-		UIManager.populateCountrySelect(AppConfig.getInstance().countries);
+		await countrySelect.readyInit();
 
-		StateManager.getInstance().load();
-		// default country and channel populate
-
-		// Initialize the application
-		//await IPTVApp.initialize();
+		// UIManager.populateCountrySelect(AppConfig.getInstance().countries);
+		// StateManager.getInstance().load();
+		// // Initialize the application
+		// //await IPTVApp.initialize();
 
 		// Global error handler for unhandled promises
 		window.addEventListener('unhandledrejection', (event) => {

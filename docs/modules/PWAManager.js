@@ -45,7 +45,7 @@ export class PWAManager {
 				await this.#register();
 
 				// Dev modunu SW ile senkronize et
-				await this.#syncDevModeWithSW();
+				this.sendDevMode();
 
 				// periyodik update kontrolü
 				if (this.#updateTimerId) clearInterval(this.#updateTimerId);
@@ -55,7 +55,7 @@ export class PWAManager {
 				this.sendGetVersion();
 
 				// controller değişince tekrar senkronize et
-				navigator.serviceWorker.addEventListener('controllerchange', () => this.#syncDevModeWithSW());
+				navigator.serviceWorker.addEventListener('controllerchange', () => this.sendDevMode());
 			}
 
 			// initial install state
@@ -164,17 +164,6 @@ export class PWAManager {
 		}
 	}
 
-	// isDevelopment bilgisini aktif SW'a gönder
-	async #syncDevModeWithSW() {
-		try {
-			if (!('serviceWorker' in navigator)) return;
-			const reg = await navigator.serviceWorker.ready;
-			reg?.active?.postMessage?.({ type: 'SET_ENV', isDevelopment: appConfig.isDevelopment });
-		} catch (e) {
-			console.warn('SET_ENV message failed:', e);
-		}
-	}
-
 	#onSWMessage(event) {
 		try {
 			const { type, data } = event.data || {};
@@ -251,6 +240,13 @@ export class PWAManager {
 			} catch {}
 		}
 		return this.#isAppInstalled;
+	}
+
+	sendDevMode() {
+		if (!('serviceWorker' in navigator)) return;
+		navigator.serviceWorker.ready.then((reg) => {
+			reg?.active?.postMessage?.({ type: 'DEV_ENV', data: { isDevelopment: appConfig.isDevelopment } });
+		});
 	}
 
 	sendSkipWaiting() {
