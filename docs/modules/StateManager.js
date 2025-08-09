@@ -3,11 +3,10 @@
    Application State Management with Notifications
    ======================================================================== */
 
-import { SettingsManager } from './_SettingsManager.js';
-import { AppConfig } from './AppConfig.js';
-import { EventManager } from './EventManager.js';
-import { NotificationManager } from './NotificationManager.js';
-import { PWAManager } from './PWAManager.js';
+import { appConfig } from './AppConfig.js';
+import { eventManager } from './EventManager.js';
+import { notificationManager } from './NotificationManager.js';
+import { pwaManager } from './PWAManager.js';
 
 class StateManager {
 	#storageKey = 'iptv-config';
@@ -25,12 +24,12 @@ class StateManager {
 			autoplayMuted: false,
 			rememberVolume: true,
 			lastUpdated: Date.now(),
-			currentTheme: '',
+			currentTheme: ''
 		};
 		this.#favs = {
 			us: {
-				url: 0,
-			},
+				url: 0
+			}
 		};
 	}
 
