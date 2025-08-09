@@ -43,6 +43,13 @@ class VideoManager {
 			video.controls = true;
 			video.preload = 'metadata';
 			video.crossOrigin = 'anonymous';
+			// Autoplay policy friendly defaults
+			video.autoplay = true;
+			video.muted = true; // muted autoplay works across browsers
+			video.playsInline = true;
+			video.setAttribute('playsinline', '');
+			video.setAttribute('webkit-playsinline', '');
+			video.setAttribute('muted', '');
 
 			// Apply saved settings
 			// const settings = SettingsManager.getSettings();
@@ -190,7 +197,7 @@ class VideoManager {
 	}
 
 	// Setup HLS.js playback
-	setupHLSPlayback(url, video, channelInfo) {
+	setupHLSPlayback(url, video) {
 		try {
 			this.currentHls = new Hls({
 				enableWorker: true,
@@ -208,14 +215,19 @@ class VideoManager {
 				console.log('HLS manifest parsed, starting playback');
 				video.play().catch((error) => {
 					console.warn('Autoplay failed:', error);
-					notificationManager.info('Manual Play Required', 'Click the play button to start the video.');
+					if (error?.name === 'NotAllowedError') {
+						this.#installOneTimeGesture(video);
+						notificationManager.info('Tap to play', 'Press any key or tap once to start the video.');
+					} else {
+						notificationManager.info('Manual Play Required', 'Click the play button to start the video.');
+					}
 				});
 			});
 
 			this.currentHls.on(Hls.Events.ERROR, (_, data) => {
 				console.error('HLS Error:', data);
 				if (data.fatal) {
-					this.handleHLSError(data, url);
+					this.handleHLSError(data);
 				}
 			});
 
@@ -237,7 +249,12 @@ class VideoManager {
 					console.log('Native HLS loaded, starting playback');
 					video.play().catch((error) => {
 						console.warn('Autoplay failed:', error);
-						SettingsManager.showToast('info', 'Manual Play Required', 'Click the play button to start the video.');
+						if (error?.name === 'NotAllowedError') {
+							this.#installOneTimeGesture(video);
+							notificationManager.info('Tap to play', 'Press any key or tap once to start the video.');
+						} else {
+							notificationManager.info('Manual Play Required', 'Click the play button to start the video.');
+						}
 					});
 				},
 				{ once: true }
@@ -250,7 +267,7 @@ class VideoManager {
 	}
 
 	// Handle HLS errors
-	handleHLSError(data, url) {
+	handleHLSError(data) {
 		try {
 			console.error('Fatal HLS error, attempting recovery:', data);
 
@@ -289,12 +306,6 @@ class VideoManager {
 				this.currentHls = null;
 			}
 
-			// Also clean up legacy appState.hls
-			if (this.currentHls) {
-				this.currentHls.destroy();
-				this.currentHls = null;
-			}
-
 			// Clean up video element
 			if (video) {
 				video.pause();
@@ -315,7 +326,7 @@ class VideoManager {
 	clearVideo() {
 		try {
 			this.stopPlayback();
-			UIManager.updateChannelInfo('Select a channel to start watching');
+			channelInfo.updateChannelInfo('Select a channel to start watching');
 			// TODO
 			//appState.setState('currentChannel', null);
 			console.log('Video player cleared');
@@ -333,7 +344,7 @@ class VideoManager {
 			if (!document.fullscreenElement) {
 				video.requestFullscreen().catch((error) => {
 					console.warn('Fullscreen request failed:', error);
-					SettingsManager.showToast('warning', 'Fullscreen Failed', 'Unable to enter fullscreen mode.');
+					notificationManager.warning('Fullscreen Failed', 'Unable to enter fullscreen mode.');
 				});
 			} else {
 				document.exitFullscreen().catch((error) => {
@@ -354,14 +365,25 @@ class VideoManager {
 			video.muted = !video.muted;
 			console.log('Video muted:', video.muted);
 
-			// Save setting if remember volume is enabled
-			const settings = SettingsManager.getSettings();
-			if (settings.rememberVolume) {
-				SettingsManager.saveSettings({ muted: video.muted });
-			}
+			// Persisting volume can be wired to Settings if needed
 		} catch (error) {
 			console.warn('Failed to toggle mute:', error);
 		}
+	}
+
+	/**
+	 * Install a one-time user gesture listener to resume autoplay
+	 * @param {HTMLVideoElement} video
+	 */
+	#installOneTimeGesture(video) {
+		const resume = () => {
+			cleanup();
+			video.play().catch(() => {});
+		};
+		const cleanup = () => {
+			['pointerdown', 'keydown', 'touchend'].forEach((t) => document.removeEventListener(t, resume, { capture: true }));
+		};
+		['pointerdown', 'keydown', 'touchend'].forEach((t) => document.addEventListener(t, resume, { once: true, capture: true }));
 	}
 	// Handle window resize
 	handleResize() {
