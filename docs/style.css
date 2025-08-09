@@ -830,3 +830,13 @@ kbd {
 		--bs-gutter-y: 1rem;
 	}
 }
+
+/* Select/Select2 odaklıyken kart hover efektini kapat */
+.card:hover:has(#countrySelect:focus),
+.card:hover:has(.select2-container--focus),
+.card:focus-within:hover {
+	transform: none;
+	box-shadow:
+		0 20px 25px -5px rgba(0, 0, 0, 0.1),
+		0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
