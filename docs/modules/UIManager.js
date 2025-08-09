@@ -44,14 +44,6 @@ export const UIManager = {
   <source srcset="${flag1}" type="image/svg+xml">
   <img src="${flag0}" alt="Ülkenin bayrağı" class="flag-img">
 </picture>`;
-
-		// const flagImg = `<img src="${flagUrl}"
-		//                          style="width: 2rem; height: auto; aspect-ratio: 4/3;
-		//                                 vertical-align: middle; margin-right: 0.5rem;
-		//                                 border-radius: 0.25rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);"
-		//                          alt="Flag"
-		//                          onerror="this.style.display='none'" />`;
-
 		return $(`<span>${flagPic}${state.text}</span>`);
 	},
 

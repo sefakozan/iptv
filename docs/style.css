@@ -55,6 +55,9 @@ body {
 		0 25px 50px -12px rgba(0, 0, 0, 0.25),
 		0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
+body:has(.select2-container--open) .card:hover {
+	transform: none;
+}
 
 /* Card Headers */
 .card-header.bg-primary {
