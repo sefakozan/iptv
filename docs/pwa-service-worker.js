@@ -454,23 +454,20 @@ class FetchStrategyManager {
 	 * @returns {Promise<Response>} Response
 	 */
 	async handleFetch(event) {
-		const { request, respondWith } = event;
+		const { request } = event;
 
 		try {
 			if (DEV_ENV.enabled) {
-				respondWith(fetch(request));
-				return;
+				return fetch(request);
 			}
 			// Skip non-GET requests
 			if (request.method !== 'GET') {
-				respondWith(fetch(request));
-				return;
+				return fetch(request);
 			}
 
 			// Skip streaming content
 			if (this.config.shouldExcludeFromCache(request.url)) {
-				respondWith(fetch(request));
-				return;
+				return fetch(request);
 			}
 
 			// Choose strategy based on request type
@@ -991,8 +988,7 @@ class ServiceWorkerManager {
 					break;
 
 				case 'GET_VERSION':
-					event.ports[0]?.postMessage({
-						type: 'GET_VERSION',
+					await this.errorManager.notifyMainThread('VERSION', {
 						version: this.config.version,
 						cacheName: this.config.cacheName
 					});
@@ -1007,10 +1003,12 @@ class ServiceWorkerManager {
 					break;
 				case 'CLEAR_ALL_CACHE':
 					await this.clearAllCache();
+					await this.errorManager.notifyMainThread('CLEAR_ALL_CACHE_OK', {});
 					break;
 				case 'SET_ENV':
 					await this.setEnv(data?.isDevelopment);
-					event.ports[0]?.postMessage({ type: 'CLEAR_ALL_CACHE_OK' });
+					// If caches were cleared in dev mode, inform clients
+					await this.errorManager.notifyMainThread('CLEAR_ALL_CACHE_OK', {});
 					break;
 
 				default:
@@ -1048,9 +1046,9 @@ class ServiceWorkerManager {
 	}
 
 	async setEnv(isDevelopment) {
-		if (isDevelopment) {
-			DEV_ENV.enabled = true;
-			await clearAllCache();
+		DEV_ENV.enabled = !!isDevelopment;
+		if (DEV_ENV.enabled) {
+			await this.clearAllCache();
 		}
 	}
 

@@ -254,18 +254,21 @@ export class PWAManager {
 	}
 
 	sendSkipWaiting() {
+		if (!('serviceWorker' in navigator)) return;
 		navigator.serviceWorker.ready.then((reg) => {
 			reg?.active?.postMessage?.({ type: 'SKIP_WAITING' });
 		});
 	}
 
 	sendGetVersion() {
+		if (!('serviceWorker' in navigator)) return;
 		navigator.serviceWorker.ready.then((reg) => {
 			reg?.active?.postMessage?.({ type: 'GET_VERSION' });
 		});
 	}
 
 	sendClearAllCache() {
+		if (!('serviceWorker' in navigator)) return;
 		navigator.serviceWorker.ready.then((reg) => {
 			reg?.active?.postMessage?.({ type: 'CLEAR_ALL_CACHE', data: {} });
 		});
