@@ -13,6 +13,8 @@ export class EventManager {
 	etype = Object.freeze({
 		COUNTRY_CHANGE: 'country:change',
 		CHANNEL_CHANGE: 'channel:change',
+		PLAYLIST_CHANGE: 'playlist:change',
+		STREAM_CHANGE: 'stream:change',
 		NEW_VERSION_INSTALLED: 'app:version:installed',
 		APP_INSTALLED: 'app:installed',
 		APP_BACKGROUND: 'app:background',
@@ -25,12 +27,14 @@ export class EventManager {
 		LOADING_END: 'loading:end',
 		ERROR_OCCURRED: 'error:occurred',
 		SETTINGS_CHANGED: 'settings:changed',
+		STATE_CHANGED: 'state:changed',
 		VIDEO_PLAY: 'video:play',
 		VIDEO_PAUSE: 'video:pause',
 		VIDEO_ERROR: 'video:error',
 		NETWORK_ONLINE: 'network:online',
 		NETWORK_OFFLINE: 'network:offline',
-		CACHE_CLEARED: 'cache:cleared',
+		SW_CACHE_CLEARED: 'sw:cache:cleared',
+		PLAYLIST_CACHE_CLEARED: 'playlist:cache:cleared',
 		SW_REGISTERD: 'sw:registered',
 		PWA_UPDATE_AVAILABLE: 'pwa:update:available',
 		PWA_UPDATE_INSTALLED: 'pwa:update:installed',
@@ -48,7 +52,7 @@ export class EventManager {
 		}
 
 		window.iptv = window.iptv || {};
-		window.iptv.em = EventManager.#instance;
+		window.iptv.em = this;
 
 		this.#initialize();
 	}

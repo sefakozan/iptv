@@ -4,6 +4,7 @@
 
 import { EventManager } from './EventManager.js';
 import { NotificationManager } from './NotificationManager.js';
+import { PWAManager } from './PWAManager.js';
 
 /**
  * @typedef {Object} Settings
@@ -52,6 +53,9 @@ export class SettingsManager {
 	/** @type {NotificationManager} */
 	#nm = NotificationManager.getInstance();
 
+	/** @type {PWAManager} */
+	#pwa = PWAManager.getInstance();
+
 	/** @type {EventManager} */
 	#em = EventManager.getInstance();
 
@@ -68,6 +72,8 @@ export class SettingsManager {
 			debugMode: config.debugMode ?? false,
 		};
 		this.#initialize();
+		window.iptv = window.iptv || {};
+		window.iptv.settings = this;
 	}
 
 	/**
@@ -128,7 +134,7 @@ export class SettingsManager {
 	 */
 	updateModalStatus() {
 		try {
-			const isInstalled = this.#isAppInstalled();
+			const isInstalled = this.#pwa.isAppInstalled();
 			this.#updateInstallStatus(isInstalled);
 			this.#updateServiceWorkerStatus();
 			this.#updateLastUpdatedTime();
@@ -136,15 +142,6 @@ export class SettingsManager {
 		} catch (error) {
 			this.#log('warn', '❌ Error updating modal status', error);
 		}
-	}
-
-	/**
-	 * Check if app is installed as PWA
-	 * @returns {boolean}
-	 * @private
-	 */
-	#isAppInstalled() {
-		return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone || document.referrer.includes('android-app://');
 	}
 
 	/**
@@ -231,54 +228,6 @@ export class SettingsManager {
 			$headerInstallBtn.style.display = isInstalled || window.deferredPrompt ? '' : 'none';
 		} catch (error) {
 			this.#log('warn', '❌ Error updating header install button', error);
-		}
-	}
-
-	/**
-	 * Handle PWA installation
-	 */
-	async installPWA() {
-		if (!window.deferredPrompt) {
-			this.#nm.info(
-				'Manual Installation',
-				`
-        To install IPTV Player manually:<br>
-        1. Click browser menu (⋮)<br>
-        2. Select "Install App" or "Add to Home Screen"<br>
-        3. Follow the installation prompts`,
-				{ delay: 8000 },
-			);
-			return;
-		}
-
-		window.deferredPrompt.prompt();
-		const { outcome } = await window.deferredPrompt.userChoice;
-		if (outcome === 'accepted') {
-			this.#nm.success('Installation Started', 'IPTV Player is being installed...');
-			setTimeout(() => this.updateModalStatus(), 1000);
-		} else {
-			this.#nm.info('Installation Cancelled', 'You can install the app later from browser menu.');
-		}
-		window.deferredPrompt = null;
-	}
-
-	/**
-	 * Update service worker
-	 */
-	async updateServiceWorker() {
-		if (!('serviceWorker' in navigator)) return;
-
-		const registrations = await navigator.serviceWorker.getRegistrations();
-		if (registrations.length === 0) return;
-
-		const registration = registrations[0];
-		if (registration.waiting) {
-			registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-			this.#nm.success('App Updated!', 'App updated successfully! Changes will be applied on next reload.', { delay: 5000 });
-			setTimeout(() => window.location.reload(), 2000);
-		} else {
-			await registration.update();
-			this.updateModalStatus();
 		}
 	}
 

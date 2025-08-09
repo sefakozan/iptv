@@ -484,7 +484,7 @@ body {
 	padding: 0.75rem;
 }
 
-.select2-selection__rendered img {
+/* .select2-selection__rendered img {
 	margin-right: 0.75rem;
 	vertical-align: middle;
 	width: 1.25rem;
@@ -492,7 +492,7 @@ body {
 	aspect-ratio: 4 / 3;
 	border-radius: 4px;
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
+} */
 
 .select2-dropdown {
 	background: #fff;
@@ -792,6 +792,16 @@ kbd {
 /* Animation */
 .modal.fade .modal-dialog {
 	transition: transform 0.3s ease;
+}
+
+/* aspect-ratio: 4/3; */
+.flag-img {
+	width: 2rem;
+	height: auto;
+	vertical-align: middle;
+	margin-right: 0.5rem;
+	border-radius: 0.25rem;
+	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 /* Responsive adjustments */

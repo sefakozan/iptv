@@ -1,0 +1,3 @@
+window.addEventListener('click', () => { ... });        // load'dan sonra
+window.addEventListener('scroll', () => { ... });       // load'dan sonra
+window.addEventListener('resize', () => { ... });       // load'dan sonra

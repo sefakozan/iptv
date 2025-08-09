@@ -6,11 +6,10 @@ export class PWAManager {
 
 	/** @type {ServiceWorkerRegistration} */
 	registration = null;
-	appVersion = '';
-	installedAppVersion = '';
-
+	#appVersion = '';
+	#isAppInstalled = false;
 	isRegistered = false;
-	isInstalled = false;
+
 	serviceWorker = null;
 	deferredPrompt = null;
 	isOnline = false;
@@ -33,6 +32,8 @@ export class PWAManager {
 
 		this.#initialize();
 		this.#listen();
+		window.iptv = window.iptv || {};
+		window.iptv.pwa = this;
 	}
 
 	/**
@@ -47,33 +48,89 @@ export class PWAManager {
 	}
 
 	#initialize() {
-		this.isInstalled = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true || document.referrer.includes('android-app://');
 		this.isOnline = navigator.onLine;
 		this.#register();
-		setInterval(() => navigator.serviceWorker.ready.then((reg) => this.#checkForUpdate.update()), 30000);
+		setInterval(() => navigator.serviceWorker.ready.then(() => this.checkForUpdate()), 30000);
+		this.isAppInstalled();
+
 		// TODO emit event when istalled bu version needed
 	}
 
 	#listen() {
 		this.#em.onOnline(() => {
 			if (!this.isOnline) {
-				this.#nm.success("You're Back Online", 'Internet connection restored.');
+				this.#nm.online();
 			}
 			this.isOnline = true;
 		});
 		this.#em.onOffline(() => {
 			this.isOnline = false;
-			this.#nm.warning('Connection Lost', 'Your internet connection has been lost. Please check your network.');
+			this.#nm.offline();
 		});
+
+		window.addEventListener('beforeinstallprompt', (event) => {
+			event.preventDefault();
+			window.deferredPrompt = event; // Yükleme istemini sakla
+
+			// "Kurulum butonunu" göster
+			//document.getElementById('installBtn').style.display = 'block';
+		});
+
+		window.addEventListener('appinstalled', (event) => {
+			console(event);
+			this.#nm.installed();
+			this.isAppInstalled();
+			window.deferredPrompt = null;
+		});
+
+		window.addEventListener('load', () => this.isAppInstalled());
+	}
+
+	/**
+	 * Handle PWA installation
+	 */
+	async installPWA() {
+		if (!window.deferredPrompt) {
+			this.#nm.manual();
+			return;
+		}
+
+		window.deferredPrompt.prompt();
+		const { outcome } = await window.deferredPrompt.userChoice;
+		if (outcome === 'accepted') {
+			this.#nm.success('Installation Started', 'IPTV Player is being installed...');
+			setTimeout(() => this.updateModalStatus(), 1000);
+		} else {
+			this.#nm.info('Installation Cancelled', 'You can install the app later from browser menu.');
+		}
+		window.deferredPrompt = null;
+	}
+
+	/**
+	 * Update service worker
+	 */
+	async checkForUpdate() {
+		if (!('serviceWorker' in navigator)) return;
+
+		const registration = await navigator.serviceWorker.getRegistration();
+		if (!registration) return;
+
+		if (registration.waiting) {
+			registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+			this.#nm.updated();
+			// TODO check
+			// setTimeout(() => window.location.reload(), 2000);
+		} else {
+			await registration.update();
+		}
 	}
 
 	async #register() {
 		try {
 			navigator.serviceWorker.addEventListener('message', (event) => {
 				//const message = { type, data, timestamp: Date.now() };
-				debugger;
+
 				const { type, data, time } = event.data;
-				debugger;
 			});
 
 			const registration = await this.#withRetry('sw-registration', () => navigator.serviceWorker.register(this.serviceWorkerPath));
@@ -123,6 +180,32 @@ export class PWAManager {
 	status() {
 		this.#initialize();
 		return {};
+	}
+
+	isAppInstalled() {
+		try {
+			this.#isAppInstalled =
+				window.matchMedia('(display-mode: standalone)').matches ||
+				window.navigator?.standalone === true ||
+				navigator?.standalone === true ||
+				document.referrer?.includes('android-app://');
+
+			if ('getInstalledRelatedApps' in navigator) {
+				navigator.getInstalledRelatedApps().then((apps) => {
+					if (apps.length > 0) {
+						this.#isAppInstalled = true;
+						this.#em.emitAppInstalled();
+					} else {
+						this.#isAppInstalled = false;
+					}
+				});
+			}
+		} catch (error) {
+			console.error(error);
+		}
+
+		if (this.#isAppInstalled) this.#em.emitAppInstalled();
+		return this.#isAppInstalled;
 	}
 
 	sendSkipWaiting() {

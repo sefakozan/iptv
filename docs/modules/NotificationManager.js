@@ -42,7 +42,6 @@ const NOTIFICATION_TYPES = Object.freeze({
  * NotificationManager class - Singleton for managing Bootstrap Toasts
  */
 
-// biome-ignore lint/correctness/noUnusedVariables: <loaded script>
 export class NotificationManager {
 	/** @type {NotificationManager|null} */
 	static #instance = null;
@@ -68,7 +67,8 @@ export class NotificationManager {
 			animation: config.animation ?? true,
 		};
 		this.#initialize();
-		window.NotificationManager = this;
+		window.iptv = window.iptv || {};
+		window.iptv.nm = this;
 	}
 
 	/**
@@ -79,7 +79,6 @@ export class NotificationManager {
 	static getInstance(config) {
 		if (!NotificationManager.#instance) {
 			NotificationManager.#instance = new NotificationManager(config);
-			window.iptv_nm = NotificationManager.#instance;
 		}
 		return NotificationManager.#instance;
 	}
@@ -412,5 +411,32 @@ export class NotificationManager {
 	 */
 	getCount() {
 		return this.#toastContainer?.querySelectorAll('.toast').length ?? 0;
+	}
+
+	online() {
+		this.success("You're Back Online", 'Internet connection restored.');
+	}
+
+	offline() {
+		this.warning('Connection Lost', 'Your internet connection has been lost. Please check your network.');
+	}
+	installed() {
+		this.primary('App Installed', 'Your app is installed and ready to use from your home screen!');
+	}
+
+	updated() {
+		this.success('App Updated!', 'App updated successfully! Changes will be applied on next reload.', { delay: 5000 });
+	}
+
+	manual() {
+		this.info(
+			'Manual Installation',
+			`
+        To install IPTV Player manually:<br>
+        1. Click browser menu (⋮)<br>
+        2. Select "Install App" or "Add to Home Screen"<br>
+        3. Follow the installation prompts`,
+			{ delay: 8000 },
+		);
 	}
 }

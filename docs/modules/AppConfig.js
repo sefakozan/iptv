@@ -115,4 +115,4 @@ export class AppConfig {
 	}
 }
 
-await AppConfig.getInstance().initialize();
+export const CountryPromise = AppConfig.getInstance().initialize();

@@ -27,8 +27,8 @@
  */
 class ServiceWorkerConfig {
 	constructor() {
-		this.development = false;
-		this.version = '2.1.9';
+		this.development = true;
+		this.version = '2.1.10';
 		this.version = this.development ? `${this.version}-dev` : this.version;
 		this.cacheName = `iptv-player-v${this.version}`;
 		this.staticCacheName = `${this.cacheName}-static`;
@@ -61,7 +61,6 @@ class ServiceWorkerConfig {
 			'./',
 			'./index.html',
 			'./style.css',
-			'./script.js',
 			'./pwa-service-worker.js',
 			'./manifest.json',
 			'./assets/icon-192x192.png',
