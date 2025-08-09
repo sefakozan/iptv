@@ -3,31 +3,18 @@
    Application State Management with Notifications
    ======================================================================== */
 
+import { SettingsManager } from './_SettingsManager.js';
 import { AppConfig } from './AppConfig.js';
 import { EventManager } from './EventManager.js';
 import { NotificationManager } from './NotificationManager.js';
 import { PWAManager } from './PWAManager.js';
-import { SettingsManager } from './SettingsManager.js';
 
-// Modern ES6 Singleton StateManager
-export class StateManager {
-	static #instance = null;
+class StateManager {
 	#storageKey = 'iptv-config';
 	#state = {};
-	favs = {
-		us: {},
-	};
-
-	/** @type {EventManager} */
-	#em = null;
-
-	/** @type {NotificationManager} */
-	#nm = null;
+	#favs = {};
 
 	constructor() {
-		if (StateManager.#instance) {
-			throw new Error('StateManager is a singleton. Use StateManager.getInstance()');
-		}
 		// Varsayılan state
 		this.#state = {
 			currentCountry: null,
@@ -40,28 +27,18 @@ export class StateManager {
 			lastUpdated: Date.now(),
 			currentTheme: '',
 		};
-		this.fav;
-		this.#nm = NotificationManager.getInstance();
-		this.#em = EventManager.getInstance();
-	}
-
-	/**
-	 * Get singleton instance
-	 * @returns {StateManager}
-	 */
-	static getInstance() {
-		if (!StateManager.#instance) {
-			StateManager.#instance = new StateManager();
-			window.iptv = window.iptv || {};
-			window.iptv.state = StateManager;
-		}
-		return StateManager.#instance;
+		this.#favs = {
+			us: {
+				url: 0,
+			},
+		};
 	}
 
 	save() {
 		localStorage.setItem(this.#storageKey, JSON.stringify(this.#state));
-		localStorage.setItem(`${this.#storageKey}-favs`, JSON.stringify(this.favs));
+		localStorage.setItem(`${this.#storageKey}-favs`, JSON.stringify(this.#favs));
 	}
+
 	load() {
 		try {
 			let storedState = localStorage.getItem(this.#storageKey);
@@ -70,7 +47,7 @@ export class StateManager {
 			storedFavs = JSON.parse(storedFavs);
 
 			this.#state = storedState;
-			this.favs = storedFavs;
+			this.#favs = storedFavs;
 			// TODO notify
 		} catch (error) {
 			console.error('warn', '❌ Failed to load states', error);
@@ -144,3 +121,5 @@ export class StateManager {
 	// 	this.#em.emit(this.#em.estr.NEW_VERSION_INSTALLED, { prev, version });
 	// }
 }
+
+export const stateManager = new StateManager();

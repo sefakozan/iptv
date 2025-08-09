@@ -30,11 +30,6 @@ body {
 	margin: 0 auto;
 }
 
-.container-fluid.h-100 {
-	height: calc(100vh - 60px);
-	padding-top: 1rem;
-}
-
 /* Cards */
 .card {
 	background: rgba(255, 255, 255, 0.95);
@@ -197,10 +192,10 @@ body:has(.select2-container--open) .card:hover {
 	transition: all 0.2s ease;
 }
 
-#countrySelect:focus {
+/* #countrySelect:focus {
 	border-color: #4f46e5;
 	box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-}
+} */
 
 #channelList {
 	background: #ffffff;
@@ -471,8 +466,8 @@ body:has(.select2-container--open) .card:hover {
 
 .select2-container--default .select2-selection--single:focus,
 .select2-container--default .select2-selection--single.select2-selection--focus {
-	border-color: #4f46e5;
-	box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+	/* border-color: #4f46e5; */
+	/*box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);*/
 	outline: none;
 }
 
@@ -859,4 +854,10 @@ kbd {
 /* Select2 açıkken sayfa yatay scroll'u kapat */
 body:has(.select2-container--open) {
 	overflow-x: hidden;
+}
+
+/* Her sütundaki son kartta alt boşluğu kaldır (taşmayı önler) */
+.main-card,
+.video-player-card {
+	margin-bottom: 0;
 }

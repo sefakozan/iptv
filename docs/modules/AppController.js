@@ -1,17 +1,17 @@
 import { AppConfig, CountryPromise } from './AppConfig.js';
+import { countrySelect } from './CountrySelect.js';
 import { PWAManager } from './PWAManager.js';
 import { StateManager } from './StateManager.js';
 import { UIManager } from './UIManager.js';
 
-function applyState() {
-	//volume
-	//muted
-}
+//applyState
+//volume
+//muted
 
 // Application Entry Point
 $(document).ready(async () => {
 	try {
-		UIManager.setCountrySelect();
+		countrySelect.readyInit();
 		// load countries
 		await CountryPromise;
 		UIManager.populateCountrySelect(AppConfig.getInstance().countries);
