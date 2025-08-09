@@ -21,15 +21,14 @@ export const UIManager = {
 			escapeMarkup: (markup) => markup, // Allow HTML content
 		});
 
-		//// Set search placeholder when dropdown opens
-		// $countrySelect.on('select2:open', () => {
-		// 	setTimeout(() => {
-		// 		const searchBox = Utils.safeQuerySelector('.select2-search__field');
-		// 		if (searchBox) {
-		// 			searchBox.placeholder = 'Type to search for a country...';
-		// 		}
-		// 	}, 0);
-		// });
+		// Not: Select2 arama input'u için built-in placeholder ayarı yok.
+		// Input, dropdown açıldığında oluşturulduğu için burada set edilir.
+		$countrySelect.on('select2:open', () => {
+			const $search = $('.select2-container--open .select2-search__field');
+			$search.attr('placeholder', 'Type to search for a country...');
+			// İsteğe bağlı:
+			$search.attr({ 'aria-label': 'Search country', inputmode: 'search' }).trigger('focus');
+		});
 	},
 
 	formatCountryOption(state) {
