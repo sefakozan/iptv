@@ -1,28 +1,49 @@
 import { appConfig } from './AppConfig.js';
-import { loadChannel } from './ChannelLoader.js';
+import { channelLoader } from './ChannelLoader.js';
+import { eventManager } from './EventManager.js';
 
+/** Country select controller: wires Select2, loads options, and reacts to selection. */
 class CountrySelect {
-	defaultCountry = 'us';
+	/** Two-letter default country code */
+	defaultCountry = 'US';
 	currentCountry = '';
 	prevCountry = '';
-	constructor() {}
-	async readyInit() {
-		await CountryPromise;
-		this.#initializeomponent();
-		this.#loadData(AppConfig.getInstance().countries);
-		$('#countrySelect').on('change', this.handleCountryChange);
+
+	constructor() {
+		this.handleCountryChange = this.handleCountryChange.bind(this);
 	}
 
+	/** Initialize component once countries are ready */
+	async readyInit() {
+		await appConfig.initialize();
+		const countries = appConfig.getCountries?.() || [];
+		this.#loadData(countries);
+		this.#initializeComponent();
+		$('#countrySelect').on('change', this.handleCountryChange);
+
+		// Select default country
+		const def = appConfig.getDefaultCountry?.();
+		const code = (def?.code || this.defaultCountry || '').toUpperCase();
+		if (code) {
+			$('#countrySelect').val(code).trigger('change');
+		}
+	}
+
+	/** @param {JQuery.ChangeEvent} event @param {{random?:boolean}} [data] */
 	async handleCountryChange(event, data) {
-		const selectedCountry = $(event.target).val();
+		const selectedCountry = String($(event.target).val() || '').toUpperCase();
 		const random = data?.random === true;
-		const channels = loadChannel(selectedCountry, random);
-		//	UIManager.populateChannelList(channels);
-		//	UIManager.enableChannelSearch();
+		this.prevCountry = this.currentCountry;
+		this.currentCountry = selectedCountry;
+		eventManager.emit(eventManager.etype.COUNTRY_CHANGE, { prev: this.prevCountry, current: this.currentCountry });
+
+		const channels = await channelLoader.load(selectedCountry, random);
+		// UI population is handled elsewhere (UIManager) if wired
+		return channels;
 	}
 
 	async loadDefault() {
-		await loadChannel(this.default);
+		await channelLoader.load(this.defaultCountry);
 	}
 
 	#formatCountryOption(state) {
@@ -36,7 +57,7 @@ class CountrySelect {
 		return $(`<span>${flagPic}${state.text}</span>`);
 	}
 
-	#initializeomponent() {
+	#initializeComponent() {
 		const $countrySelect = $('#countrySelect');
 
 		// sorter içinde kullanmak için son arama terimi
@@ -54,6 +75,7 @@ class CountrySelect {
 			templateResult: this.#formatCountryOption,
 			templateSelection: this.#formatCountryOption,
 			escapeMarkup: (markup) => markup,
+			dropdownParent: $countrySelect.parent(),
 
 			// 0–2 karakter: ad + kod içinde ara
 			// 3+ karakter: sadece ad içinde ara
@@ -119,11 +141,14 @@ class CountrySelect {
 
 			countries.forEach((country) => {
 				if (country.disabled) return;
+				const code = String(country.code || '').toUpperCase();
+				const name = String(country.name || code);
+				const imgs = Array.isArray(country.imgs) ? country.imgs : [];
 
-				const option = new Option(`${country.name} (${country.code})`, country.code);
-				option.setAttribute('data-flag0', country.imgs[0]);
-				option.setAttribute('data-flag1', country.imgs[1]);
-				option.setAttribute('data-flag2', country.imgs[2]);
+				const option = new Option(`${name} (${code})`, code);
+				if (imgs[0]) option.setAttribute('data-flag0', imgs[0]);
+				if (imgs[1]) option.setAttribute('data-flag1', imgs[1]);
+				if (imgs[2]) option.setAttribute('data-flag2', imgs[2]);
 				option.className = 'country-option';
 
 				$countrySelect.append(option);
