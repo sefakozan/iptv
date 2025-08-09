@@ -1,15 +1,16 @@
 // NotificationManager.js
 // IPTV Player - Advanced Notification Management System
-// Optimized Bootstrap Toast Implementation with Singleton Pattern
+// Optimized Bootstrap Toast Implementation
+
+import { appConfig } from './AppConfig.js';
 
 /**
  * @typedef {Object} NotificationOptions
  * @property {number} [delay] - Toast display duration in milliseconds
  * @property {boolean} [autohide=true] - Whether the toast auto-hides
  * @property {boolean} [animation=true] - Whether to use animation
- * @property {Object} [action] - Action button configuration
- * @property {string} action.text - Action button text
- * @property {() => void} action.callback - Action button callback
+ * @property {boolean} [isTop=false] - Show toast at top position
+ * @property {{ text: string, callback: () => void }} [action] - Action button configuration
  */
 
 /**
@@ -21,7 +22,7 @@
 /**
  * @typedef {Object} NotificationConfig
  * @property {number} defaultDelay - Default toast duration
- * @property {string} position - Toast container position
+ * @property {string} position - Toast container position (e.g., 'top-0 end-0')
  * @property {boolean} autohide - Default autohide setting
  * @property {boolean} animation - Default animation setting
  */
@@ -39,9 +40,8 @@ const NOTIFICATION_TYPES = Object.freeze({
 });
 
 /**
- * NotificationManager class - Singleton for managing Bootstrap Toasts
+ * NotificationManager - Bootstrap Toast helper (module-level singleton via export)
  */
-
 export class NotificationManager {
 	/** @type {HTMLElement|null} */
 	#toastContainer = null;
@@ -49,10 +49,6 @@ export class NotificationManager {
 	/** @type {NotificationConfig} */
 	#config;
 
-	/**
-	 * @param {Partial<NotificationConfig>} [config]
-	 * @private Use NotificationManager.getInstance()
-	 */
 	constructor() {
 		this.#config = {
 			defaultDelay: 5000,
@@ -63,10 +59,6 @@ export class NotificationManager {
 		this.#initialize();
 	}
 
-	/**
-	 * Initialize notification system
-	 * @private
-	 */
 	#initialize() {
 		try {
 			this.#createToastContainer();
@@ -76,12 +68,8 @@ export class NotificationManager {
 		}
 	}
 
-	/**
-	 * Create toast container
-	 * @private
-	 */
 	#createToastContainer() {
-		this.#toastContainer = document.getElementById('');
+		this.#toastContainer = document.getElementById('toastContainer');
 		if (!this.#toastContainer) {
 			this.#toastContainer = document.createElement('div');
 			this.#toastContainer.id = 'toastContainer';
@@ -93,7 +81,7 @@ export class NotificationManager {
 
 	/**
 	 * Show a notification toast
-	 * @param {'success' | 'error' | 'warning' | 'info' | 'loading'} type
+	 * @param {'success'|'error'|'warning'|'info'|'loading'|'primary'} type
 	 * @param {string} title
 	 * @param {string} message
 	 * @param {NotificationOptions} [options={}]
@@ -105,13 +93,8 @@ export class NotificationManager {
 				throw new TypeError('Invalid parameters: type, title, and message must be non-empty strings');
 			}
 
-			if (!this.#toastContainer) {
-				this.#createToastContainer();
-			}
-
-			if (options.isTop) {
-				this.setPosition('top-0 end-0');
-			}
+			if (!this.#toastContainer) this.#createToastContainer();
+			if (options.isTop) this.setPosition('top-0 end-0');
 
 			const toast = this.#createToastElement(type, title, message, options);
 			this.#toastContainer.appendChild(toast);
@@ -138,27 +121,16 @@ export class NotificationManager {
 			return bsToast;
 		} catch (error) {
 			this.#log('error', '❌ Failed to show notification', error);
-			this.#log('info', `[${type.toUpperCase()}] ${title}: ${message}`);
+			this.#log('info', `[${String(type).toUpperCase()}] ${title}: ${message}`);
 			return null;
 		}
 	}
 
-	/**
-	 * Create toast HTML element
-	 * @param {string} type
-	 * @param {string} title
-	 * @param {string} message
-	 * @param {NotificationOptions} options
-	 * @returns {HTMLElement}
-	 * @private
-	 */
 	#createToastElement(type, title, message, options) {
 		const toastId = this.#generateId('toast');
 		const typeConfig = this.#getTypeConfig(type);
 		const actionHtml = options.action
-			? `<button type="button" class="btn btn-sm btn-outline-primary toast-action-btn ms-2">
-           ${this.#sanitizeHtml(options.action.text || 'Action')}
-         </button>`
+			? `<button type="button" class="btn btn-sm btn-outline-primary toast-action-btn ms-2">${this.#sanitizeHtml(options.action.text || 'Action')}</button>`
 			: '';
 
 		const toastHtml = `
@@ -178,190 +150,65 @@ export class NotificationManager {
 
 		const tempDiv = document.createElement('div');
 		tempDiv.innerHTML = toastHtml;
-		return tempDiv.firstElementChild;
+		return /** @type {HTMLElement} */ (tempDiv.firstElementChild);
 	}
 
-	/**
-	 * Get type-specific configuration
-	 * @param {string} type
-	 * @returns {TypeConfig}
-	 * @private
-	 */
 	#getTypeConfig(type) {
 		const configs = {
-			[NOTIFICATION_TYPES.SUCCESS]: {
-				icon: 'fas fa-check-circle text-success',
-				headerClass: 'bg-success-subtle'
-			},
-			[NOTIFICATION_TYPES.ERROR]: {
-				icon: 'fas fa-exclamation-circle text-danger',
-				headerClass: 'bg-danger-subtle'
-			},
-			[NOTIFICATION_TYPES.WARNING]: {
-				icon: 'fas fa-exclamation-triangle text-warning',
-				headerClass: 'bg-warning-subtle'
-			},
-			[NOTIFICATION_TYPES.INFO]: {
-				icon: 'fas fa-info-circle text-info',
-				headerClass: 'bg-info-subtle'
-			},
-			[NOTIFICATION_TYPES.LOADING]: {
-				icon: 'fas fa-spinner fa-spin text-primary',
-				headerClass: 'bg-primary-subtle'
-			},
-			[NOTIFICATION_TYPES.PRIMARY]: {
-				icon: 'fas fa-bell',
-				headerClass: 'bg-primary text-white'
-			}
+			[NOTIFICATION_TYPES.SUCCESS]: { icon: 'fas fa-check-circle text-success', headerClass: 'bg-success-subtle' },
+			[NOTIFICATION_TYPES.ERROR]: { icon: 'fas fa-exclamation-circle text-danger', headerClass: 'bg-danger-subtle' },
+			[NOTIFICATION_TYPES.WARNING]: { icon: 'fas fa-exclamation-triangle text-warning', headerClass: 'bg-warning-subtle' },
+			[NOTIFICATION_TYPES.INFO]: { icon: 'fas fa-info-circle text-info', headerClass: 'bg-info-subtle' },
+			[NOTIFICATION_TYPES.LOADING]: { icon: 'fas fa-spinner fa-spin text-primary', headerClass: 'bg-primary-subtle' },
+			[NOTIFICATION_TYPES.PRIMARY]: { icon: 'fas fa-bell', headerClass: 'bg-primary text-white' }
 		};
 		return configs[type] || configs[NOTIFICATION_TYPES.INFO];
 	}
 
-	/**
-	 * Sanitize HTML content
-	 * @param {string} str
-	 * @returns {string}
-	 * @private
-	 */
 	#sanitizeHtml(str) {
 		const div = document.createElement('div');
-		div.textContent = str;
+		div.textContent = String(str);
 		return div.innerHTML;
 	}
 
-	/**
-	 * Get formatted time string
-	 * @returns {string}
-	 * @private
-	 */
 	#getTimeString() {
-		return new Date().toLocaleTimeString('en-US', {
-			hour12: false,
-			hour: '2-digit',
-			minute: '2-digit'
-		});
+		return new Date().toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit' });
 	}
 
-	/**
-	 * Generate unique ID
-	 * @param {string} prefix
-	 * @returns {string}
-	 * @private
-	 */
 	#generateId(prefix) {
 		return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
 	}
 
-	/**
-	 * Validate input parameters
-	 * @param {string} type
-	 * @param {string} title
-	 * @param {string} message
-	 * @returns {boolean}
-	 * @private
-	 */
 	#isValidInput(type, title, message) {
 		return typeof type === 'string' && type && typeof title === 'string' && title && typeof message === 'string' && message;
 	}
 
-	/**
-	 * Log messages with level
-	 * @param {'info' | 'error'} level
-	 * @param {string} message
-	 * @param {...any} args
-	 * @private
-	 */
 	#log(level, message, ...args) {
 		console[level](message, ...args);
 	}
 
-	/**
-	 * Show success notification
-	 * @param {string} title
-	 * @param {string} message
-	 * @param {NotificationOptions} [options={}]
-	 * @returns {bootstrap.Toast|null}
-	 */
 	success(title, message, options = {}) {
 		return this.show(NOTIFICATION_TYPES.SUCCESS, title, message, options);
 	}
-
-	/**
-	 * Show error notification
-	 * @param {string} title
-	 * @param {string} message
-	 * @param {NotificationOptions} [options={}]
-	 * @returns {bootstrap.Toast|null}
-	 */
 	error(title, message, options = {}) {
 		return this.show(NOTIFICATION_TYPES.ERROR, title, message, options);
 	}
-
-	/**
-	 * Show warning notification
-	 * @param {string} title
-	 * @param {string} message
-	 * @param {NotificationOptions} [options={}]
-	 * @returns {bootstrap.Toast|null}
-	 */
 	warning(title, message, options = {}) {
 		return this.show(NOTIFICATION_TYPES.WARNING, title, message, options);
 	}
-
-	/**
-	 * Show info notification
-	 * @param {string} title
-	 * @param {string} message
-	 * @param {NotificationOptions} [options={}]
-	 * @returns {bootstrap.Toast|null}
-	 */
 	info(title, message, options = {}) {
 		return this.show(NOTIFICATION_TYPES.INFO, title, message, options);
 	}
-
-	/**
-	 * Show loading notification
-	 * @param {string} title
-	 * @param {string} message
-	 * @param {NotificationOptions} [options={}]
-	 * @returns {bootstrap.Toast|null}
-	 */
 	loading(title, message, options = {}) {
-		return this.show(NOTIFICATION_TYPES.LOADING, title, message, {
-			...options,
-			autohide: false
-		});
+		return this.show(NOTIFICATION_TYPES.LOADING, title, message, { ...options, autohide: false });
 	}
-
-	/**
-	 * Show loading notification
-	 * @param {string} title
-	 * @param {string} message
-	 * @param {NotificationOptions} [options={}]
-	 * @returns {bootstrap.Toast|null}
-	 */
 	primary(title, message, options = {}) {
-		return this.show(NOTIFICATION_TYPES.PRIMARY, title, message, {
-			...options,
-			autohide: false
-		});
+		return this.show(NOTIFICATION_TYPES.PRIMARY, title, message, { ...options, autohide: false });
 	}
-
-	/**
-	 * Show persistent notification
-	 * @param {string} type
-	 * @param {string} title
-	 * @param {string} message
-	 * @param {NotificationOptions} [options={}]
-	 * @returns {bootstrap.Toast|null}
-	 */
 	persistent(type, title, message, options = {}) {
 		return this.show(type, title, message, { ...options, autohide: false });
 	}
 
-	/**
-	 * Clear all notifications
-	 */
 	clearAll() {
 		try {
 			const toasts = this.#toastContainer?.querySelectorAll('.toast') ?? [];
@@ -374,10 +221,6 @@ export class NotificationManager {
 		}
 	}
 
-	/**
-	 * Update notification position
-	 * @param {string} position - Bootstrap position class (e.g., 'top-end')
-	 */
 	setPosition(position) {
 		try {
 			if (!this.#toastContainer) return;
@@ -389,10 +232,6 @@ export class NotificationManager {
 		}
 	}
 
-	/**
-	 * Get current notification count
-	 * @returns {number}
-	 */
 	getCount() {
 		return this.#toastContainer?.querySelectorAll('.toast').length ?? 0;
 	}
@@ -400,29 +239,28 @@ export class NotificationManager {
 	online() {
 		this.success("You're Back Online", 'Internet connection restored.');
 	}
-
 	offline() {
 		this.warning('Connection Lost', 'Your internet connection has been lost. Please check your network.');
 	}
 	installed() {
 		this.primary('App Installed', 'Your app is installed and ready to use from your home screen!');
 	}
-
 	updated() {
 		this.success('App Updated!', 'App updated successfully! Changes will be applied on next reload.', { delay: 5000 });
 	}
-
 	manual() {
 		this.info(
 			'Manual Installation',
-			`
-        To install IPTV Player manually:<br>
-        1. Click browser menu (⋮)<br>
-        2. Select "Install App" or "Add to Home Screen"<br>
-        3. Follow the installation prompts`,
+			`To install IPTV Player manually:<br>1. Click browser menu (⋮)<br>2. Select "Install App" or "Add to Home Screen"<br>3. Follow the installation prompts`,
 			{ delay: 8000, isTop: true }
 		);
 	}
 }
 
 export const notificationManager = new NotificationManager();
+
+// Dev’de global erişim (export adıyla, window.iptv altında)
+if (appConfig.isDevelopment && typeof window !== 'undefined') {
+	window.iptv = window.iptv || {};
+	window.iptv.notificationManager = notificationManager;
+}
