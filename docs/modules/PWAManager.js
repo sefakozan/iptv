@@ -1,86 +1,88 @@
-import { EventManager } from './EventManager.js';
-import { NotificationManager } from './NotificationManager.js';
+import { appConfig } from './AppConfig.js';
+import { eventManager } from './EventManager.js';
+import { notificationManager } from './NotificationManager.js';
 
 export class PWAManager {
 	serviceWorkerPath = 'pwa-service-worker.js';
 
-	/** @type {ServiceWorkerRegistration} */
+	/** @type {ServiceWorkerRegistration|null} */
 	registration = null;
+
 	#appVersion = '';
 	#isAppInstalled = false;
 	isRegistered = false;
-
-	serviceWorker = null;
-	deferredPrompt = null;
 	isOnline = false;
 	updateAvailable = false;
 
-	/** @type {PWAManager|null} */
-	static #instance = null;
+	/** @type {BeforeInstallPromptEvent|null} */
+	deferredPrompt = null;
 
-	/** @type {NotificationManager} */
-	#nm = NotificationManager.getInstance();
+	// init guards
+	#initialized = false;
+	#initPromise = null;
+	#updateTimerId = null;
 
-	/** @type {EventManager} */
-	#em = EventManager.getInstance();
-
-	constructor() {
-		if (PWAManager.#instance) {
-			throw new Error('SettingsManager is a singleton. Use SettingsManager.getInstance()');
-		}
-		this.retryAttempts = new Map();
-
-		this.#initialize();
-		this.#listen();
-		window.iptv = window.iptv || {};
-		window.iptv.pwa = this;
+	isInitialized() {
+		return this.#initialized;
 	}
 
-	/**
-	 * Get singleton instance
-	 * @returns {PWAManager}
-	 */
-	static getInstance() {
-		if (!PWAManager.#instance) {
-			PWAManager.#instance = new PWAManager();
-		}
-		return PWAManager.#instance;
-	}
+	async initialize() {
+		if (this.#initPromise) return this.#initPromise;
 
-	#initialize() {
-		this.isOnline = navigator.onLine;
-		this.#register();
-		setInterval(() => navigator.serviceWorker.ready.then(() => this.checkForUpdate()), 30000);
-		this.isAppInstalled();
+		this.#initPromise = (async () => {
+			if (this.#initialized) return;
 
-		// TODO emit event when istalled bu version needed
-	}
+			// path from config if available
+			try {
+				const cfg = appConfig.getConfig?.();
+				if (cfg?.serviceWorkerPath) this.serviceWorkerPath = cfg.serviceWorkerPath;
+			} catch {}
 
-	#listen() {
-		this.#em.onOnline(() => {
-			if (!this.isOnline) {
-				this.#nm.online();
+			this.isOnline = navigator.onLine;
+			this.#setupListeners();
+
+			if ('serviceWorker' in navigator) {
+				await this.#register();
+				// periodic update check
+				if (this.#updateTimerId) clearInterval(this.#updateTimerId);
+				this.#updateTimerId = window.setInterval(() => this.checkForUpdate(), 30000);
 			}
+
+			// initial install state
+			this.isAppInstalled();
+
+			this.#initialized = true;
+		})();
+
+		return this.#initPromise;
+	}
+
+	#setupListeners() {
+		// Online / Offline
+		window.addEventListener('online', () => {
+			if (!this.isOnline) notificationManager.online();
 			this.isOnline = true;
 		});
-		this.#em.onOffline(() => {
+		window.addEventListener('offline', () => {
 			this.isOnline = false;
-			this.#nm.offline();
+			notificationManager.offline();
 		});
 
+		// PWA install prompt
 		window.addEventListener('beforeinstallprompt', (event) => {
 			event.preventDefault();
-			window.deferredPrompt = event; // Yükleme istemini sakla
-
-			// "Kurulum butonunu" göster
-			//document.getElementById('installBtn').style.display = 'block';
+			this.deferredPrompt = event;
 		});
 
 		window.addEventListener('appinstalled', (event) => {
-			console(event);
-			this.#nm.installed();
+			console.log('PWA installed:', event);
+			notificationManager.installed();
 			this.isAppInstalled();
-			window.deferredPrompt = null;
+			this.deferredPrompt = null;
+			// Event publish
+			try {
+				eventManager.emit(eventManager.etype.APP_INSTALLED, { source: 'pwa' });
+			} catch {}
 		});
 
 		window.addEventListener('load', () => this.isAppInstalled());
@@ -90,24 +92,22 @@ export class PWAManager {
 	 * Handle PWA installation
 	 */
 	async installPWA() {
-		if (!window.deferredPrompt) {
-			this.#nm.manual();
+		if (!this.deferredPrompt) {
+			notificationManager.manual();
 			return;
 		}
-
-		window.deferredPrompt.prompt();
-		const { outcome } = await window.deferredPrompt.userChoice;
+		this.deferredPrompt.prompt();
+		const { outcome } = await this.deferredPrompt.userChoice;
 		if (outcome === 'accepted') {
-			this.#nm.success('Installation Started', 'IPTV Player is being installed...');
-			setTimeout(() => this.updateModalStatus(), 1000);
+			notificationManager.success('Installation Started', 'IPTV Player is being installed...');
 		} else {
-			this.#nm.info('Installation Cancelled', 'You can install the app later from browser menu.');
+			notificationManager.info('Installation Cancelled', 'You can install the app later from browser menu.');
 		}
-		window.deferredPrompt = null;
+		this.deferredPrompt = null;
 	}
 
 	/**
-	 * Update service worker
+	 * Public: check and apply update if waiting worker exists
 	 */
 	async checkForUpdate() {
 		if (!('serviceWorker' in navigator)) return;
@@ -116,10 +116,13 @@ export class PWAManager {
 		if (!registration) return;
 
 		if (registration.waiting) {
-			registration.waiting.postMessage({ type: 'SKIP_WAITING' });
-			this.#nm.updated();
-			// TODO check
-			// setTimeout(() => window.location.reload(), 2000);
+			try {
+				registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+				this.updateAvailable = true;
+				notificationManager.updated();
+			} catch (e) {
+				console.error('Failed to message waiting SW:', e);
+			}
 		} else {
 			await registration.update();
 		}
@@ -127,26 +130,45 @@ export class PWAManager {
 
 	async #register() {
 		try {
-			navigator.serviceWorker.addEventListener('message', (event) => {
-				//const message = { type, data, timestamp: Date.now() };
-
-				const { type, data, time } = event.data;
-			});
+			// SW message listener
+			navigator.serviceWorker.addEventListener('message', (event) => this.#onSWMessage(event));
 
 			const registration = await this.#withRetry('sw-registration', () => navigator.serviceWorker.register(this.serviceWorkerPath));
 
 			console.log('✅ Service Worker registered successfully:', registration);
 			this.registration = registration;
 			this.isRegistered = true;
-			this.isInstalled = true;
-			//this.#em.emitRegistered(registration);
 
 			this.registration.addEventListener('updatefound', () => {
 				const newWorker = this.registration.installing;
 				if (newWorker) this.#updateFound(newWorker);
 			});
 		} catch (error) {
-			console.error(`Service Worker Registration\n${error}`);
+			console.error('Service Worker Registration\n', error);
+		}
+	}
+
+	#onSWMessage(event) {
+		try {
+			const { type, data } = event.data || {};
+			if (!type) return;
+
+			switch (type) {
+				case 'VERSION':
+					this.#appVersion = data?.version || '';
+					break;
+				case 'CLEAR_ALL_CACHE_OK':
+					notificationManager.success('Cache Cleared', 'All caches cleared by Service Worker.');
+					break;
+				case 'UPDATE_AVAILABLE':
+					this.updateAvailable = true;
+					notificationManager.info('Update Available', 'A new version is ready. It will be applied on reload.');
+					break;
+				default:
+					break;
+			}
+		} catch (e) {
+			console.warn('SW message parse error:', e);
 		}
 	}
 
@@ -154,49 +176,41 @@ export class PWAManager {
 		newWorker.onstatechange = () => {
 			if (newWorker.state === 'installed') {
 				if (navigator.serviceWorker.controller) {
-					console.log('Uygulama güncellendi. Yenileme önerilebilir.');
-					console.log('Yeni güncelleme hazır.');
-					// showRefreshUI()
-					//showRefreshPrompt()
+					this.updateAvailable = true;
+					console.log('New update is installed and ready.');
+					notificationManager.info('Update Ready', 'A new version is installed. Reload to apply.');
 				}
 			}
 		};
 	}
 
-	/**
-	 * Check for service worker update
-	 */
-	async #checkForUpdate() {
-		if (!this.registration) return;
-
-		try {
-			await this.registration.update();
-			console.log('🔍 Checked for Service Worker update');
-		} catch (error) {
-			console.error(`Service Worker Update Check\n${error}`);
-		}
-	}
-
 	status() {
-		this.#initialize();
-		return {};
+		return {
+			serviceWorkerPath: this.serviceWorkerPath,
+			isRegistered: this.isRegistered,
+			isOnline: this.isOnline,
+			updateAvailable: this.updateAvailable,
+			isAppInstalled: this.#isAppInstalled,
+			appVersion: this.#appVersion
+		};
 	}
 
 	isAppInstalled() {
 		try {
 			this.#isAppInstalled =
-				window.matchMedia('(display-mode: standalone)').matches ||
+				window.matchMedia?.('(display-mode: standalone)').matches ||
 				window.navigator?.standalone === true ||
 				navigator?.standalone === true ||
 				document.referrer?.includes('android-app://');
 
 			if ('getInstalledRelatedApps' in navigator) {
 				navigator.getInstalledRelatedApps().then((apps) => {
-					if (apps.length > 0) {
-						this.#isAppInstalled = true;
-						this.#em.emitAppInstalled();
-					} else {
-						this.#isAppInstalled = false;
+					const installed = Array.isArray(apps) && apps.length > 0;
+					this.#isAppInstalled = this.#isAppInstalled || installed;
+					if (installed) {
+						try {
+							eventManager.emit(eventManager.etype.APP_INSTALLED, { source: 'pwa' });
+						} catch {}
 					}
 				});
 			}
@@ -204,60 +218,62 @@ export class PWAManager {
 			console.error(error);
 		}
 
-		if (this.#isAppInstalled) this.#em.emitAppInstalled();
+		if (this.#isAppInstalled) {
+			try {
+				eventManager.emit(eventManager.etype.APP_INSTALLED, { source: 'pwa' });
+			} catch {}
+		}
 		return this.#isAppInstalled;
 	}
 
 	sendSkipWaiting() {
-		// Yeni SW'yi hemen aktif et
-		navigator.serviceWorker.ready.then((sw) => {
-			sw.active.postMessage({ type: 'SKIP_WAITING' });
+		navigator.serviceWorker.ready.then((reg) => {
+			reg?.active?.postMessage?.({ type: 'SKIP_WAITING' });
 		});
 	}
 
 	sendGetVersion() {
-		// Yeni SW'yi hemen aktif et
-		navigator.serviceWorker.ready.then((sw) => {
-			sw.active.postMessage({ type: 'GET_VERSION' });
+		navigator.serviceWorker.ready.then((reg) => {
+			reg?.active?.postMessage?.({ type: 'GET_VERSION' });
 		});
 	}
 
 	sendClearAllCache() {
-		// Yeni SW'yi hemen aktif et
-		navigator.serviceWorker.ready.then((sw) => {
-			sw.active.postMessage({ type: 'CLEAR_ALL_CACHE', data: {} });
+		navigator.serviceWorker.ready.then((reg) => {
+			reg?.active?.postMessage?.({ type: 'CLEAR_ALL_CACHE', data: {} });
 		});
 	}
 
 	/**
-	 * Handle retry logic
-	 * @param {string} operation - Operation name
-	 * @param {Function} func - Function to retry
-	 * @param {number} maxRetries - Maximum retry attempts
-	 * @param {number} delay - Delay between retries
-	 * @returns {Promise} Operation result
+	 * Retry helper with exponential backoff (linear delay here for simplicity)
+	 * @param {string} operation
+	 * @param {() => Promise<any>} func
+	 * @param {number} maxRetries
+	 * @param {number} delay
 	 */
 	async #withRetry(operation, func, maxRetries = 10, delay = 1000) {
-		const attempts = this.retryAttempts.get(operation) || 0;
-
-		try {
-			const result = await func();
-			this.retryAttempts.delete(operation); // Reset on success
-			return result;
-		} catch (error) {
-			if (attempts < maxRetries) {
-				this.retryAttempts.set(operation, attempts + 1);
-				console.warn(`${operation} (attempt ${attempts + 1}/${maxRetries}) \n ${error}`);
-
-				await new Promise((resolve) => setTimeout(resolve, delay));
-				return this.withRetry(operation, func, maxRetries, delay);
-			} else {
-				this.retryAttempts.delete(operation);
-				console.error(`${operation} (final attempt failed) \n ${error}`);
-				throw error;
+		let attempt = 0;
+		for (;;) {
+			try {
+				return await func();
+			} catch (error) {
+				attempt++;
+				if (attempt >= maxRetries) {
+					console.error(`${operation} (final attempt failed)\n`, error);
+					throw error;
+				}
+				console.warn(`${operation} (attempt ${attempt}/${maxRetries})\n`, error);
+				await new Promise((r) => setTimeout(r, delay));
 			}
 		}
 	}
 }
 
-PWAManager.getInstance();
+export const pwaManager = new PWAManager();
+await pwaManager.initialize();
+
+// Dev’de global erişim (export adıyla, window.iptv altında)
+if (appConfig.isDevelopment && typeof window !== 'undefined') {
+	window.iptv = window.iptv || {};
+	window.iptv.pwaManager = pwaManager;
+}

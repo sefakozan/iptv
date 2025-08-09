@@ -16,7 +16,7 @@
  * @property {boolean} cacheBust
  */
 
-export class AppConfig {
+class AppConfig {
 	/** Manuel development bayrağı (otomatik tespit YOK) */
 	isDevelopment = true;
 
@@ -218,7 +218,7 @@ export class AppConfig {
 	}
 }
 
-// Export + init
+// Export + init (yalnızca instance)
 export const appConfig = new AppConfig();
 await appConfig.initialize();
 

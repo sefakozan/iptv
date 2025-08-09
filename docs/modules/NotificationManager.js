@@ -42,7 +42,7 @@ const NOTIFICATION_TYPES = Object.freeze({
 /**
  * NotificationManager - Bootstrap Toast helper (module-level singleton via export)
  */
-export class NotificationManager {
+class NotificationManager {
 	/** @type {HTMLElement|null} */
 	#toastContainer = null;
 

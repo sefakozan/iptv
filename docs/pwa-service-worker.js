@@ -27,9 +27,7 @@
  */
 class ServiceWorkerConfig {
 	constructor() {
-		this.development = true; // @PROD prod’da false yap
 		this.version = '2.1.10';
-		this.version = this.development ? `${this.version}-dev` : this.version;
 		this.cacheName = `iptv-player-v${this.version}`;
 		this.staticCacheName = `${this.cacheName}-static`;
 		this.dynamicCacheName = `${this.cacheName}-dynamic`;
@@ -41,7 +39,7 @@ class ServiceWorkerConfig {
 			static: 100,
 			dynamic: 200,
 			images: 150,
-			api: 50,
+			api: 50
 		};
 
 		// Cache expiration times (in milliseconds)
@@ -49,7 +47,7 @@ class ServiceWorkerConfig {
 			static: 7 * 24 * 60 * 60 * 1000, // 7 days
 			dynamic: 24 * 60 * 60 * 1000, // 1 day
 			images: 30 * 24 * 60 * 60 * 1000, // 30 days
-			api: 5 * 60 * 1000, // 5 minutes
+			api: 5 * 60 * 1000 // 5 minutes
 		};
 
 		// Network timeout
@@ -66,7 +64,7 @@ class ServiceWorkerConfig {
 			'./assets/icon-192x192.png',
 			'./assets/icon-512x512.png',
 			'./assets/screenshot-wide.png',
-			'./assets/screenshot-mobile.png',
+			'./assets/screenshot-mobile.png'
 		];
 
 		// External CDN resources
@@ -78,7 +76,7 @@ class ServiceWorkerConfig {
 			'https://code.jquery.com/jquery-3.7.1.min.js',
 			'https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js',
 			'https://cdn.jsdelivr.net/npm/hls.js@1.6.9/dist/hls.min.js',
-			'https://cdn.jsdelivr.net/npm/iptv-util@latest/rollup/iptv-util-min.js',
+			'https://cdn.jsdelivr.net/npm/iptv-util@latest/rollup/iptv-util-min.js'
 		];
 
 		// Streaming patterns to exclude from caching
@@ -88,7 +86,7 @@ class ServiceWorkerConfig {
 			/\/hls\//, // HLS streaming paths
 			/\/dash\//, // DASH streaming paths
 			/video\/mp2t/, // MPEG-TS content type
-			/application\/vnd\.apple\.mpegurl/, // HLS content type
+			/application\/vnd\.apple\.mpegurl/ // HLS content type
 		];
 
 		// Allowed M3U sources (for playlist caching)
@@ -148,7 +146,7 @@ class ServiceWorkerErrorManager {
 			cacheHits: 0,
 			cacheMisses: 0,
 			networkRequests: 0,
-			errors: 0,
+			errors: 0
 		};
 	}
 
@@ -165,7 +163,7 @@ class ServiceWorkerErrorManager {
 			stack: error instanceof Error ? error.stack : null,
 			context,
 			metadata,
-			id: this.generateErrorId(),
+			id: this.generateErrorId()
 		};
 
 		this.errors.push(errorEntry);
@@ -210,7 +208,7 @@ class ServiceWorkerErrorManager {
 		return {
 			...this.performanceMetrics,
 			cacheEfficiency: this.performanceMetrics.cacheHits / (this.performanceMetrics.cacheHits + this.performanceMetrics.cacheMisses) || 0,
-			errorRate: this.performanceMetrics.errors / this.performanceMetrics.networkRequests || 0,
+			errorRate: this.performanceMetrics.errors / this.performanceMetrics.networkRequests || 0
 		};
 	}
 
@@ -311,7 +309,7 @@ class CacheManager {
 		try {
 			const response = await fetch(url, {
 				mode: 'cors',
-				credentials: 'omit',
+				credentials: 'omit'
 			});
 
 			if (response.ok) {
@@ -459,11 +457,6 @@ class FetchStrategyManager {
 		const { request } = event;
 
 		try {
-			// cache disabled
-			if (this.config.development) {
-				return fetch(request);
-			}
-
 			// Skip non-GET requests
 			if (request.method !== 'GET') {
 				return fetch(request);
@@ -627,7 +620,7 @@ class FetchStrategyManager {
 
 		try {
 			const response = await fetch(request, {
-				signal: controller.signal,
+				signal: controller.signal
 			});
 			clearTimeout(timeoutId);
 			return response;
@@ -652,8 +645,8 @@ class FetchStrategyManager {
 				statusText: response.statusText,
 				headers: {
 					...Object.fromEntries(response.headers.entries()),
-					'sw-cache-date': new Date().toISOString(),
-				},
+					'sw-cache-date': new Date().toISOString()
+				}
 			});
 
 			await cache.put(request, responseToCache);
@@ -715,15 +708,15 @@ class FetchStrategyManager {
 			JSON.stringify({
 				error: 'Network error',
 				message: 'Unable to fetch resource',
-				offline: !navigator.onLine,
+				offline: !navigator.onLine
 			}),
 			{
 				status: 503,
 				statusText: 'Service Unavailable',
 				headers: {
-					'Content-Type': 'application/json',
-				},
-			},
+					'Content-Type': 'application/json'
+				}
+			}
 		);
 	}
 }
@@ -828,20 +821,20 @@ class PushNotificationManager {
 				data: {
 					dateOfArrival: Date.now(),
 					primaryKey: data.primaryKey || Date.now(),
-					url: data.url || './',
+					url: data.url || './'
 				},
 				actions: [
 					{
 						action: 'open',
 						title: 'Open IPTV Player',
-						icon: './assets/icon-96x96.png',
+						icon: './assets/icon-96x96.png'
 					},
 					{
 						action: 'dismiss',
 						title: 'Dismiss',
-						icon: './assets/icon-96x96.png',
-					},
-				],
+						icon: './assets/icon-96x96.png'
+					}
+				]
 			};
 
 			await self.registration.showNotification(data.title || 'IPTV Player', options);
@@ -970,7 +963,7 @@ class ServiceWorkerManager {
 			// Notify clients of activation
 			await this.errorManager.notifyMainThread('sw:activated', {
 				version: this.config.version,
-				caches: this.config.getAllCacheNames(),
+				caches: this.config.getAllCacheNames()
 			});
 		} catch (error) {
 			this.errorManager.logError(error, 'Service Worker Activation');
@@ -995,7 +988,7 @@ class ServiceWorkerManager {
 				case 'GET_VERSION':
 					event.ports[0]?.postMessage({
 						version: this.config.version,
-						cacheName: this.config.cacheName,
+						cacheName: this.config.cacheName
 					});
 					break;
 
@@ -1091,7 +1084,7 @@ self.addEventListener('error', (event) => {
 	swManager.errorManager.logError(event.error, 'Global SW Error', {
 		filename: event.filename,
 		lineno: event.lineno,
-		colno: event.colno,
+		colno: event.colno
 	});
 });
 

@@ -10,7 +10,7 @@ import { appConfig } from './AppConfig.js';
  * @property {number} timestamp
  */
 
-export class EventManager {
+class EventManager {
 	etype = Object.freeze({
 		NETWORK_ONLINE: 'network:online',
 		NETWORK_OFFLINE: 'network:offline',
