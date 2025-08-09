@@ -1,18 +1,20 @@
+import { channelInfo } from './ChannelInfo.js';
+import { channelSelect } from './ChannelSelect.js';
+import { notificationManager } from './NotificationManager.js';
+
 /* ========================================================================
    IPTV Player - Video Player Management
    ======================================================================== */
 
 // Video Player Management
-const VideoManager = {
+class VideoManager {
 	// Video player state
-	isInitialized: false,
-	currentHls: null,
+	isInitialized = false;
+	currentHls = null;
 
 	// Initialize video manager
 	initialize() {
 		try {
-			console.log('Initializing Video Manager...');
-
 			const video = document.getElementById('videoPlayer');
 			if (!video) {
 				throw new Error('Video player element not found');
@@ -22,7 +24,7 @@ const VideoManager = {
 			this.setupVideoElement(video);
 
 			// Add video event listeners
-			this.setupVideoEventListeners(video);
+			//this.setupVideoEventListeners(video);
 
 			// Check HLS support
 			this.checkHLSSupport();
@@ -31,9 +33,8 @@ const VideoManager = {
 			console.log('Video Manager initialized successfully');
 		} catch (error) {
 			console.error('Video Manager initialization failed:', error);
-			ErrorManager.handle(error, ErrorManager.ERROR_TYPES.CRITICAL, 'Video Manager initialization');
 		}
-	},
+	}
 
 	// Setup video element properties
 	setupVideoElement(video) {
@@ -44,24 +45,24 @@ const VideoManager = {
 			video.crossOrigin = 'anonymous';
 
 			// Apply saved settings
-			const settings = SettingsManager.getSettings();
-			if (settings.autoplayMuted !== false) {
-				video.muted = true;
-			}
+			// const settings = SettingsManager.getSettings();
+			// if (settings.autoplayMuted !== false) {
+			// 	video.muted = true;
+			// }
 
-			if (settings.rememberVolume && typeof settings.volume === 'number') {
-				video.volume = Math.max(0, Math.min(1, settings.volume));
-			}
+			// if (settings.rememberVolume && typeof settings.volume === 'number') {
+			// 	video.volume = Math.max(0, Math.min(1, settings.volume));
+			// }
 
-			if (typeof settings.muted === 'boolean') {
-				video.muted = settings.muted;
-			}
+			// if (typeof settings.muted === 'boolean') {
+			// 	video.muted = settings.muted;
+			// }
 
 			console.log('Video element configured');
 		} catch (error) {
 			console.warn('Failed to setup video element:', error);
 		}
-	},
+	}
 
 	// Setup video event listeners
 	setupVideoEventListeners(video) {
@@ -114,7 +115,7 @@ const VideoManager = {
 		} catch (error) {
 			console.warn('Failed to setup video event listeners:', error);
 		}
-	},
+	}
 
 	// Check HLS support
 	checkHLSSupport() {
@@ -128,12 +129,13 @@ const VideoManager = {
 
 			if (!hlsSupported && !nativeSupported) {
 				console.warn('HLS playback not supported in this browser');
-				SettingsManager.showToast('warning', 'Limited Support', 'Your browser may not support all video formats. Please try a modern browser like Chrome, Firefox, or Safari.');
+
+				notificationManager.warning('warning', 'Limited Support', 'Your browser may not support all video formats. Please try a modern browser like Chrome, Firefox, or Safari.');
 			}
 		} catch (error) {
 			console.warn('Failed to check HLS support:', error);
 		}
-	},
+	}
 
 	// Load and play channel by index
 	loadChannel(channelIndex) {
@@ -142,34 +144,19 @@ const VideoManager = {
 				throw new Error('Video Manager not initialized');
 			}
 
-			// Get channel data from app state
-			const channels = appState.getState('channels');
-			if (!channels || channels.length === 0) {
-				throw new Error('No channels available');
-			}
+			const channel = channelSelect.currentChannels[channelIndex];
 
-			const index = parseInt(channelIndex);
-			if (isNaN(index) || index < 0 || index >= channels.length) {
-				throw new Error('Invalid channel index');
-			}
-
-			const channel = channels[index];
 			console.log('Loading channel:', channel.name, 'URL:', channel.url);
+			channelInfo.updateChannelInfo('', channel);
 
-			// Store current channel
-			appState.setState('currentChannel', channel);
-
-			// Update UI first
-			UIManager.updateChannelInfo('Loading channel...', channel);
-
-			this.loadChannelByUrl(channel.url, channel);
+			this.loadChannelByUrl(channel.url);
 		} catch (error) {
-			ErrorManager.handle(error, ErrorManager.ERROR_TYPES.PLAYBACK, 'Loading channel', true);
+			console.error('Loading channel', error);
 		}
-	},
+	}
 
 	// Load and play channel by URL
-	loadChannelByUrl(channelUrl, channelInfo = null) {
+	loadChannelByUrl(channelUrl) {
 		try {
 			if (!this.isInitialized) {
 				throw new Error('Video Manager not initialized');
@@ -186,21 +173,21 @@ const VideoManager = {
 			}
 
 			// Show loading
-			UIManager.showLoadingSpinner('#videoPlayer');
+			this.showLoadingSpinner('#videoPlayer');
 
 			// Setup HLS playback
 			if (Hls.isSupported()) {
-				this.setupHLSPlayback(channelUrl, video, channelInfo);
+				this.setupHLSPlayback(channelUrl, video);
 			} else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-				this.setupNativePlayback(channelUrl, video, channelInfo);
+				this.setupNativePlayback(channelUrl, video);
 			} else {
 				throw new Error('HLS playback not supported in this browser');
 			}
 		} catch (error) {
-			UIManager.hideLoadingSpinner('#videoPlayer');
-			ErrorManager.handle(error, ErrorManager.ERROR_TYPES.PLAYBACK, 'Loading channel', true);
+			this.hideLoadingSpinner('#videoPlayer');
+			console.error('Loading channel', error);
 		}
-	},
+	}
 
 	// Setup HLS.js playback
 	setupHLSPlayback(url, video, channelInfo) {
@@ -221,7 +208,7 @@ const VideoManager = {
 				console.log('HLS manifest parsed, starting playback');
 				video.play().catch((error) => {
 					console.warn('Autoplay failed:', error);
-					SettingsManager.showToast('info', 'Manual Play Required', 'Click the play button to start the video.');
+					notificationManager.info('Manual Play Required', 'Click the play button to start the video.');
 				});
 			});
 
@@ -232,15 +219,15 @@ const VideoManager = {
 				}
 			});
 
-			// Store reference for cleanup
-			appState.setState('currentHls', this.currentHls);
+			// TODO Store reference for cleanup
+			//appState.setState('currentHls', this.currentHls);
 		} catch (error) {
 			throw new Error(`HLS setup failed: ${error.message}`);
 		}
-	},
+	}
 
 	// Setup native HLS playback (Safari)
-	setupNativePlayback(url, video, channelInfo) {
+	setupNativePlayback(url, video) {
 		try {
 			video.src = url;
 
@@ -260,7 +247,7 @@ const VideoManager = {
 		} catch (error) {
 			throw new Error(`Native HLS setup failed: ${error.message}`);
 		}
-	},
+	}
 
 	// Handle HLS errors
 	handleHLSError(data, url) {
@@ -277,19 +264,19 @@ const VideoManager = {
 					this.currentHls.recoverMediaError();
 					break;
 				default:
-					console.log('Unrecoverable error, destroying HLS instance');
+					// TODO show user
+					console.error('Unrecoverable error, destroying HLS instance');
 					this.stopPlayback();
-					ErrorManager.handle(new Error(`HLS Fatal Error: ${data.type} - ${data.details}`), ErrorManager.ERROR_TYPES.PLAYBACK, 'HLS playback error', true);
 					break;
 			}
 		} catch (error) {
 			console.error('Error handling HLS error:', error);
 		}
-	},
+	}
 	// Play selected channel (alias for loadChannel)
 	async playChannel(channelIndex) {
 		return this.loadChannel(channelIndex);
-	},
+	}
 
 	// Stop current playback
 	stopPlayback() {
@@ -303,9 +290,9 @@ const VideoManager = {
 			}
 
 			// Also clean up legacy appState.hls
-			if (appState.hls) {
-				appState.hls.destroy();
-				appState.hls = null;
+			if (this.currentHls) {
+				this.currentHls.destroy();
+				this.currentHls = null;
 			}
 
 			// Clean up video element
@@ -316,25 +303,26 @@ const VideoManager = {
 			}
 
 			// Hide loading spinner
-			UIManager.hideLoadingSpinner('#videoPlayer');
+			this.hideLoadingSpinner('#videoPlayer');
 
 			console.log('Playback stopped');
 		} catch (error) {
-			ErrorManager.handle(error, ErrorManager.ERROR_TYPES.PLAYBACK, 'Stopping playback');
+			console.error('Stopping playback', error);
 		}
-	},
+	}
 
 	// Clear video player
 	clearVideo() {
 		try {
 			this.stopPlayback();
 			UIManager.updateChannelInfo('Select a channel to start watching');
-			appState.setState('currentChannel', null);
+			// TODO
+			//appState.setState('currentChannel', null);
 			console.log('Video player cleared');
 		} catch (error) {
 			console.warn('Failed to clear video:', error);
 		}
-	},
+	}
 
 	// Toggle fullscreen
 	toggleFullscreen() {
@@ -355,7 +343,7 @@ const VideoManager = {
 		} catch (error) {
 			console.warn('Fullscreen toggle failed:', error);
 		}
-	},
+	}
 
 	// Toggle mute
 	toggleMute() {
@@ -374,8 +362,7 @@ const VideoManager = {
 		} catch (error) {
 			console.warn('Failed to toggle mute:', error);
 		}
-	},
-
+	}
 	// Handle window resize
 	handleResize() {
 		try {
@@ -384,12 +371,12 @@ const VideoManager = {
 		} catch (error) {
 			console.warn('Failed to handle resize:', error);
 		}
-	},
+	}
 
 	// Check if video manager is ready
 	isReady() {
 		return this.isInitialized && document.getElementById('videoPlayer') !== null;
-	},
+	}
 
 	// Get current playback state
 	getPlaybackState() {
@@ -411,7 +398,7 @@ const VideoManager = {
 			console.warn('Failed to get playback state:', error);
 			return null;
 		}
-	},
+	}
 
 	// Cleanup video manager
 	cleanup() {
@@ -438,4 +425,50 @@ const VideoManager = {
 			console.warn('Video Manager cleanup failed:', error);
 		}
 	}
-};
+
+	// Show loading spinner for specific elements
+	showLoadingSpinner(targetSelector = '#videoPlayer') {
+		try {
+			const $target = $(targetSelector);
+			if ($target.length === 0) return;
+
+			// Remove existing spinner
+			$target.find('.loading-spinner').remove();
+
+			// Create spinner overlay
+			const spinnerHtml = `
+				<div class="loading-spinner position-absolute top-50 start-50 translate-middle text-light" 
+					 style="z-index: 1000;">
+					<div class="spinner-border" role="status">
+						<span class="visually-hidden">Loading...</span>
+					</div>
+					<div class="mt-2 small">Loading video...</div>
+				</div>
+			`;
+
+			// Add relative positioning if not set
+			if ($target.css('position') === 'static') {
+				$target.css('position', 'relative');
+			}
+
+			$target.append(spinnerHtml);
+		} catch (error) {
+			console.warn('Failed to show loading spinner:', error);
+		}
+	}
+
+	// Hide loading spinner
+	hideLoadingSpinner(targetSelector = '#videoPlayer') {
+		try {
+			$(targetSelector)
+				.find('.loading-spinner')
+				.fadeOut(200, function () {
+					$(this).remove();
+				});
+		} catch (error) {
+			console.warn('Failed to hide loading spinner:', error);
+		}
+	}
+}
+
+export const videoManager = new VideoManager();

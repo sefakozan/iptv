@@ -25,7 +25,8 @@ class CountrySelect {
 		const def = appConfig.getDefaultCountry?.();
 		const code = (def?.code || this.defaultCountry || '').toUpperCase();
 		if (code) {
-			$('#countrySelect').val(code).trigger('change');
+			// TODO
+			$('#countrySelect').val('TR').trigger('change');
 		}
 	}
 
@@ -124,12 +125,13 @@ class CountrySelect {
 			}
 		});
 
+		// TODO  burasi ne is yapiyor
 		// Arama input placeholder (Select2 v4 için built-in yok)
-		$countrySelect.on('select2:open', () => {
-			const $search = $('.select2-container--open .select2-search__field');
-			$search.attr('placeholder', 'Type to search for a country...');
-			$search.attr({ 'aria-label': 'Search country', inputmode: 'search' }).trigger('focus');
-		});
+		// $countrySelect.on('select2:open', () => {
+		// 	const $search = $('.select2-container--open .select2-search__field');
+		// 	$search.attr('placeholder', 'Type to search for a country...');
+		// 	$search.attr({ 'aria-label': 'Search country', inputmode: 'search' }).trigger('focus');
+		// });
 	}
 
 	#loadData(countries) {

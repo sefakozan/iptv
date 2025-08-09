@@ -49,7 +49,7 @@ const UIManager = {
 			const flagSources = [
 				`${APP_CONFIG.api.flagUrl}${codePoints}.svg`,
 				`${APP_CONFIG.api.flagFallbackUrl1}${codePoints}.svg`,
-				`${APP_CONFIG.api.flagFallbackUrl2}${codePoints}.svg`,
+				`${APP_CONFIG.api.flagFallbackUrl2}${codePoints}.svg`
 			];
 
 			// Return the first source for now (we can add error handling later)
@@ -83,7 +83,7 @@ const UIManager = {
 						'background-repeat': 'no-repeat',
 						'background-position': '8px center',
 						'background-size': '24px 24px',
-						'padding-left': '40px',
+						'padding-left': '40px'
 					});
 				}
 
@@ -118,7 +118,7 @@ const UIManager = {
 			'input.channelSearch',
 			Utils.debounce((event) => {
 				this.filterChannels(event.target.value);
-			}, APP_CONFIG.ui.searchDelay),
+			}, APP_CONFIG.ui.searchDelay)
 		);
 	},
 
@@ -157,7 +157,7 @@ const UIManager = {
 						'background-repeat': 'no-repeat',
 						'background-position': '8px center',
 						'background-size': '24px 24px',
-						'padding-left': '40px',
+						'padding-left': '40px'
 					});
 				}
 
@@ -278,50 +278,6 @@ const UIManager = {
 		}
 	},
 
-	// Show loading spinner for specific elements
-	showLoadingSpinner(targetSelector = '#videoPlayer') {
-		try {
-			const $target = $(targetSelector);
-			if ($target.length === 0) return;
-
-			// Remove existing spinner
-			$target.find('.loading-spinner').remove();
-
-			// Create spinner overlay
-			const spinnerHtml = `
-				<div class="loading-spinner position-absolute top-50 start-50 translate-middle text-light" 
-					 style="z-index: 1000;">
-					<div class="spinner-border" role="status">
-						<span class="visually-hidden">Loading...</span>
-					</div>
-					<div class="mt-2 small">Loading video...</div>
-				</div>
-			`;
-
-			// Add relative positioning if not set
-			if ($target.css('position') === 'static') {
-				$target.css('position', 'relative');
-			}
-
-			$target.append(spinnerHtml);
-		} catch (error) {
-			console.warn('Failed to show loading spinner:', error);
-		}
-	},
-
-	// Hide loading spinner
-	hideLoadingSpinner(targetSelector = '#videoPlayer') {
-		try {
-			$(targetSelector)
-				.find('.loading-spinner')
-				.fadeOut(200, function () {
-					$(this).remove();
-				});
-		} catch (error) {
-			console.warn('Failed to hide loading spinner:', error);
-		}
-	},
-
 	// Show channel loading state
 	showChannelLoading(message = 'Loading channels...') {
 		try {
@@ -349,5 +305,5 @@ const UIManager = {
 		} catch (error) {
 			console.warn('Failed to toggle info panel:', error);
 		}
-	},
+	}
 };

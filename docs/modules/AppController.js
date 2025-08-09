@@ -1,8 +1,9 @@
 import { appConfig } from './AppConfig.js';
+import { channelSelect } from './ChannelSelect.js';
 import { countrySelect } from './CountrySelect.js';
 import { pwaManager } from './PWAManager.js';
 import { stateManager } from './StateManager.js';
-import { UIManager } from './UIManager.js';
+import { videoManager } from './VideoManager.js';
 
 //applyState
 //volume
@@ -12,6 +13,8 @@ import { UIManager } from './UIManager.js';
 $(document).ready(async () => {
 	try {
 		await countrySelect.readyInit();
+		channelSelect.readyInit();
+		videoManager.initialize();
 
 		// UIManager.populateCountrySelect(AppConfig.getInstance().countries);
 		// StateManager.getInstance().load();

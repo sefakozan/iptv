@@ -1,29 +1,31 @@
 import { appConfig } from './AppConfig.js';
+import { channelInfo } from './ChannelInfo.js';
 import { channelLoader } from './ChannelLoader.js';
 import { eventManager } from './EventManager.js';
+import { videoManager } from './VideoManager.js';
 
 /** Country select controller: wires Select2, loads options, and reacts to selection. */
 class ChannelSelect {
-	#currentChannels = [];
+	currentChannels = [];
 
 	/** Initialize component once countries are ready */
-	async readyInit() {}
-
-	async handleChannelChange(event, data) {}
+	readyInit() {
+		$('#channelList').on('change', this.handleChannelChange);
+	}
 
 	#formatChannelOption(state) {}
 
 	#initializeComponent() {}
 
 	async load(countryCode, isRandomSort) {
-		this.#currentChannels = await channelLoader.load(countryCode, isRandomSort);
-		this.#populate(this.#currentChannels);
+		this.currentChannels = await channelLoader.load(countryCode, isRandomSort);
+		this.#populate(this.currentChannels);
 		this.#enableChannelSearch();
 	}
 
 	#populate(channels) {
 		try {
-			this.#currentChannels = channels;
+			this.currentChannels = channels;
 			const $channelList = $('#channelList');
 			const $channelSearch = $('#channelSearch');
 
@@ -89,23 +91,23 @@ class ChannelSelect {
 
 			if (!query) {
 				// Show all channels if no search term
-				this.populate(this.#currentChannels);
+				this.#populate(this.currentChannels);
 				return;
 			}
 
-			const filteredChannels = this.#currentChannels.filter((channel) => channel.name.toLowerCase().includes(query));
+			const filteredChannels = this.currentChannels.filter((channel) => channel.name.toLowerCase().includes(query));
 
 			if (filteredChannels.length === 0) {
 				$channelList.append('<option value="">No channels found</option>');
 				// TODO
-				VideoManager.stopPlayback();
-				this.updateChannelInfo('No channel selected');
+				videoManager.stopPlayback();
+				channelInfo.updateChannelInfo('No channel selected');
 				return;
 			}
 
 			// Populate with filtered channels
 			filteredChannels.forEach((channel) => {
-				const originalIndex = this.#currentChannels.indexOf(channel);
+				const originalIndex = this.currentChannels.indexOf(channel);
 				const option = new Option(channel.name, originalIndex.toString());
 
 				if (channel.logo) {
@@ -128,6 +130,25 @@ class ChannelSelect {
 			}
 		} catch (error) {
 			console.error(error, 'Filtering channels');
+		}
+	}
+
+	handleChannelChange(event) {
+		try {
+			const selectedIndex = $(event.target).val();
+
+			if (!selectedIndex || selectedIndex === '') {
+				channelInfo.updateChannelInfo('No channel selected');
+				videoManager.stopPlayback();
+				return;
+			}
+
+			const index = parseInt(selectedIndex);
+
+			// Play selected channel
+			videoManager.playChannel(index);
+		} catch (error) {
+			console.error('Channel selection change', error);
 		}
 	}
 }
