@@ -16,7 +16,16 @@ class EventManager {
 		NETWORK_OFFLINE: 'network:offline',
 		APP_RESIZE: 'app:resize',
 		APP_BACKGROUND: 'app:background',
-		APP_FOREGROUND: 'app:foreground'
+		APP_FOREGROUND: 'app:foreground',
+		// App-level domain events
+		STATE_LOADED: 'state:loaded',
+		COUNTRY_CHANGE: 'country:change',
+		CHANNEL_CHANGE: 'channel:change',
+		PLAYLIST_CHANGE: 'playlist:change',
+		STREAM_CHANGE: 'stream:change',
+		FAVORITES_CHANGED: 'favorites:changed',
+		FAVORITES_ADDED: 'favorites:added',
+		FAVORITES_REMOVED: 'favorites:removed'
 	});
 
 	#initialized = false;

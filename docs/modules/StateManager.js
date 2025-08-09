@@ -6,119 +6,209 @@
 import { appConfig } from './AppConfig.js';
 import { eventManager } from './EventManager.js';
 import { notificationManager } from './NotificationManager.js';
-import { pwaManager } from './PWAManager.js';
+
+/**
+ * @typedef {Object} Channel
+ * @property {string} id
+ * @property {string} name
+ * @property {string} url
+ * @property {string} [logo]
+ */
+
+/**
+ * @typedef {Object} AppState
+ * @property {string|null} currentCountry
+ * @property {string} defaultCountry
+ * @property {Channel|null} currentChannel
+ * @property {string|null} currentPlaylist
+ * @property {string|null} currentStream
+ * @property {boolean} autoplayMuted
+ * @property {boolean} rememberVolume
+ * @property {string} currentTheme
+ * @property {number} lastUpdated
+ * @property {string[]} favorites
+ */
 
 class StateManager {
 	#storageKey = 'iptv-config';
-	#state = {};
+	/** @type {AppState} */
+	#state;
+	// Legacy per-country favorites storage (kept for forward compatibility)
 	#favs = {};
 
 	constructor() {
-		// Varsayılan state
+		// Default state
 		this.#state = {
 			currentCountry: null,
-			defaultCountry: 'us',
+			defaultCountry: 'US',
 			currentChannel: null,
 			currentPlaylist: null,
 			currentStream: null,
 			autoplayMuted: false,
 			rememberVolume: true,
 			lastUpdated: Date.now(),
-			currentTheme: ''
+			currentTheme: '',
+			favorites: []
 		};
-		this.#favs = {
-			us: {
-				url: 0
-			}
-		};
+		// optional legacy bucket
+		this.#favs = { us: { url: 0 } };
 	}
 
+	/** Persist current state to localStorage */
 	save() {
-		localStorage.setItem(this.#storageKey, JSON.stringify(this.#state));
-		localStorage.setItem(`${this.#storageKey}-favs`, JSON.stringify(this.#favs));
+		try {
+			localStorage.setItem(this.#storageKey, JSON.stringify(this.#state));
+			localStorage.setItem(`${this.#storageKey}-favs`, JSON.stringify(this.#favs));
+		} catch (e) {
+			console.warn('State save failed:', e);
+		}
 	}
 
+	/**
+	 * Load state from localStorage and merge with defaults
+	 * @returns {AppState}
+	 */
 	load() {
 		try {
-			let storedState = localStorage.getItem(this.#storageKey);
-			let storedFavs = localStorage.getItem(`${this.#storageKey}-favs`);
-			storedState = JSON.parse(storedState);
-			storedFavs = JSON.parse(storedFavs);
+			const rawState = localStorage.getItem(this.#storageKey);
+			const rawFavs = localStorage.getItem(`${this.#storageKey}-favs`);
+			const loaded = rawState ? JSON.parse(rawState) : {};
+			const favs = rawFavs ? JSON.parse(rawFavs) : this.#favs;
 
-			this.#state = storedState;
-			this.#favs = storedFavs;
-			// TODO notify
+			// Merge cautiously to keep shape stable
+			this.#state = {
+				...this.#state,
+				...loaded,
+				favorites: Array.isArray(loaded?.favorites) ? loaded.favorites : this.#state.favorites,
+				lastUpdated: Date.now()
+			};
+			this.#favs = favs && typeof favs === 'object' ? favs : this.#favs;
+
+			// Notify listeners with a snapshot
+			eventManager.emit(eventManager.etype.STATE_LOADED, { state: this.getState() });
+			return this.getState();
 		} catch (error) {
-			console.error('warn', '❌ Failed to load states', error);
-			return {};
+			console.error('Failed to load state:', error);
+			return this.getState();
 		}
 	}
 
+	/**
+	 * Return a shallow clone of the current state
+	 * @returns {AppState}
+	 */
 	getState() {
-		return { ...this.#state };
+		return { ...this.#state, favorites: [...this.#state.favorites] };
 	}
 
-	setCountry(country) {
-		const prev = this.#state.country;
-		this.#state.country = country;
-		this.#em.emit(this.#em.estr.COUNTRY_CHANGE, { prev, country });
+	/**
+	 * Set selected country (2-letter code)
+	 * @param {string|null} countryCode
+	 */
+	setCountry(countryCode) {
+		const prev = this.#state.currentCountry;
+		if (prev === countryCode) return;
+		this.#state.currentCountry = countryCode;
+		this.#touch();
+		this.save();
+		eventManager.emit(eventManager.etype.COUNTRY_CHANGE, { prev, current: countryCode });
 	}
 
+	/**
+	 * Set current playing channel
+	 * @param {Channel|null} channel
+	 */
 	setChannel(channel) {
-		const prev = this.#state.channel;
-		this.#state.channel = channel;
-		this.#em.emit(this.#em.estr.CHANNEL_CHANGE, { prev, channel });
+		const prev = this.#state.currentChannel;
+		if (prev?.id === channel?.id) return;
+		this.#state.currentChannel = channel || null;
+		this.#touch();
+		this.save();
+		eventManager.emit(eventManager.etype.CHANNEL_CHANGE, { prev, current: channel || null });
 	}
 
+	/**
+	 * Set current playlist URL
+	 * @param {string|null} playlist
+	 */
 	setPlaylist(playlist) {
-		const prev = this.#state.playlist;
-		this.#state.playlist = playlist;
-		this.#em.emit('playlist:change', { prev, playlist });
-		//this.nm.info('Playlist değişti', String(playlist));
+		const prev = this.#state.currentPlaylist;
+		if (prev === playlist) return;
+		this.#state.currentPlaylist = playlist || null;
+		this.#touch();
+		this.save();
+		eventManager.emit(eventManager.etype.PLAYLIST_CHANGE, { prev, current: this.#state.currentPlaylist });
 	}
 
+	/**
+	 * Set current stream URL
+	 * @param {string|null} stream
+	 */
 	setStream(stream) {
-		const prev = this.#state.stream;
-		this.#state.stream = stream;
-		this.#em.emit('stream:change', { prev, stream });
-		//this.nm.info('Stream değişti', String(stream));
+		const prev = this.#state.currentStream;
+		if (prev === stream) return;
+		this.#state.currentStream = stream || null;
+		this.#touch();
+		this.save();
+		eventManager.emit(eventManager.etype.STREAM_CHANGE, { prev, current: this.#state.currentStream });
 	}
 
+	/**
+	 * Replace favorites list entirely
+	 * @param {string[]} favorites
+	 */
 	setFavorites(favorites) {
+		const next = Array.from(new Set(Array.isArray(favorites) ? favorites : []));
 		const prev = [...this.#state.favorites];
-		this.#state.favorites = [...favorites];
-		this.#em.emit(this.#em.estr.FAVORITES_CHANGED, { prev, favorites });
-		this.nm.success('Favoriler güncellendi', 'Favori listesi değişti');
+		this.#state.favorites = next;
+		this.#touch();
+		this.save();
+		eventManager.emit(eventManager.etype.FAVORITES_CHANGED, { prev, current: [...next] });
+		notificationManager.success('Favoriler güncellendi', 'Favori listesi değişti');
 	}
 
-	addFavorite(channel) {
-		if (!this.#state.favorites.includes(channel)) {
+	/**
+	 * Add a channel id into favorites
+	 * @param {string} channelId
+	 */
+	addFavorite(channelId) {
+		if (!channelId) return;
+		if (!Array.isArray(this.#state.favorites)) this.#state.favorites = [];
+		if (!this.#state.favorites.includes(channelId)) {
 			const prev = [...this.#state.favorites];
-			this.#state.favorites.push(channel);
-			this.#em.emit(this.#em.estr.FAVORITES_ADDED, { channel });
+			this.#state.favorites.push(channelId);
+			this.#touch();
+			this.save();
+			eventManager.emit(eventManager.etype.FAVORITES_ADDED, { channelId, prev, current: [...this.#state.favorites] });
 		}
 	}
 
-	removeFavorite(channel) {
-		const idx = this.#state.favorites.indexOf(channel);
+	/**
+	 * Remove a channel id from favorites
+	 * @param {string} channelId
+	 */
+	removeFavorite(channelId) {
+		if (!Array.isArray(this.#state.favorites) || !channelId) return;
+		const idx = this.#state.favorites.indexOf(channelId);
 		if (idx !== -1) {
 			const prev = [...this.#state.favorites];
 			this.#state.favorites.splice(idx, 1);
-			this.#em.emit(this.#em.estr.FAVORITES_REMOVED, { channel });
+			this.#touch();
+			this.save();
+			eventManager.emit(eventManager.etype.FAVORITES_REMOVED, { channelId, prev, current: [...this.#state.favorites] });
 		}
 	}
 
-	// setInstalled(installed) {
-	// 	const prev = this.#state.installed;
-	// 	this.#state.installed = installed;
-	// 	this.#em.emit(this.#em.estr.APP_INSTALLED, { prev, installed });
-	// }
-
-	// setVersion(version) {
-	// 	const prev = this.#state.version;
-	// 	this.#state.version = version;
-	// 	this.#em.emit(this.#em.estr.NEW_VERSION_INSTALLED, { prev, version });
-	// }
+	/** Update lastUpdated */
+	#touch() {
+		this.#state.lastUpdated = Date.now();
+	}
 }
 
 export const stateManager = new StateManager();
+
+// Dev’de global erişim (export adıyla, window.iptv altında)
+if (appConfig.isDevelopment && typeof window !== 'undefined') {
+	window.iptv = window.iptv || {};
+	window.iptv.stateManager = stateManager;
+}

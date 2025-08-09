@@ -1,5 +1,4 @@
-import { SettingsManager } from './_SettingsManager.js';
-import { AppConfig, CountryPromise } from './AppConfig.js';
+import { appConfig } from './AppConfig.js';
 import { loadChannel } from './ChannelLoader.js';
 
 class CountrySelect {
@@ -18,8 +17,6 @@ class CountrySelect {
 		const selectedCountry = $(event.target).val();
 		const random = data?.random === true;
 		const channels = loadChannel(selectedCountry, random);
-
-		debugger;
 		//	UIManager.populateChannelList(channels);
 		//	UIManager.enableChannelSearch();
 	}
@@ -52,7 +49,7 @@ class CountrySelect {
 			language: {
 				searching: () => 'Type to search for a country...',
 				inputTooShort: () => 'Type to search for a country...',
-				noResults: () => 'No country found',
+				noResults: () => 'No country found'
 			},
 			templateResult: this.#formatCountryOption,
 			templateSelection: this.#formatCountryOption,
@@ -104,7 +101,7 @@ class CountrySelect {
 					.map((item, idx) => ({ item, idx, score: scoreOf(item) }))
 					.sort((a, b) => b.score - a.score || a.idx - b.idx)
 					.map((x) => x.item);
-			},
+			}
 		});
 
 		// Arama input placeholder (Select2 v4 için built-in yok)
