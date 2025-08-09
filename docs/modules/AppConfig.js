@@ -2,64 +2,72 @@
    AppConfig - Uygulama yapılandırması ve ülke verisi yükleme
    ============================================================================ */
 
+/**
+ * @typedef {Object} AppRuntimeConfig
+ * @property {string} serviceWorkerPath
+ * @property {string} playlistUri
+ * @property {string} playlistFallbackUrl1
+ * @property {string} flagUrl
+ * @property {string} flagFallbackUrl1
+ * @property {string} flagFallbackUrl2
+ * @property {string} countriesUri
+ * @property {number} fetchTimeoutMs
+ * @property {'default'|'no-store'|'no-cache'|'reload'|'force-cache'|'only-if-cached'} fetchCacheMode
+ * @property {boolean} cacheBust
+ */
+
 export class AppConfig {
-	/** @type {Readonly<{ serviceWorkerPath:string, playlistUri:string, playlistFallbackUrl1:string, flagUrl:string, flagFallbackUrl1:string, flagFallbackUrl2:string, countriesUri:string }>} */
-	config = Object.freeze({
+	/** Manuel development bayrağı (otomatik tespit YOK) */
+	isDevelopment = true;
+
+	/** @type {AppRuntimeConfig} */
+	config = {
 		serviceWorkerPath: 'pwa-service-worker.js',
-		playlistUri: 's/', // local listeler
+		playlistUri: 's/',
 		playlistFallbackUrl1: 'https://raw.githubusercontent.com/iptv-org/iptv/refs/heads/gh-pages/countries/',
 		flagUrl: 'https://twemoji.maxcdn.com/v/14.0.2/svg/',
 		flagFallbackUrl1: 'https://cdn.jsdelivr.net/gh/twitter/twemoji@14.0.2/assets/svg/',
 		flagFallbackUrl2: 'https://abs-0.twimg.com/emoji/v2/svg/',
 		countriesUri: './data/countries.json',
 		fetchTimeoutMs: 15000,
-		fetchCacheMode: 'no-store', // @PROD prod’da 'default' yap
-		cacheBust: true, // @PROD prod’da false yap
-	});
+		fetchCacheMode: 'no-store',
+		cacheBust: true
+	};
 
 	/** @type {Array<{name:string, code:string, languages?:string[], flag?:string, alternatives?:string[], default?:boolean, sort?:string[], imgs?:string[], disabled?:boolean}>} */
 	countries = [
-		{
-			name: 'Turkey',
-			code: 'TR',
-			languages: ['tur'],
-			flag: '🇹🇷',
-			sort: ['ATV', 'Habertürk'],
-			imgs: [],
-		},
-		{
-			name: 'United States',
-			code: 'US',
-			languages: ['eng', 'spa'],
-			flag: '🇺🇸',
-			alternatives: ['USA'],
-			default: true,
-			sort: ['CNN', 'NBC'],
-			imgs: [],
-		},
+		{ name: 'Turkey', code: 'TR', languages: ['tur'], flag: '🇹🇷', sort: ['ATV', 'Habertürk'], imgs: [] },
+		{ name: 'United States', code: 'US', languages: ['eng', 'spa'], flag: '🇺🇸', alternatives: ['USA'], default: true, sort: ['CNN', 'NBC'], imgs: [] }
 	];
 
-	#countryMap = new Map(); // CODE -> country
+	#countryMap = new Map();
 	#initialized = false;
 	#initPromise = null;
+
+	constructor() {
+		// Prod ayarları (manuel)
+		if (!this.isDevelopment) {
+			this.config.cacheBust = false;
+			this.config.fetchCacheMode = 'no-cache';
+		}
+	}
 
 	isInitialized() {
 		return this.#initialized;
 	}
 
-	// Idempotent init: tekrar çağrılırsa aynı promise döner
+	// Idempotent init
 	async initialize() {
 		if (this.#initPromise) return this.#initPromise;
 
 		this.#initPromise = (async () => {
 			let loaded;
 			try {
-				loaded = await this.#fetchJsonWithTimeout(this.config.countriesUri, 15000);
+				loaded = await this.#fetchJsonWithTimeout(this.config.countriesUri, this.config.fetchTimeoutMs);
 			} catch (err) {
 				console.warn('AppConfig: countries.json yüklenemedi, fallback veriler kullanılacak.', err);
 				loaded = this.countries;
 			}
-
 			this.countries = this.#normalizeCountries(Array.isArray(loaded) ? loaded : this.countries);
 			this.#rebuildIndex();
 			this.#initialized = true;
@@ -69,18 +77,17 @@ export class AppConfig {
 		return this.#initPromise;
 	}
 
-	// Yardımcı: JSON fetch + timeout + cache-bypass
-	async #fetchJsonWithTimeout(url, timeoutMs = this.config.fetchTimeoutMs) {
+	// JSON fetch + timeout (+ opsiyonel cache-bust)
+	async #fetchJsonWithTimeout(url, timeoutMs = 15000) {
 		const controller = new AbortController();
 		const t = setTimeout(() => controller.abort('timeout'), timeoutMs);
 		try {
 			const finalUrl = this.config.cacheBust ? `${url}${url.includes('?') ? '&' : '?'}_=${Date.now()}` : url;
-
 			const res = await fetch(finalUrl, {
 				signal: controller.signal,
 				cache: this.config.fetchCacheMode,
 				credentials: 'same-origin',
-				headers: { Accept: 'application/json' },
+				headers: { Accept: 'application/json' }
 			});
 			if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
 			return await res.json();
@@ -89,19 +96,15 @@ export class AppConfig {
 		}
 	}
 
-	// Ülke verilerini normalize et
-	#normalizeCountries(countries) {
+	#normalizeCountries(list) {
 		const out = [];
-		for (const c of countries) {
+		for (const c of list) {
 			if (!c || !c.name) continue;
-
 			const name = String(c.name).trim();
 			const code = String(c.code || '')
 				.trim()
 				.toUpperCase();
 			const disabled = Boolean(c.disabled);
-
-			// Flag zorunlu değil; img URL’leri flag’den türetilir (imgs yoksa)
 			const flag = typeof c.flag === 'string' ? c.flag : undefined;
 
 			let imgs = Array.isArray(c.imgs) ? c.imgs.filter(Boolean) : [];
@@ -116,21 +119,17 @@ export class AppConfig {
 				alternatives: Array.isArray(c.alternatives) ? c.alternatives : [],
 				default: Boolean(c.default),
 				sort: Array.isArray(c.sort) ? c.sort : [],
-				imgs,
+				imgs
 			});
 		}
-
-		// En az bir default yoksa US veya ilkini default yap
 		if (!out.some((x) => x.default)) {
-			const idxUS = out.findIndex((x) => x.code === 'US');
-			if (idxUS >= 0) out[idxUS].default = true;
-			else if (out.length > 0) out[0].default = true;
+			const i = out.findIndex((x) => x.code === 'US');
+			if (i >= 0) out[i].default = true;
+			else if (out.length) out[0].default = true;
 		}
-
 		return out;
 	}
 
-	// Flag’dan (emoji) Twemoji URL’leri üret
 	#buildFlagImgs(flag) {
 		if (!flag || typeof flag !== 'string') return [];
 		try {
@@ -145,53 +144,40 @@ export class AppConfig {
 
 	#rebuildIndex() {
 		this.#countryMap.clear();
-		for (const c of this.countries) {
-			this.#countryMap.set(c.code, c);
-		}
+		for (const c of this.countries) this.#countryMap.set(c.code, c);
 	}
 
-	// Getter’lar
+	/** @returns {AppRuntimeConfig} */
 	getConfig() {
 		return this.config;
 	}
-
 	getCountries() {
 		return this.countries;
 	}
-
 	getCountryByCode(code) {
-		if (!code) return undefined;
-		return this.#countryMap.get(String(code).toUpperCase());
+		return code ? this.#countryMap.get(String(code).toUpperCase()) : undefined;
 	}
-
 	getDefaultCountry() {
 		return this.countries.find((c) => c.default) || this.countries[0];
 	}
 
-	// Playlist URL (local + fallback)
 	getPlaylistUrl(code) {
 		const c = this.getCountryByCode(code);
 		if (!c) return undefined;
 		const lc = c.code.toLowerCase();
-		const primary = `${this.config.playlistUri}${lc}.m3u`;
-		const fallback = `${this.config.playlistFallbackUrl1}${lc}.m3u`;
-		return { primary, fallback };
+		return { primary: `${this.config.playlistUri}${lc}.m3u`, fallback: `${this.config.playlistFallbackUrl1}${lc}.m3u` };
 	}
 
-	// Tarayıcı özellikleri
 	getBrowserSupport() {
 		const hasWindow = typeof window !== 'undefined';
 		const hasNavigator = typeof navigator !== 'undefined';
 		const hasDocument = typeof document !== 'undefined';
 
 		const hasIptvUtil = hasWindow && typeof window.IptvUtil !== 'undefined';
-
 		const hasHlsLib = hasWindow && typeof window.Hls !== 'undefined';
 		const hlsVersion = hasHlsLib && window.Hls?.version ? window.Hls.version : false;
-
 		const hasBootstrap = hasWindow && !!window.bootstrap;
 		const bootstrapVersion = hasBootstrap && window.bootstrap?.Modal?.VERSION ? window.bootstrap.Modal.VERSION : false;
-
 		const hasJq = hasWindow && typeof window.$ !== 'undefined';
 		const jqueryVersion = hasJq ? window.$.fn?.jquery : false;
 
@@ -208,12 +194,9 @@ export class AppConfig {
 
 		const isMobile = hasNavigator && /Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 		const isDarkMode = hasWindow && window.matchMedia?.('(prefers-color-scheme: dark)').matches;
-
 		const touchPoints = (hasNavigator && (Number(navigator.maxTouchPoints) || Number(navigator.msMaxTouchPoints))) || 0;
 		const isTouchDevice = (hasWindow && 'ontouchstart' in window) || touchPoints > 0;
-
 		const isWasm = typeof WebAssembly !== 'undefined' && typeof WebAssembly.instantiate === 'function';
-
 		const isAppInstalled =
 			(hasWindow && window.matchMedia?.('(display-mode: standalone)').matches) ||
 			(hasNavigator && navigator.standalone) ||
@@ -230,16 +213,17 @@ export class AppConfig {
 			isDarkMode,
 			isTouchDevice,
 			isWebAssemblySupported: isWasm,
-			isAppInstalled,
+			isAppInstalled
 		};
 	}
 }
 
-// Tek örnek + init sözü (geriye dönük alias ile)
+// Export + init
 export const appConfig = new AppConfig();
 await appConfig.initialize();
 
-// Dev: Console/test için global erişim
-if (typeof window !== 'undefined') {
-	if (!('appConfig' in window)) window.appConfig = appConfig;
+// Dev’de global erişim (export adıyla, window.iptv altında)
+if (appConfig.isDevelopment && typeof window !== 'undefined') {
+	window.iptv = window.iptv || {};
+	window.iptv.appConfig = appConfig;
 }
