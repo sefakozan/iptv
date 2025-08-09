@@ -43,9 +43,19 @@ export class PWAManager {
 
 			if ('serviceWorker' in navigator) {
 				await this.#register();
-				// periodic update check
+
+				// Dev modunu SW ile senkronize et
+				await this.#syncDevModeWithSW();
+
+				// periyodik update kontrolü
 				if (this.#updateTimerId) clearInterval(this.#updateTimerId);
 				this.#updateTimerId = window.setInterval(() => this.checkForUpdate(), 30000);
+
+				// mevcut sürümü iste
+				this.sendGetVersion();
+
+				// controller değişince tekrar senkronize et
+				navigator.serviceWorker.addEventListener('controllerchange', () => this.#syncDevModeWithSW());
 			}
 
 			// initial install state
@@ -133,7 +143,13 @@ export class PWAManager {
 			// SW message listener
 			navigator.serviceWorker.addEventListener('message', (event) => this.#onSWMessage(event));
 
-			const registration = await this.#withRetry('sw-registration', () => navigator.serviceWorker.register(this.serviceWorkerPath));
+			// Dev bilgisini options ile değil, message ile göndereceğiz
+			const opts = {
+				scope: './',
+				updateViaCache: appConfig.isDevelopment ? 'none' : 'imports'
+			};
+
+			const registration = await this.#withRetry('sw-registration', () => navigator.serviceWorker.register(this.serviceWorkerPath, opts));
 
 			console.log('✅ Service Worker registered successfully:', registration);
 			this.registration = registration;
@@ -145,6 +161,17 @@ export class PWAManager {
 			});
 		} catch (error) {
 			console.error('Service Worker Registration\n', error);
+		}
+	}
+
+	// isDevelopment bilgisini aktif SW'a gönder
+	async #syncDevModeWithSW() {
+		try {
+			if (!('serviceWorker' in navigator)) return;
+			const reg = await navigator.serviceWorker.ready;
+			reg?.active?.postMessage?.({ type: 'SET_ENV', isDevelopment: appConfig.isDevelopment });
+		} catch (e) {
+			console.warn('SET_ENV message failed:', e);
 		}
 	}
 

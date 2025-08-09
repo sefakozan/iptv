@@ -454,18 +454,23 @@ class FetchStrategyManager {
 	 * @returns {Promise<Response>} Response
 	 */
 	async handleFetch(event) {
-		const { request } = event;
+		const { request, respondWith } = event;
 
 		try {
+			if (DEV_ENV.enabled) {
+				respondWith(fetch(request));
+				return;
+			}
 			// Skip non-GET requests
 			if (request.method !== 'GET') {
-				return fetch(request);
+				respondWith(fetch(request));
+				return;
 			}
 
 			// Skip streaming content
 			if (this.config.shouldExcludeFromCache(request.url)) {
-				this.errorManager.logMetric('networkRequests');
-				return fetch(request);
+				respondWith(fetch(request));
+				return;
 			}
 
 			// Choose strategy based on request type
@@ -987,6 +992,7 @@ class ServiceWorkerManager {
 
 				case 'GET_VERSION':
 					event.ports[0]?.postMessage({
+						type: 'GET_VERSION',
 						version: this.config.version,
 						cacheName: this.config.cacheName
 					});
@@ -998,6 +1004,13 @@ class ServiceWorkerManager {
 
 				case 'CLEAR_CACHE':
 					await this.clearSpecificCache(data?.cacheName);
+					break;
+				case 'CLEAR_ALL_CACHE':
+					await this.clearAllCache();
+					break;
+				case 'SET_ENV':
+					await this.setEnv(data?.isDevelopment);
+					event.ports[0]?.postMessage({ type: 'CLEAR_ALL_CACHE_OK' });
 					break;
 
 				default:
@@ -1021,6 +1034,27 @@ class ServiceWorkerManager {
 	}
 
 	/**
+	 * Clear specific cache
+	 * @param {string} cacheName - Cache name to clear
+	 * @returns {Promise<void>}
+	 */
+	async clearAllCache() {
+		const allCacheNames = this.config.getAllCacheNames();
+
+		for (const cacheName of allCacheNames) {
+			await caches.delete(cacheName);
+			console.log(`🗑️ Cleared cache: ${cacheName}`);
+		}
+	}
+
+	async setEnv(isDevelopment) {
+		if (isDevelopment) {
+			DEV_ENV.enabled = true;
+			await clearAllCache();
+		}
+	}
+
+	/**
 	 * Log storage information
 	 * @returns {Promise<void>}
 	 */
@@ -1040,6 +1074,9 @@ class ServiceWorkerManager {
 // =============================================================================
 // Global Service Worker Instance & Event Listeners
 // =============================================================================
+
+// Geliştirme modu bayrağı (message ile yönetilir)
+const DEV_ENV = { enabled: false };
 
 // Create global service worker manager
 const swManager = new ServiceWorkerManager();
