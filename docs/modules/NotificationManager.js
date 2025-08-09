@@ -35,7 +35,7 @@ const NOTIFICATION_TYPES = Object.freeze({
 	WARNING: 'warning',
 	INFO: 'info',
 	LOADING: 'loading',
-	PRIMARY: 'primary',
+	PRIMARY: 'primary'
 });
 
 /**
@@ -43,9 +43,6 @@ const NOTIFICATION_TYPES = Object.freeze({
  */
 
 export class NotificationManager {
-	/** @type {NotificationManager|null} */
-	static #instance = null;
-
 	/** @type {HTMLElement|null} */
 	#toastContainer = null;
 
@@ -56,31 +53,14 @@ export class NotificationManager {
 	 * @param {Partial<NotificationConfig>} [config]
 	 * @private Use NotificationManager.getInstance()
 	 */
-	constructor(config = {}) {
-		if (NotificationManager.#instance) {
-			throw new Error('NotificationManager is a singleton. Use NotificationManager.getInstance()');
-		}
+	constructor() {
 		this.#config = {
-			defaultDelay: config.defaultDelay ?? 5000,
-			position: config.position ?? 'top-0 end-0',
-			autohide: config.autohide ?? true,
-			animation: config.animation ?? true,
+			defaultDelay: 5000,
+			position: 'bottom-0 end-0',
+			autohide: true,
+			animation: true
 		};
 		this.#initialize();
-		window.iptv = window.iptv || {};
-		window.iptv.nm = this;
-	}
-
-	/**
-	 * Get singleton instance
-	 * @param {Partial<NotificationConfig>} [config]
-	 * @returns {NotificationManager}
-	 */
-	static getInstance(config) {
-		if (!NotificationManager.#instance) {
-			NotificationManager.#instance = new NotificationManager(config);
-		}
-		return NotificationManager.#instance;
 	}
 
 	/**
@@ -129,13 +109,17 @@ export class NotificationManager {
 				this.#createToastContainer();
 			}
 
+			if (options.isTop) {
+				this.setPosition('top-0 end-0');
+			}
+
 			const toast = this.#createToastElement(type, title, message, options);
 			this.#toastContainer.appendChild(toast);
 
 			const bsToast = new bootstrap.Toast(toast, {
 				delay: options.delay ?? this.#config.defaultDelay,
 				autohide: options.autohide ?? (type !== NOTIFICATION_TYPES.LOADING && this.#config.autohide),
-				animation: options.animation ?? this.#config.animation,
+				animation: options.animation ?? this.#config.animation
 			});
 
 			toast.addEventListener('hidden.bs.toast', () => toast.remove());
@@ -207,28 +191,28 @@ export class NotificationManager {
 		const configs = {
 			[NOTIFICATION_TYPES.SUCCESS]: {
 				icon: 'fas fa-check-circle text-success',
-				headerClass: 'bg-success-subtle',
+				headerClass: 'bg-success-subtle'
 			},
 			[NOTIFICATION_TYPES.ERROR]: {
 				icon: 'fas fa-exclamation-circle text-danger',
-				headerClass: 'bg-danger-subtle',
+				headerClass: 'bg-danger-subtle'
 			},
 			[NOTIFICATION_TYPES.WARNING]: {
 				icon: 'fas fa-exclamation-triangle text-warning',
-				headerClass: 'bg-warning-subtle',
+				headerClass: 'bg-warning-subtle'
 			},
 			[NOTIFICATION_TYPES.INFO]: {
 				icon: 'fas fa-info-circle text-info',
-				headerClass: 'bg-info-subtle',
+				headerClass: 'bg-info-subtle'
 			},
 			[NOTIFICATION_TYPES.LOADING]: {
 				icon: 'fas fa-spinner fa-spin text-primary',
-				headerClass: 'bg-primary-subtle',
+				headerClass: 'bg-primary-subtle'
 			},
 			[NOTIFICATION_TYPES.PRIMARY]: {
 				icon: 'fas fa-bell',
-				headerClass: 'bg-primary text-white',
-			},
+				headerClass: 'bg-primary text-white'
+			}
 		};
 		return configs[type] || configs[NOTIFICATION_TYPES.INFO];
 	}
@@ -254,7 +238,7 @@ export class NotificationManager {
 		return new Date().toLocaleTimeString('en-US', {
 			hour12: false,
 			hour: '2-digit',
-			minute: '2-digit',
+			minute: '2-digit'
 		});
 	}
 
@@ -345,7 +329,7 @@ export class NotificationManager {
 	loading(title, message, options = {}) {
 		return this.show(NOTIFICATION_TYPES.LOADING, title, message, {
 			...options,
-			autohide: false,
+			autohide: false
 		});
 	}
 
@@ -359,7 +343,7 @@ export class NotificationManager {
 	primary(title, message, options = {}) {
 		return this.show(NOTIFICATION_TYPES.PRIMARY, title, message, {
 			...options,
-			autohide: false,
+			autohide: false
 		});
 	}
 
@@ -436,7 +420,9 @@ export class NotificationManager {
         1. Click browser menu (⋮)<br>
         2. Select "Install App" or "Add to Home Screen"<br>
         3. Follow the installation prompts`,
-			{ delay: 8000 },
+			{ delay: 8000, isTop: true }
 		);
 	}
 }
+
+export const notificationManager = new NotificationManager();
