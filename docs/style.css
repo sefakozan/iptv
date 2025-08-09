@@ -322,7 +322,7 @@ body:has(.select2-container--open) .card:hover {
 	border-color: #d1d5db;
 	box-shadow:
 		0 10px 15px -3px rgba(0, 0, 0, 0.1),
-		0 4px 6px -2px rgba(0, 0, 0, 0.05);
+		0 4px 6px -1px rgba(0, 0, 0, 0.05);
 	transform: translateY(-1px);
 }
 
@@ -550,6 +550,18 @@ body:has(.select2-container--open) .card:hover {
 
 .select2-dropdown .select2-results__options::-webkit-scrollbar-thumb:hover {
 	background: #666;
+}
+
+/* Select2 search input border/outline override */
+.select2-container--default .select2-search--dropdown .select2-search__field {
+	border: 1px solid #e5e7eb; /* veya 0; */
+	border-radius: 8px;
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field:focus {
+	outline: none;
+	border-color: #4f46e5; /* tema rengine çek */
+	box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 /* Utilities */

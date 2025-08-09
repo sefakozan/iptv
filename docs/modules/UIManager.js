@@ -7,6 +7,9 @@ export const UIManager = {
 	setCountrySelect() {
 		const $countrySelect = $('#countrySelect');
 
+		// sorter içinde kullanmak için son arama terimi
+		let lastTerm = '';
+
 		$countrySelect.select2({
 			placeholder: 'Select a country',
 			allowClear: false,
@@ -18,11 +21,58 @@ export const UIManager = {
 			},
 			templateResult: this.formatCountryOption,
 			templateSelection: this.formatCountryOption,
-			escapeMarkup: (markup) => markup, // Allow HTML content
+			escapeMarkup: (markup) => markup,
+
+			// 0–2 karakter: ad + kod içinde ara
+			// 3+ karakter: sadece ad içinde ara
+			matcher: (params, data) => {
+				const term = $.trim(params.term || '').toLowerCase();
+				lastTerm = term;
+
+				if (!term) return data;
+				if (typeof data.text === 'undefined') return null;
+
+				const name = (data.text || '').toLowerCase();
+				const code = (data.id || '').toLowerCase();
+
+				if (term.length <= 2) {
+					return name.includes(term) || code.includes(term) ? data : null;
+				}
+				return name.includes(term) ? data : null;
+			},
+
+			// Öncelik:
+			// 1) Tam 2 karakter kod = arama terimi (tam eşleşme) en üstte
+			// 2) name startsWith(term)
+			// 3) (yalnızca term<=2 iken) code startsWith(term)
+			// 4) içerene göre (zaten matcher sağlıyor), eşitlikte orijinal sırayı koru
+			sorter: (results) => {
+				if (!lastTerm) return results;
+				const term = lastTerm;
+
+				const scoreOf = (item) => {
+					const name = (item.text || '').toLowerCase();
+					const code = (item.id || '').toLowerCase();
+					let s = 0;
+
+					if (term.length === 2 && code === term) s += 1000; // tam kod eşleşmesi
+					if (name.startsWith(term)) s += 100; // ad başlıyor
+					if (term.length <= 2 && code.startsWith(term)) s += 90; // kod başlıyor
+					// içerme (başlamıyorsa) küçük ek puan
+					if (!name.startsWith(term) && name.includes(term)) s += 10;
+					if (term.length <= 2 && !code.startsWith(term) && code.includes(term)) s += 9;
+
+					return s;
+				};
+
+				return results
+					.map((item, idx) => ({ item, idx, score: scoreOf(item) }))
+					.sort((a, b) => b.score - a.score || a.idx - b.idx)
+					.map((x) => x.item);
+			},
 		});
 
-		// Not: Select2 arama input'u için built-in placeholder ayarı yok.
-		// Input, dropdown açıldığında oluşturulduğu için burada set edilir.
+		// Arama input placeholder (Select2 v4 için built-in yok)
 		$countrySelect.on('select2:open', () => {
 			const $search = $('.select2-container--open .select2-search__field');
 			$search.attr('placeholder', 'Type to search for a country...');
