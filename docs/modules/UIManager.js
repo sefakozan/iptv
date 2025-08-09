@@ -1,10 +1,11 @@
 /* ========================================================================
-   IPTV Player - User Interface Management
+   IPTV Player - User Interface Management (Static Class)
    ======================================================================== */
 
-// User Interface Management
-export const UIManager = {
-	setCountrySelect() {
+// biome-ignore lint/complexity/noStaticOnlyClass: <all static>
+export class UIManager {
+	// Ülke seçimi (Select2) kurulum
+	static setCountrySelect() {
 		const $countrySelect = $('#countrySelect');
 
 		// sorter içinde kullanmak için son arama terimi
@@ -19,8 +20,8 @@ export const UIManager = {
 				inputTooShort: () => 'Type to search for a country...',
 				noResults: () => 'No country found',
 			},
-			templateResult: this.formatCountryOption,
-			templateSelection: this.formatCountryOption,
+			templateResult: UIManager.formatCountryOption,
+			templateSelection: UIManager.formatCountryOption,
 			escapeMarkup: (markup) => markup,
 
 			// 0–2 karakter: ad + kod içinde ara
@@ -76,12 +77,12 @@ export const UIManager = {
 		$countrySelect.on('select2:open', () => {
 			const $search = $('.select2-container--open .select2-search__field');
 			$search.attr('placeholder', 'Type to search for a country...');
-			// İsteğe bağlı:
 			$search.attr({ 'aria-label': 'Search country', inputmode: 'search' }).trigger('focus');
 		});
-	},
+	}
 
-	formatCountryOption(state) {
+	// Select2 seçenek render’ı (ülke bayrakları + metin)
+	static formatCountryOption(state) {
 		if (!state.id) return state.text;
 
 		const flag0 = $(state.element).data('flag0');
@@ -89,33 +90,28 @@ export const UIManager = {
 		const flag2 = $(state.element).data('flag2');
 
 		const flagPic = `<picture>
-	<source srcset="${flag2}" type="image/svg+xml">
+    <source srcset="${flag2}" type="image/svg+xml">
   <source srcset="${flag1}" type="image/svg+xml">
   <img src="${flag0}" alt="Ülkenin bayrağı" class="flag-img">
 </picture>`;
 		return $(`<span>${flagPic}${state.text}</span>`);
-	},
+	}
 
-	// Populate country select dropdown
-	populateCountrySelect(countries) {
+	// Ülke listesini doldur
+	static populateCountrySelect(countries) {
 		try {
 			const $countrySelect = $('#countrySelect');
 			$countrySelect.empty();
 
-			// Add CSS for flag support if not already added
-
 			countries.forEach((country) => {
 				if (country.disabled) return;
 
-				// Use emoji directly in the text for better compatibility
 				const option = new Option(`${country.name} (${country.code})`, country.code);
 				option.setAttribute('data-flag0', country.imgs[0]);
 				option.setAttribute('data-flag1', country.imgs[1]);
 				option.setAttribute('data-flag2', country.imgs[2]);
-				$countrySelect.append(option);
-
-				// Add CSS class for styling
 				option.className = 'country-option';
+
 				$countrySelect.append(option);
 			});
 
@@ -123,10 +119,10 @@ export const UIManager = {
 		} catch (error) {
 			console.error(error, 'Populating country select');
 		}
-	},
+	}
 
-	// Populate channel list
-	populateChannelList(channels) {
+	// Kanal listesini doldur
+	static populateChannelList(channels) {
 		try {
 			const $channelList = $('#channelList');
 			const $channelSearch = $('#channelSearch');
@@ -157,38 +153,37 @@ export const UIManager = {
 
 			console.log(`Populated channel list with ${channels.length} channels`);
 
-			// Auto-select first channel if not first load
+			// İlk yükleme değilse ilk kanalı seç
 			if (!appState.isFirstLoad && channels.length > 0) {
 				$channelList.val('0').trigger('change');
 			}
 		} catch (error) {
 			console.error(error, 'Populating channel list');
 		}
-	},
+	}
 
-	// Populate channel select dropdown (alias for populateChannelList)
-	populateChannelSelect(channels) {
-		return this.populateChannelList(channels);
-	},
+	// Alias
+	static populateChannelSelect(channels) {
+		return UIManager.populateChannelList(channels);
+	}
 
-	// Enable channel search functionality
-	enableChannelSearch() {
+	// Arama etkinleştir
+	static enableChannelSearch() {
 		const $channelSearch = $('#channelSearch');
 
-		// Remove existing handlers to prevent duplicates
+		// Çoğul bağlamayı engelle
 		$channelSearch.off('input.channelSearch');
 
-		// Add debounced search handler
 		$channelSearch.on(
 			'input.channelSearch',
 			Utils.debounce((event) => {
-				this.filterChannels(event.target.value);
+				UIManager.filterChannels(event.target.value);
 			}, APP_CONFIG.ui.searchDelay),
 		);
-	},
+	}
 
-	// Filter channels based on search term
-	filterChannels(searchTerm) {
+	// Arama filtresi
+	static filterChannels(searchTerm) {
 		try {
 			const query = searchTerm.toLowerCase().trim();
 			const channels = appState.getState('channels');
@@ -197,8 +192,7 @@ export const UIManager = {
 			$channelList.empty();
 
 			if (!query) {
-				// Show all channels if no search term
-				this.populateChannelList(channels);
+				UIManager.populateChannelList(channels);
 				return;
 			}
 
@@ -207,11 +201,10 @@ export const UIManager = {
 			if (filteredChannels.length === 0) {
 				$channelList.append('<option value="">No channels found</option>');
 				VideoManager.stopPlayback();
-				this.updateChannelInfo('No channel selected');
+				UIManager.updateChannelInfo('No channel selected');
 				return;
 			}
 
-			// Populate with filtered channels
 			filteredChannels.forEach((channel) => {
 				const originalIndex = channels.indexOf(channel);
 				const option = new Option(channel.name, originalIndex.toString());
@@ -229,7 +222,7 @@ export const UIManager = {
 				$channelList.append(option);
 			});
 
-			// Auto-select first filtered result
+			// İlk sonucu otomatik seç
 			if (filteredChannels.length > 0) {
 				const firstOption = $channelList.find('option:first');
 				$channelList.val(firstOption.val()).trigger('change');
@@ -237,10 +230,10 @@ export const UIManager = {
 		} catch (error) {
 			console.error(error, 'Filtering channels');
 		}
-	},
+	}
 
-	// Update channel information display
-	updateChannelInfo(message, channel = null) {
+	// Kanal bilgi panelini güncelle
+	static updateChannelInfo(message, channel = null) {
 		try {
 			const $channelInfo = $('#channelInfo');
 
@@ -274,21 +267,21 @@ export const UIManager = {
 		} catch (error) {
 			console.error(error, ErrorManager.ERROR_TYPES.UI, 'Updating channel info');
 		}
-	},
+	}
 
-	// Show channel loading/error states
-	showChannelError(message) {
+	// Hata durumu
+	static showChannelError(message) {
 		$('#channelList')
 			.empty()
 			.append(`<option value="">${Utils.sanitizeHtml(message)}</option>`)
 			.prop('disabled', true);
 
 		$('#channelSearch').prop('disabled', true).val('');
-		this.updateChannelInfo(message);
-	},
+		UIManager.updateChannelInfo(message);
+	}
 
-	// Show channel loading state
-	showChannelLoading(message = 'Loading channels...') {
+	// Yükleniyor durumu
+	static showChannelLoading(message = 'Loading channels...') {
 		try {
 			$('#channelList')
 				.empty()
@@ -296,16 +289,16 @@ export const UIManager = {
 				.prop('disabled', true);
 
 			$('#channelSearch').prop('disabled', true).val('');
-			this.updateChannelInfo(message);
+			UIManager.updateChannelInfo(message);
 
 			console.log('Channel loading shown:', message);
 		} catch (error) {
 			console.error(error, 'Showing channel loading');
 		}
-	},
+	}
 
-	// Toggle info panel (if implemented)
-	toggleInfoPanel() {
+	// Info panel toggle
+	static toggleInfoPanel() {
 		try {
 			const $infoPanel = $('#infoPanel');
 			if ($infoPanel.length > 0) {
@@ -314,5 +307,5 @@ export const UIManager = {
 		} catch (error) {
 			console.warn('Failed to toggle info panel:', error);
 		}
-	},
-};
+	}
+}

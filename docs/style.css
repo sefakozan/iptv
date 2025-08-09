@@ -508,6 +508,21 @@ body:has(.select2-container--open) .card:hover {
 	overflow: hidden;
 }
 
+.select2-dropdown {
+	overflow-x: hidden; /* yatay scroll'u kapat */
+	max-width: 100vw; /* viewport dışına taşmayı önle */
+}
+
+.select2-dropdown .select2-results__options {
+	overflow-x: hidden; /* sadece dikey scroll */
+}
+
+/* Uzun metinlerin taşmasını önle */
+.select2-results__option {
+	white-space: normal;
+	word-break: break-word;
+}
+
 .select2-results__option {
 	padding: 0.75rem 1rem;
 	transition: all 0.15s ease;
@@ -839,4 +854,9 @@ kbd {
 	box-shadow:
 		0 20px 25px -5px rgba(0, 0, 0, 0.1),
 		0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Select2 açıkken sayfa yatay scroll'u kapat */
+body:has(.select2-container--open) {
+	overflow-x: hidden;
 }
