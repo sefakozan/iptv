@@ -1,3 +1,0 @@
-- docker-compose up --build -d
-- docker-compose up --build --force-recreate -d
-- docker-compose down
