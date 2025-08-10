@@ -17,6 +17,11 @@ RUN apt-get update && \
         libavcodec-dev \
         libavutil-dev \
         libswresample-dev \
+        libavfilter-dev \
+        libavdevice-dev \
+        libswscale-dev \
+        libpostproc-dev \
+        wget \
         && \
     rm -rf /var/lib/apt/lists/*
 
@@ -25,60 +30,10 @@ COPY src /app/src
 WORKDIR /app
 
 RUN gcc /app/src/multi_hls_gateway.c -o /app/hls_gateway \
-    -levent -levent_openssl \
-    -lssl -lcrypto \
-    -lnghttp2 \
-    -lavformat -lavcodec -lavutil -lswresample \
+    -levent \
+    -lavformat -lavcodec -lavutil -lswresample -lswscale -lavfilter -lavdevice \
+    -lpostproc -lm \
     -lpthread -lz
 
-# ————————————————————————————————————————————————————————
-# 2. Aşama: Çalıştırılabilir İmaj
-# ————————————————————————————————————————————————————————
-
-FROM ubuntu:24.04
-ENV DEBIAN_FRONTEND=noninteractive
-
-# Gerekli runtime kütüphaneleri
-RUN apt-get update && \
-    apt-get install -y \
-    apt-utils \
-    libevent-2.1-7 \
-    libevent-openssl-2.1-7 \
-    libssl3 \
-    libnghttp2-14 \
-    ffmpeg \
-    curl \
-    openssl \
-        ca-certificates \
-        && \
-    rm -rf /var/lib/apt/lists/*
-
-# Sertifika deposu
-RUN update-ca-certificates
-
-# Uygulamayı kopyala
-COPY --from=builder /app/hls_gateway /usr/local/bin/hls_gateway
-
-# Certbot yükle
-RUN apt-get update && \
-    apt-get install -y certbot && \
-    rm -rf /var/lib/apt/lists/*
-
-# Dizinler
-RUN mkdir -p /etc/letsencrypt /var/lib/hls-gateway
-
-# Volume
-VOLUME ["/etc/letsencrypt"]
-
-# Port
 EXPOSE 5001
-
-# Başlatma betiği
-COPY entrypoint.sh /entrypoint.sh
-RUN sed -i 's/\r$//' /entrypoint.sh && chmod +x /entrypoint.sh
-
-# Varsayılan olarak certbot'u devre dışı bırak (compose ile override edilebilir)
-ENV DISABLE_CERTBOT=1
-ENV USE_TLS=0
-
-ENTRYPOINT ["/entrypoint.sh"]
+CMD ["./app/hls_gateway"]

@@ -5,17 +5,4 @@ services:
     build: .
     ports:
       - "5001:5001"
-    environment:
-      - DOMAIN=hls.yourdomain.com
-      - EMAIL=admin@yourdomain.com
-      - WORKERS=1
-      - SEG_MS=500
-      - AAC_BR=64000
-      - AAC_SR=44100
-      - AAC_CH=1
-      # - CERTBOT_DRY_RUN=1  # Gerçek sertifika almak için kaldır
-    volumes:
-      - ./certs:/etc/letsencrypt
-      - ./logs:/var/log/hls-gateway
     restart: unless-stopped
-    # Gerçek üretimde: command: ["--break-my-neck"] gibi test sonrası kaldır
