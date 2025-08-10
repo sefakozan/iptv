@@ -12,9 +12,12 @@
 
 #include <libavformat/avformat.h>
 #include <libavcodec/avcodec.h>
+#include <libavcodec/bsf.h>
 #include <libavutil/opt.h>
 #include <libavutil/avstring.h>
 #include <libavutil/channel_layout.h>
+#include <libavutil/audio_fifo.h>
+#include <libavutil/time.h>
 #include <libswresample/swresample.h>
 
 #include <stdio.h>
@@ -33,6 +36,7 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
+#include <event2/bufferevent_ssl.h>
 
 #ifndef MAX
 #define MAX(a,b) ((a)>(b)?(a):(b))
@@ -40,15 +44,15 @@
 
 #define PORT 5001
 #define MAX_STREAMS 256
-#define MAX_SEGMENTS 4
+#define MAX_SEGMENTS 24
 #define IO_BUF_SIZE 65536
 #define SEGMENT_PREALLOC (2 * 1024 * 1024)
 #define STREAM_TIMEOUT_SEC 300
 
 static int G_SEG_MS = 1000;
 static int G_AAC_BR = 96000;
-static int G_AAC_SR = 44100;
-static int G_AAC_CH = 1;
+static int G_AAC_SR = 48000;
+static int G_AAC_CH = 2;
 static int G_WORKERS = 1;
 
 typedef struct {
@@ -75,6 +79,7 @@ typedef struct {
     int active_seg_index;
     int64_t seg_start_time_ms;
     int64_t a_next_pts;
+    AVBSFContext   *v_bsf;
 
     mem_segment_t segments[MAX_SEGMENTS];
     int seg_head;
@@ -96,6 +101,7 @@ static int stream_count = 0;
 static pthread_mutex_t map_mutex = PTHREAD_MUTEX_INITIALIZER;
 static struct event_base *base;
 static SSL_CTX *g_ssl_ctx = NULL;
+static int G_USE_TLS = 1;
 
 // ✅ Güvenli getenv_int
 static int getenv_int(const char *k, int defv) {
@@ -150,6 +156,14 @@ static int seg_write_cb(void *opaque, uint8_t *buf, int buf_size) {
     return buf_size;
 }
 
+// Small helper to pretty-print FFmpeg error codes
+static inline void log_averr(const char *what, int err) {
+    if (err >= 0) return;
+    char msg[256];
+    av_strerror(err, msg, sizeof(msg));
+    fprintf(stderr, "[gateway][fferr] %s: (%d) %s\n", what, err, msg);
+}
+
 static int open_segment_muxer(transcoder_t *t, mem_segment_t *seg) {
     int ret = avformat_alloc_output_context2(&t->ofmt_ctx, NULL, "mpegts", NULL);
     if (ret < 0 || !t->ofmt_ctx) return AVERROR_UNKNOWN;
@@ -157,21 +171,26 @@ static int open_segment_muxer(transcoder_t *t, mem_segment_t *seg) {
     av_opt_set(t->ofmt_ctx->priv_data, "aac_latm", "0", 0);
     av_opt_set(t->ofmt_ctx->priv_data, "muxdelay", "0", 0);
     av_opt_set(t->ofmt_ctx->priv_data, "muxpreload", "0", 0);
+    av_opt_set(t->ofmt_ctx->priv_data, "mpegts_flags", "resend_headers+initial_discontinuity", 0);
+    // Try to force immediate packet flushes
+    av_opt_set(t->ofmt_ctx->priv_data, "flush_packets", "1", 0);
 
     AVStream *vst = avformat_new_stream(t->ofmt_ctx, NULL);
     if (!vst) return AVERROR(ENOMEM);
-    if ((ret = avcodec_parameters_copy(vst->codecpar, t->ifmt_ctx->streams[t->video_stream_index]->codecpar)) < 0) return ret;
+    // Prefer BSF par_out for proper Annex B extradata (SPS/PPS) if filter is active
+    if (t->v_bsf && t->v_bsf->par_out && t->v_bsf->par_out->codec_id == AV_CODEC_ID_H264) {
+        if ((ret = avcodec_parameters_copy(vst->codecpar, t->v_bsf->par_out)) < 0) return ret;
+    } else {
+        if ((ret = avcodec_parameters_copy(vst->codecpar, t->ifmt_ctx->streams[t->video_stream_index]->codecpar)) < 0) return ret;
+    }
     vst->time_base = (AVRational){1, 90000};
+    vst->codecpar->codec_tag = 0;
 
     AVStream *ast = avformat_new_stream(t->ofmt_ctx, NULL);
     if (!ast) return AVERROR(ENOMEM);
-    ast->codecpar->codec_id = AV_CODEC_ID_AAC;
-    ast->codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
-    ast->codecpar->sample_rate = t->a_enc_ctx->sample_rate;
-    ast->codecpar->channel_layout = t->a_enc_ctx->channel_layout;
-    ast->codecpar->channels = t->a_enc_ctx->channels;
-    ast->codecpar->format = t->a_enc_ctx->sample_fmt;
-    ast->codecpar->bit_rate = t->a_enc_ctx->bit_rate;
+    // AAC için encoder context parametrelerini (özellikle extradata) codecpar'a kopyala
+    if ((ret = avcodec_parameters_from_context(ast->codecpar, t->a_enc_ctx)) < 0) return ret;
+    ast->codecpar->codec_tag = 0;
     ast->time_base = (AVRational){1, t->a_enc_ctx->sample_rate};
 
     seg->size = 0;
@@ -182,17 +201,30 @@ static int open_segment_muxer(transcoder_t *t, mem_segment_t *seg) {
     t->ofmt_ctx->pb = seg->avio;
     t->ofmt_ctx->flags |= AVFMT_FLAG_CUSTOM_IO;
 
-    if ((ret = avformat_write_header(t->ofmt_ctx, NULL)) < 0) return ret;
+    if ((ret = avformat_write_header(t->ofmt_ctx, NULL)) < 0) {
+        log_averr("avformat_write_header(mpegts)", ret);
+        return ret;
+    }
+    // flush header bytes into our memory buffer so playlist can see non-zero segment size immediately
+    if (t->ofmt_ctx->pb) avio_flush(t->ofmt_ctx->pb);
+    fprintf(stderr, "[gateway] segment %d started (size=%zu)\n", seg->num, seg->size);
     return 0;
 }
 
 static void close_segment_muxer(transcoder_t *t) {
     if (!t->ofmt_ctx) return;
     av_write_trailer(t->ofmt_ctx);
+    if (t->ofmt_ctx->pb) avio_flush(t->ofmt_ctx->pb);
     if (t->ofmt_ctx->pb) {
         AVIOContext *pb = t->ofmt_ctx->pb;
         t->ofmt_ctx->pb = NULL;
         avio_context_free(&pb);
+        // also clear pointers on the currently active segment to avoid double-free/use-after-free
+        if (t->active_seg_index >= 0 && t->active_seg_index < MAX_SEGMENTS) {
+            mem_segment_t *cur = &t->segments[t->active_seg_index];
+            cur->avio = NULL;
+            cur->avio_buf = NULL; // force fresh buffer allocation next time
+        }
     }
     avformat_free_context(t->ofmt_ctx);
     t->ofmt_ctx = NULL;
@@ -207,6 +239,8 @@ static int start_new_segment(transcoder_t *t) {
 
     if (seg->data) { av_free(seg->data); seg->data = NULL; seg->size = 0; seg->cap = 0; }
     if (seg->avio) { avio_context_free(&seg->avio); seg->avio = NULL; }
+    // The avio_context_free above will also free the internal buffer; ensure we don't reuse a freed pointer
+    seg->avio_buf = NULL;
     seg->num = t->seg_head;
 
     int ret = open_segment_muxer(t, seg);
@@ -214,6 +248,7 @@ static int start_new_segment(transcoder_t *t) {
         t->active_seg_index = idx;
         t->seg_start_time_ms = av_gettime() / 1000;
         t->seg_head++;
+        fprintf(stderr, "[gateway] active segment index=%d num=%d size=%zu\n", idx, seg->num, seg->size);
     }
     pthread_mutex_unlock(&t->mutex);
     return ret;
@@ -263,9 +298,27 @@ static int push_and_encode_audio(transcoder_t *t, AVFrame *in_frame) {
 
         if ((ret = avcodec_send_frame(t->a_enc_ctx, efr)) < 0) break;
         while ((ret = avcodec_receive_packet(t->a_enc_ctx, pkt)) == 0) {
+            // Rescale PTS/DTS from encoder time_base to output audio stream time_base
+            AVStream *out_ast = t->ofmt_ctx ? t->ofmt_ctx->streams[1] : NULL;
+            if (out_ast) {
+                av_packet_rescale_ts(pkt, t->a_enc_ctx->time_base, out_ast->time_base);
+            }
             pkt->stream_index = 1;
             pthread_mutex_lock(&t->mutex);
-            if (t->ofmt_ctx) av_interleaved_write_frame(t->ofmt_ctx, pkt);
+            if (t->ofmt_ctx) {
+                size_t before = 0, after = 0;
+                if (t->active_seg_index >= 0) before = t->segments[t->active_seg_index].size;
+                int wret = av_interleaved_write_frame(t->ofmt_ctx, pkt);
+                if (wret < 0) {
+                    log_averr("write audio packet", wret);
+                } else if (t->active_seg_index >= 0) {
+                    after = t->segments[t->active_seg_index].size;
+                    if (after == before) {
+                        fprintf(stderr, "[gateway][warn] audio write produced no growth (seg=%d size=%zu)\n",
+                                t->segments[t->active_seg_index].num, after);
+                    }
+                }
+            }
             pthread_mutex_unlock(&t->mutex);
             av_packet_unref(pkt);
         }
@@ -299,13 +352,58 @@ static void* transcode_loop(void *arg) {
 
         if (pkt->stream_index == t->video_stream_index) {
             AVStream *in_st = t->ifmt_ctx->streams[pkt->stream_index];
-            pthread_mutex_lock(&t->mutex);
-            if (t->ofmt_ctx) {
-                av_packet_rescale_ts(pkt, in_st->time_base, t->ofmt_ctx->streams[0]->time_base);
-                pkt->stream_index = 0;
-                av_interleaved_write_frame(t->ofmt_ctx, pkt);
-            }
-            pthread_mutex_unlock(&t->mutex);
+                if (t->v_bsf) {
+                    if (av_bsf_send_packet(t->v_bsf, pkt) == 0) {
+                        AVPacket *op = av_packet_alloc();
+                        while (av_bsf_receive_packet(t->v_bsf, op) == 0) {
+                            // Encourage TS muxer to start cleanly at keyframes
+                            if (op->flags & AV_PKT_FLAG_KEY) {
+                                op->flags |= AV_PKT_FLAG_KEY;
+                            }
+                            av_packet_rescale_ts(op, in_st->time_base, t->ofmt_ctx->streams[0]->time_base);
+                            op->stream_index = 0;
+                            pthread_mutex_lock(&t->mutex);
+                            if (t->ofmt_ctx) {
+                                size_t before = 0, after = 0;
+                                if (t->active_seg_index >= 0) before = t->segments[t->active_seg_index].size;
+                                int wret = av_interleaved_write_frame(t->ofmt_ctx, op);
+                                if (wret < 0) {
+                                    log_averr("write video packet", wret);
+                                }
+                                if (t->active_seg_index >= 0) {
+                                    after = t->segments[t->active_seg_index].size;
+                                    if (after == before) {
+                                        fprintf(stderr, "[gateway][warn] video write produced no growth (seg=%d size=%zu)\n",
+                                                t->segments[t->active_seg_index].num, after);
+                                    }
+                                }
+                            }
+                            pthread_mutex_unlock(&t->mutex);
+                            av_packet_unref(op);
+                        }
+                        av_packet_free(&op);
+                    }
+                } else {
+                    pthread_mutex_lock(&t->mutex);
+                    if (t->ofmt_ctx) {
+                        av_packet_rescale_ts(pkt, in_st->time_base, t->ofmt_ctx->streams[0]->time_base);
+                        pkt->stream_index = 0;
+                        size_t before = 0, after = 0;
+                        if (t->active_seg_index >= 0) before = t->segments[t->active_seg_index].size;
+                        int wret = av_interleaved_write_frame(t->ofmt_ctx, pkt);
+                        if (wret < 0) {
+                            log_averr("write video packet (no bsf)", wret);
+                        }
+                        if (t->active_seg_index >= 0) {
+                            after = t->segments[t->active_seg_index].size;
+                            if (after == before) {
+                                fprintf(stderr, "[gateway][warn] video write (no bsf) produced no growth (seg=%d size=%zu)\n",
+                                        t->segments[t->active_seg_index].num, after);
+                            }
+                        }
+                    }
+                    pthread_mutex_unlock(&t->mutex);
+                }
         } else if (pkt->stream_index == t->audio_stream_index) {
             if (avcodec_send_packet(t->a_dec_ctx, pkt) == 0) {
                 while (avcodec_receive_frame(t->a_dec_ctx, frame) == 0) {
@@ -328,9 +426,27 @@ static void* transcode_loop(void *arg) {
     avcodec_send_frame(t->a_enc_ctx, NULL);
     AVPacket *fp = av_packet_alloc();
     while (avcodec_receive_packet(t->a_enc_ctx, fp) == 0) {
+        AVStream *out_ast = t->ofmt_ctx ? t->ofmt_ctx->streams[1] : NULL;
+        if (out_ast) {
+            av_packet_rescale_ts(fp, t->a_enc_ctx->time_base, out_ast->time_base);
+        }
         fp->stream_index = 1;
         pthread_mutex_lock(&t->mutex);
-        if (t->ofmt_ctx) av_interleaved_write_frame(t->ofmt_ctx, fp);
+        if (t->ofmt_ctx) {
+            size_t before = 0, after = 0;
+            if (t->active_seg_index >= 0) before = t->segments[t->active_seg_index].size;
+            int wret = av_interleaved_write_frame(t->ofmt_ctx, fp);
+            if (wret < 0) {
+                log_averr("write audio packet (flush)", wret);
+            }
+            if (t->active_seg_index >= 0) {
+                after = t->segments[t->active_seg_index].size;
+                if (after == before) {
+                    fprintf(stderr, "[gateway][warn] audio flush write produced no growth (seg=%d size=%zu)\n",
+                            t->segments[t->active_seg_index].num, after);
+                }
+            }
+        }
         pthread_mutex_unlock(&t->mutex);
         av_packet_unref(fp);
     }
@@ -347,6 +463,7 @@ end:
     avformat_close_input(&t->ifmt_ctx);
     avcodec_free_context(&t->a_dec_ctx);
     avcodec_free_context(&t->a_enc_ctx);
+    if (t->v_bsf) av_bsf_free(&t->v_bsf);
     swr_free(&t->swr_ctx);
     if (t->fifo) av_audio_fifo_free(t->fifo);
 
@@ -376,15 +493,17 @@ static int open_audio_codec(transcoder_t *t, enum AVCodecID dec_id, AVCodecParam
     t->a_enc_ctx->channels = out_ch;
     t->a_enc_ctx->bit_rate = G_AAC_BR;
     t->a_enc_ctx->time_base = (AVRational){1, out_sr};
+    t->a_enc_ctx->flags |= AV_CODEC_FLAG_GLOBAL_HEADER;
 
     if (enc && strcmp(enc->name, "libfdk_aac") == 0) {
         t->a_enc_ctx->sample_fmt = AV_SAMPLE_FMT_S16;
         av_opt_set(t->a_enc_ctx, "profile", "aac_low", 0);
         av_opt_set(t->a_enc_ctx, "afterburner", "0", 0);
     } else {
+        // Native AAC prefers FLTP; set common options for better compatibility
         t->a_enc_ctx->sample_fmt = AV_SAMPLE_FMT_FLTP;
-        av_opt_set(t->a_enc_ctx, "aac_coder", "anmr", 0);
-        av_opt_set(t->a_enc_ctx, "cutoff", "15000", 0);  // ✅ av_opt_set ile
+        av_opt_set(t->a_enc_ctx, "profile", "aac_low", 0);
+        av_opt_set(t->a_enc_ctx, "cutoff", "18000", 0);
     }
 
     if (avcodec_open2(t->a_enc_ctx, enc, NULL) < 0) return -1;
@@ -428,9 +547,19 @@ static transcoder_t* start_transcoder(const char *url) {
     av_dict_set(&opts, "reconnect", "1", 0);
     av_dict_set(&opts, "reconnect_streamed", "1", 0);
     av_dict_set(&opts, "reconnect_on_network_error", "1", 0);
-    av_dict_set(&opts, "rw_timeout", "2000000", 0);
+    // Zor ağlar için daha uzun zaman aşımı (mikrosaniye): 15s
+    av_dict_set(&opts, "rw_timeout", "15000000", 0);
+    av_dict_set(&opts, "timeout", "15000000", 0);
+    // Bazı kaynaklar user-agent ister
+    av_dict_set(&opts, "user_agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115 Safari/537.36", 0);
 
-    if (avformat_open_input(&t->ifmt_ctx, url, NULL, &opts) < 0) { av_dict_free(&opts); free(t); return NULL; }
+    int oret = avformat_open_input(&t->ifmt_ctx, url, NULL, &opts);
+    if (oret < 0) {
+        fprintf(stderr, "[gateway] avformat_open_input FAILED (%d) url=%s\n", oret, url);
+        av_dict_free(&opts);
+        free(t);
+        return NULL;
+    }
     av_dict_free(&opts);
     if (avformat_find_stream_info(t->ifmt_ctx, NULL) < 0) { avformat_close_input(&t->ifmt_ctx); free(t); return NULL; }
 
@@ -445,12 +574,31 @@ static transcoder_t* start_transcoder(const char *url) {
         avformat_close_input(&t->ifmt_ctx); free(t); return NULL;
     }
 
+    // Initialize Annex B bitstream filter for H.264/HEVC before remuxing into MPEG-TS
+    t->v_bsf = NULL;
+    enum AVCodecID v_id = t->ifmt_ctx->streams[t->video_stream_index]->codecpar->codec_id;
+    const AVBitStreamFilter *f = NULL;
+    if (v_id == AV_CODEC_ID_H264) {
+        f = av_bsf_get_by_name("h264_mp4toannexb");
+    } else if (v_id == AV_CODEC_ID_HEVC) {
+        f = av_bsf_get_by_name("hevc_mp4toannexb");
+    }
+    if (f) {
+        if (av_bsf_alloc(f, &t->v_bsf) == 0) {
+            avcodec_parameters_copy(t->v_bsf->par_in, t->ifmt_ctx->streams[t->video_stream_index]->codecpar);
+            t->v_bsf->time_base_in = t->ifmt_ctx->streams[t->video_stream_index]->time_base;
+            if (av_bsf_init(t->v_bsf) < 0) { av_bsf_free(&t->v_bsf); t->v_bsf = NULL; }
+        }
+    }
+
     if (pthread_create(&t->thread, NULL, transcode_loop, t) != 0) {
         avformat_close_input(&t->ifmt_ctx);
         avcodec_free_context(&t->a_dec_ctx);
         avcodec_free_context(&t->a_enc_ctx);
         swr_free(&t->swr_ctx);
+        if (t->v_bsf) av_bsf_free(&t->v_bsf);
         if (t->fifo) av_audio_fifo_free(t->fifo);
+    if (t->v_bsf) av_bsf_free(&t->v_bsf);
         free(t);
         return NULL;
     }
@@ -470,8 +618,9 @@ static void evict_lru_if_needed() {
     if (idx >= 0) {
         transcoder_t *t = stream_map[idx].t;
         for (int k = 0; k < MAX_SEGMENTS; k++) {
-            if (t->segments[k].data) av_free(t->segments[k].data);
-            if (t->segments[k].avio) avio_context_free(&t->segments[k].avio);
+            if (t->segments[k].data) { av_free(t->segments[k].data); t->segments[k].data = NULL; t->segments[k].size = 0; t->segments[k].cap = 0; }
+            if (t->segments[k].avio) { avio_context_free(&t->segments[k].avio); t->segments[k].avio = NULL; }
+            t->segments[k].avio_buf = NULL;
         }
         free(t);
         memmove(&stream_map[idx], &stream_map[idx+1], (--stream_count - idx) * sizeof(stream_entry_t));
@@ -506,6 +655,7 @@ static transcoder_t* get_or_create_transcoder(const char *url) {
 // ✅ Fonksiyon ile handler
 static void m3u8_handler(struct evhttp_request *req) {
     const char *uri = evhttp_request_get_uri(req);
+    fprintf(stderr, "[gateway] m3u8 request: %s\n", uri);
     struct evhttp_uri *decoded = evhttp_uri_parse(uri);
     if (!decoded) { evhttp_send_error(req, 400, "Bad Request"); return; }
     const char *query = evhttp_uri_get_query(decoded);
@@ -517,6 +667,7 @@ static void m3u8_handler(struct evhttp_request *req) {
     av_strlcpy(encoded, q + 2, sizeof(encoded));
     char input_url[1024];
     url_decode(input_url, encoded);
+    fprintf(stderr, "[gateway] input_url: %s\n", input_url);
 
     transcoder_t *t = get_or_create_transcoder(input_url);
     if (!t) { evhttp_send_error(req, 500, "Cannot start transcoder"); evhttp_uri_free(decoded); return; }
@@ -595,12 +746,25 @@ static void segment_handler(struct evhttp_request *req) {
     pthread_mutex_unlock(&t->mutex);
     if (!found) { evhttp_send_error(req, 404, "Segment not found"); evhttp_uri_free(decoded); return; }
 
-    struct evbuffer *buf = evbuffer_new();
-    evbuffer_add(buf, found->data, found->size);
     struct evkeyvalq *out = evhttp_request_get_output_headers(req);
     evhttp_add_header(out, "Content-Type", "video/MP2T");
     evhttp_add_header(out, "Access-Control-Allow-Origin", "*");
     evhttp_add_header(out, "Access-Control-Expose-Headers", "*");
+
+    // If this is a HEAD request, return headers with correct Content-Length but no body
+    if (evhttp_request_get_command(req) == EVHTTP_REQ_HEAD) {
+        char cl[32];
+        snprintf(cl, sizeof(cl), "%zu", found->size);
+        evhttp_add_header(out, "Content-Length", cl);
+        struct evbuffer *empty = evbuffer_new();
+        evhttp_send_reply(req, 200, "OK", empty);
+        evbuffer_free(empty);
+        evhttp_uri_free(decoded);
+        return;
+    }
+
+    struct evbuffer *buf = evbuffer_new();
+    evbuffer_add(buf, found->data, found->size);
     evhttp_send_reply(req, 200, "OK", buf);
     evbuffer_free(buf);
     evhttp_uri_free(decoded);
@@ -611,23 +775,7 @@ static struct bufferevent* bevcb(struct event_base *base, void *arg) {
     return bufferevent_openssl_socket_new(base, -1, ssl, BUFFEREVENT_SSL_ACCEPTING, BEV_OPT_CLOSE_ON_FREE);
 }
 
-static int create_listener_socket(const char *addr, int port) {
-    int fd = socket(AF_INET, SOCK_STREAM, 0);
-    if (fd < 0) return -1;
-    int one = 1;
-    setsockopt(fd, SOL_SOCKET, SO_REUSEADDR, &one, sizeof(one));
-#ifdef SO_REUSEPORT
-    setsockopt(fd, SOL_SOCKET, SO_REUSEPORT, &one, sizeof(one));
-#endif
-    struct sockaddr_in sin;
-    memset(&sin, 0, sizeof(sin));
-    sin.sin_family = AF_INET;
-    sin.sin_port = htons((uint16_t)port);
-    sin.sin_addr.s_addr = inet_addr(addr);
-    if (bind(fd, (struct sockaddr*)&sin, sizeof(sin)) < 0) { close(fd); return -1; }
-    if (listen(fd, 512) < 0) { close(fd); return -1; }
-    return fd;
-}
+// Bağlama libevent tarafından yapılacak
 
 static void generic_handler(struct evhttp_request *req, void *arg) {
     const char *uri = evhttp_request_get_uri(req);
@@ -635,6 +783,18 @@ static void generic_handler(struct evhttp_request *req, void *arg) {
     if (!decoded) { evhttp_send_error(req, 400, "Bad Request"); return; }
     const char *path = evhttp_uri_get_path(decoded);
     if (!path) { evhttp_send_error(req, 404, "Not Found"); evhttp_uri_free(decoded); return; }
+    fprintf(stderr, "[gateway] request path: %s\n", path);
+    if (strcmp(path, "/health") == 0) {
+        struct evbuffer *buf = evbuffer_new();
+        evbuffer_add_printf(buf, "ok");
+        struct evkeyvalq *out = evhttp_request_get_output_headers(req);
+        evhttp_add_header(out, "Content-Type", "text/plain");
+        evhttp_add_header(out, "Access-Control-Allow-Origin", "*");
+        evhttp_send_reply(req, 200, "OK", buf);
+        evbuffer_free(buf);
+        evhttp_uri_free(decoded);
+        return;
+    }
     if (strcmp(path, "/m3u8") == 0) { evhttp_uri_free(decoded); m3u8_handler(req); return; }
     if (strncmp(path, "/seg_", 5) == 0) { evhttp_uri_free(decoded); segment_handler(req); return; }
     evhttp_uri_free(decoded);
@@ -651,8 +811,9 @@ static void* cleanup_thread(void *arg) {
             if (now - stream_map[i].t->last_access > STREAM_TIMEOUT_SEC) {
                 transcoder_t *t = stream_map[i].t;
                 for (int k = 0; k < MAX_SEGMENTS; k++) {
-                    if (t->segments[k].data) av_free(t->segments[k].data);
-                    if (t->segments[k].avio) avio_context_free(&t->segments[k].avio);
+                    if (t->segments[k].data) { av_free(t->segments[k].data); t->segments[k].data = NULL; t->segments[k].size = 0; t->segments[k].cap = 0; }
+                    if (t->segments[k].avio) { avio_context_free(&t->segments[k].avio); t->segments[k].avio = NULL; }
+                    t->segments[k].avio_buf = NULL;
                 }
                 free(t);
                 memmove(&stream_map[i], &stream_map[i+1], (--stream_count - i) * sizeof(stream_entry_t));
@@ -662,41 +823,43 @@ static void* cleanup_thread(void *arg) {
         pthread_mutex_unlock(&map_mutex);
     }
     return NULL;
-}close_segment_muxer
+}
 
 static int run_one_worker(void) {
     base = event_base_new();
     if (!base) return 1;
     struct evhttp *http = evhttp_new(base);
 
-    g_ssl_ctx = SSL_CTX_new(TLS_server_method());
-    if (SSL_CTX_use_certificate_file(g_ssl_ctx, "cert.pem", SSL_FILETYPE_PEM) <= 0 ||
-        SSL_CTX_use_PrivateKey_file(g_ssl_ctx, "key.pem", SSL_FILETYPE_PEM) <= 0) {
-        fprintf(stderr, "Sertifika hatası. 'cert.pem' ve 'key.pem' oluşturun.\n");
-        return 1;
+    if (G_USE_TLS) {
+        g_ssl_ctx = SSL_CTX_new(TLS_server_method());
+        if (SSL_CTX_use_certificate_file(g_ssl_ctx, "cert.pem", SSL_FILETYPE_PEM) <= 0 ||
+            SSL_CTX_use_PrivateKey_file(g_ssl_ctx, "key.pem", SSL_FILETYPE_PEM) <= 0) {
+            fprintf(stderr, "Sertifika hatası. 'cert.pem' ve 'key.pem' oluşturun.\n");
+            return 1;
+        }
+        evhttp_set_bevcb(http, bevcb, NULL);
     }
-
-    evhttp_set_bevcb(http, bevcb, NULL);
-    evhttp_set_allowed_methods(http, EVHTTP_REQ_GET);
+    evhttp_set_allowed_methods(http, EVHTTP_REQ_GET | EVHTTP_REQ_HEAD);
     evhttp_set_max_headers_size(http, 8192);
 
-    int fd = create_listener_socket("0.0.0.0", PORT);
-    if (fd < 0) { fprintf(stderr, "Bind hatası: %s\n", strerror(errno)); return 1; }
-    if (evhttp_accept_socket(http, fd) != 0) { fprintf(stderr, "evhttp_accept_socket hatası\n"); return 1; }
+    if (evhttp_bind_socket(http, "0.0.0.0", PORT) != 0) {
+        fprintf(stderr, "evhttp_bind_socket hatası: %s\n", strerror(errno));
+        return 1;
+    }
 
     evhttp_set_gencb(http, generic_handler, NULL);
 
     pthread_t cleanup_tid;
     pthread_create(&cleanup_tid, NULL, cleanup_thread, NULL);
 
-    printf("Worker PID %d hazır: https://localhost:%d (SEG_MS=%d, AAC=%dk@%dHz/%s)\n",
-           getpid(), PORT, G_SEG_MS, G_AAC_BR / 1000, G_AAC_SR, G_AAC_CH == 1 ? "mono" : "stereo");
+    printf("Worker PID %d hazır: %s://localhost:%d (SEG_MS=%d, AAC=%dk@%dHz/%s)\n",
+           getpid(), G_USE_TLS ? "https" : "http", PORT, G_SEG_MS, G_AAC_BR / 1000, G_AAC_SR, G_AAC_CH == 1 ? "mono" : "stereo");
 
     event_base_dispatch(base);
 
     evhttp_free(http);
     event_base_free(base);
-    SSL_CTX_free(g_ssl_ctx);
+    if (g_ssl_ctx) SSL_CTX_free(g_ssl_ctx);
     return 0;
 }
 
@@ -706,13 +869,14 @@ int main() {
     G_SEG_MS = getenv_int("SEG_MS", 1000);
     if (G_SEG_MS < 200) G_SEG_MS = 200;
     if (G_SEG_MS > 2000) G_SEG_MS = 2000;
-    G_AAC_BR = getenv_int("AAC_BR", 96000);
-    G_AAC_SR = getenv_int("AAC_SR", 44100);
-    if (G_AAC_SR != 44100 && G_AAC_SR != 48000) G_AAC_SR = 44100;
-    G_AAC_CH = getenv_int("AAC_CH", 1);
-    if (G_AAC_CH != 1 && G_AAC_CH != 2) G_AAC_CH = 1;
+    G_AAC_BR = getenv_int("AAC_BR", 128000);
+    G_AAC_SR = getenv_int("AAC_SR", 48000);
+    if (G_AAC_SR != 44100 && G_AAC_SR != 48000) G_AAC_SR = 48000;
+    G_AAC_CH = getenv_int("AAC_CH", 2);
+    if (G_AAC_CH != 1 && G_AAC_CH != 2) G_AAC_CH = 2;
     G_WORKERS = getenv_int("WORKERS", 1);
     if (G_WORKERS < 1) G_WORKERS = 1;
+    G_USE_TLS = getenv_int("USE_TLS", 1);
 
     avformat_network_init();
     SSL_load_error_strings();

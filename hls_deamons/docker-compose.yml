@@ -8,7 +8,7 @@ services:
     environment:
       - DOMAIN=hls.yourdomain.com
       - EMAIL=admin@yourdomain.com
-      - WORKERS=4
+      - WORKERS=1
       - SEG_MS=500
       - AAC_BR=64000
       - AAC_SR=44100
