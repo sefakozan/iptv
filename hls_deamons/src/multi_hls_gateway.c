@@ -1,6 +1,6 @@
-// hls_gateway_final.c
+// multi_hls_gateway.c
 // Ubuntu 24.04 + FFmpeg 5.1 (apt) + libevent + HTTP + çoklu akış
-// Derle: gcc hls_gateway_final.c -o hls_gateway -levent -lavformat -lavcodec -lavutil -lswresample -lpthread -lz
+// Derle: gcc multi_hls_gateway.c -o hls_gateway -levent -lavformat -lavcodec -lavutil -lswresample -lpthread -lz
 
 #include <event2/event.h>
 #include <event2/http.h>
@@ -11,7 +11,6 @@
 #include <libavcodec/avcodec.h>
 #include <libavutil/opt.h>
 #include <libavutil/avstring.h>
-#include <libavutil/channel_layout.h>
 #include <libavutil/time.h>  // av_gettime_relative() için
 #include <libswresample/swresample.h>
 
@@ -55,7 +54,13 @@ typedef struct {
     AVCodecContext  *a_dec_ctx;
     AVCodecContext  *a_enc_ctx;
     SwrContext      *swr_ctx;
-    AVAudioFifo     *fifo;
+
+    // Audio buffer (AVAudioFifo yerine)
+    uint8_t **audio_buf;
+    int audio_buf_samples;
+    int audio_buf_capacity;
+    int audio_channels;
+    int audio_sample_rate;
 
     AVFormatContext *ofmt_ctx;
     int active_seg_index;
@@ -127,7 +132,7 @@ static int seg_write_cb(void *opaque, uint8_t *buf, int buf_size) {
 }
 
 // === Segment muxer aç ===
-static int open_segment_muxer(transcoder_t *t, mem_segment_t *seg) {
+static int open_segment_muxer(transcoder_t *t) {
     int ret = avformat_alloc_output_context2(&t->ofmt_ctx, NULL, "mpegts", NULL);
     if (ret < 0 || !t->ofmt_ctx) return AVERROR_UNKNOWN;
 
@@ -143,12 +148,20 @@ static int open_segment_muxer(transcoder_t *t, mem_segment_t *seg) {
     ast->codecpar->codec_id = AV_CODEC_ID_AAC;
     ast->codecpar->codec_type = AVMEDIA_TYPE_AUDIO;
     ast->codecpar->sample_rate = 48000;
-    ast->codecpar->channel_layout = AV_CH_LAYOUT_STEREO;
     ast->codecpar->channels = 2;
+    
+    #if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(57, 28, 100)
+    av_channel_layout_default(&ast->codecpar->ch_layout, 2);
+    #else
+    ast->codecpar->channel_layout = AV_CH_LAYOUT_STEREO;
+    #endif
+    
     ast->codecpar->format = AV_SAMPLE_FMT_FLTP;
     ast->codecpar->bit_rate = 128000;
     ast->time_base = (AVRational){1, 48000};
 
+    // Segment için AVIO context
+    mem_segment_t *seg = &t->segments[t->active_seg_index];
     seg->size = 0;
     if (!seg->avio_buf) seg->avio_buf = (uint8_t*)av_malloc(IO_BUF_SIZE);
     if (!seg->avio_buf) return AVERROR(ENOMEM);
@@ -184,10 +197,10 @@ static int start_new_segment(transcoder_t *t) {
     if (seg->avio) { avio_context_free(&seg->avio); seg->avio = NULL; }
     seg->num = t->seg_head;
 
-    int ret = open_segment_muxer(t, seg);
+    t->active_seg_index = idx;
+    int ret = open_segment_muxer(t);
     if (ret == 0) {
-        t->active_seg_index = idx;
-        t->seg_start_time_ms = av_gettime_relative() / 1000;  // ✅ Çalışır (libavutil/timer.h)
+        t->seg_start_time_ms = av_gettime_relative() / 1000;  // ✅ FFmpeg 5.1 uyumlu
         t->seg_head++;
     }
     pthread_mutex_unlock(&t->mutex);
@@ -197,59 +210,56 @@ static int start_new_segment(transcoder_t *t) {
 // === Ses transcode ===
 static int push_and_encode_audio(transcoder_t *t, AVFrame *in_frame) {
     int ret = 0;
-    AVFrame *cfrm = NULL;
+    AVFrame *out_frame = NULL;
+    AVPacket *pkt = NULL;
 
     if (in_frame) {
-        cfrm = av_frame_alloc();
-        if (!cfrm) return AVERROR(ENOMEM);
-        cfrm->channel_layout = t->a_enc_ctx->channel_layout;
-        cfrm->channels = t->a_enc_ctx->channels;
-        cfrm->format = t->a_enc_ctx->sample_fmt;
-        cfrm->sample_rate = t->a_enc_ctx->sample_rate;
-        cfrm->nb_samples = in_frame->nb_samples;
-        if ((ret = av_frame_get_buffer(cfrm, 0)) < 0) goto done;
-        if ((ret = swr_convert(t->swr_ctx, (uint8_t**)cfrm->data, cfrm->nb_samples,
-                               (const uint8_t**)in_frame->data, in_frame->nb_samples)) < 0) goto done;
+        // Ses dönüşümü
+        out_frame = av_frame_alloc();
+        if (!out_frame) return AVERROR(ENOMEM);
+        
+        #if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(57, 28, 100)
+        av_channel_layout_default(&out_frame->ch_layout, 2);
+        #else
+        out_frame->channel_layout = AV_CH_LAYOUT_STEREO;
+        out_frame->channels = 2;
+        #endif
+        
+        out_frame->format = AV_SAMPLE_FMT_FLTP;
+        out_frame->sample_rate = 48000;
+        out_frame->nb_samples = in_frame->nb_samples;
+        
+        if ((ret = av_frame_get_buffer(out_frame, 0)) < 0) goto end;
 
-        if ((ret = av_audio_fifo_realloc(t->fifo, av_audio_fifo_size(t->fifo) + cfrm->nb_samples)) < 0) goto done;
-        if ((ret = av_audio_fifo_write(t->fifo, (void**)cfrm->data, cfrm->nb_samples)) < cfrm->nb_samples) { ret = AVERROR_UNKNOWN; goto done; }
+        if ((ret = swr_convert(t->swr_ctx, (uint8_t**)out_frame->data, out_frame->nb_samples,
+                               (const uint8_t**)in_frame->data, in_frame->nb_samples)) < 0) goto end;
+
+        out_frame->pts = t->a_next_pts;
+        t->a_next_pts += out_frame->nb_samples;
     }
 
-    AVPacket *pkt = av_packet_alloc();
-    AVFrame  *efr = av_frame_alloc();
-    if (!pkt || !efr) { ret = AVERROR(ENOMEM); goto done2; }
+    // Encode
+    if ((ret = avcodec_send_frame(t->a_enc_ctx, in_frame ? out_frame : NULL)) < 0) goto end;
 
-    while (av_audio_fifo_size(t->fifo) >= t->a_enc_ctx->frame_size) {
-        efr->nb_samples = t->a_enc_ctx->frame_size;
-        efr->channel_layout = t->a_enc_ctx->channel_layout;
-        efr->channels = t->a_enc_ctx->channels;
-        efr->format = t->a_enc_ctx->sample_fmt;
-        efr->sample_rate = t->a_enc_ctx->sample_rate;
-        if ((ret = av_frame_get_buffer(efr, 0)) < 0) break;
+    pkt = av_packet_alloc();
+    if (!pkt) { ret = AVERROR(ENOMEM); goto end; }
 
-        ret = av_audio_fifo_read(t->fifo, (void**)efr->data, efr->nb_samples);
-        if (ret < efr->nb_samples) { ret = AVERROR_UNKNOWN; break; }
-
-        efr->pts = t->a_next_pts;
-        t->a_next_pts += efr->nb_samples;
-
-        if ((ret = avcodec_send_frame(t->a_enc_ctx, efr)) < 0) break;
-        while ((ret = avcodec_receive_packet(t->a_enc_ctx, pkt)) == 0) {
-            pkt->stream_index = 1;
-            pthread_mutex_lock(&t->mutex);
-            if (t->ofmt_ctx) av_interleaved_write_frame(t->ofmt_ctx, pkt);
-            pthread_mutex_unlock(&t->mutex);
-            av_packet_unref(pkt);
+    while ((ret = avcodec_receive_packet(t->a_enc_ctx, pkt)) == 0) {
+        pkt->stream_index = 1;
+        pthread_mutex_lock(&t->mutex);
+        if (t->ofmt_ctx) {
+            av_packet_rescale_ts(pkt, t->a_enc_ctx->time_base, t->ofmt_ctx->streams[1]->time_base);
+            av_interleaved_write_frame(t->ofmt_ctx, pkt);
         }
-        av_frame_unref(efr);
-        if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) ret = 0;
+        pthread_mutex_unlock(&t->mutex);
+        av_packet_unref(pkt);
     }
 
-done2:
+    if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) ret = 0;
+
+end:
+    if (out_frame) av_frame_free(&out_frame);
     if (pkt) av_packet_free(&pkt);
-    if (efr) av_frame_free(&efr);
-done:
-    if (cfrm) av_frame_free(&cfrm);
     return ret;
 }
 
@@ -303,7 +313,10 @@ static void* transcode_loop(void *arg) {
     while (avcodec_receive_packet(t->a_enc_ctx, fp) == 0) {
         fp->stream_index = 1;
         pthread_mutex_lock(&t->mutex);
-        if (t->ofmt_ctx) av_interleaved_write_frame(t->ofmt_ctx, fp);
+        if (t->ofmt_ctx) {
+            av_packet_rescale_ts(fp, t->a_enc_ctx->time_base, t->ofmt_ctx->streams[1]->time_base);
+            av_interleaved_write_frame(t->ofmt_ctx, fp);
+        }
         pthread_mutex_unlock(&t->mutex);
         av_packet_unref(fp);
     }
@@ -321,7 +334,6 @@ end:
     avcodec_free_context(&t->a_dec_ctx);
     avcodec_free_context(&t->a_enc_ctx);
     swr_free(&t->swr_ctx);
-    if (t->fifo) av_audio_fifo_free(t->fifo);
 
     return NULL;
 }
@@ -355,7 +367,7 @@ static transcoder_t* start_transcoder(const char *url) {
     if (t->audio_stream_index < 0 || t->video_stream_index < 0) { avformat_close_input(&t->ifmt_ctx); free(t); return NULL; }
 
     // MP2 decode
-    const AVCodec *dec = avcodec_find_decoder(AV_CODEC_ID_MP2);
+    const AVCodec *dec = avcodec_find_decoder(t->ifmt_ctx->streams[t->audio_stream_index]->codecpar->codec_id);
     t->a_dec_ctx = avcodec_alloc_context3(dec);
     avcodec_parameters_to_context(t->a_dec_ctx, t->ifmt_ctx->streams[t->audio_stream_index]->codecpar);
     if (avcodec_open2(t->a_dec_ctx, dec, NULL) < 0) { avformat_close_input(&t->ifmt_ctx); free(t); return NULL; }
@@ -364,29 +376,45 @@ static transcoder_t* start_transcoder(const char *url) {
     const AVCodec *enc = avcodec_find_encoder(AV_CODEC_ID_AAC);
     t->a_enc_ctx = avcodec_alloc_context3(enc);
     t->a_enc_ctx->sample_rate = 48000;
-    t->a_enc_ctx->channel_layout = AV_CH_LAYOUT_STEREO;
     t->a_enc_ctx->channels = 2;
+    
+    #if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(57, 28, 100)
+    av_channel_layout_default(&t->a_enc_ctx->ch_layout, 2);
+    #else
+    t->a_enc_ctx->channel_layout = AV_CH_LAYOUT_STEREO;
+    #endif
+    
     t->a_enc_ctx->sample_fmt = AV_SAMPLE_FMT_FLTP;
     t->a_enc_ctx->bit_rate = 128000;
     t->a_enc_ctx->time_base = (AVRational){1, 48000};
     if (avcodec_open2(t->a_enc_ctx, enc, NULL) < 0) { avformat_close_input(&t->ifmt_ctx); free(t); return NULL; }
 
     // SWR
+    #if LIBAVUTIL_VERSION_INT >= AV_VERSION_INT(57, 28, 100)
+    SwrContext *swr = swr_alloc();
+    AVChannelLayout in_ch_layout, out_ch_layout;
+    av_channel_layout_default(&in_ch_layout, 2);
+    av_channel_layout_default(&out_ch_layout, 2);
+    av_opt_set_int(swr, "in_channel_layout", in_ch_layout.nb_channels, 0);
+    av_opt_set_int(swr, "out_channel_layout", out_ch_layout.nb_channels, 0);
+    av_opt_set_int(swr, "in_sample_rate", t->a_dec_ctx->sample_rate, 0);
+    av_opt_set_int(swr, "out_sample_rate", 48000, 0);
+    av_opt_set_sample_fmt(swr, "in_sample_fmt", t->a_dec_ctx->sample_fmt, 0);
+    av_opt_set_sample_fmt(swr, "out_sample_fmt", AV_SAMPLE_FMT_FLTP, 0);
+    swr_init(swr);
+    t->swr_ctx = swr;
+    #else
     t->swr_ctx = swr_alloc_set_opts(NULL,
         AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_FLTP, 48000,
-        AV_CH_LAYOUT_STEREO, AV_SAMPLE_FMT_S16, 48000, 0, NULL);
+        AV_CH_LAYOUT_STEREO, t->a_dec_ctx->sample_fmt, t->a_dec_ctx->sample_rate, 0, NULL);
     swr_init(t->swr_ctx);
-
-    // FIFO
-    t->fifo = av_audio_fifo_alloc(AV_SAMPLE_FMT_FLTP, 2, 1024);
-    if (!t->fifo) { avformat_close_input(&t->ifmt_ctx); free(t); return NULL; }
+    #endif
 
     if (pthread_create(&t->thread, NULL, transcode_loop, t) != 0) {
         avformat_close_input(&t->ifmt_ctx);
         avcodec_free_context(&t->a_dec_ctx);
         avcodec_free_context(&t->a_enc_ctx);
         swr_free(&t->swr_ctx);
-        if (t->fifo) av_audio_fifo_free(t->fifo);
         free(t);
         return NULL;
     }
@@ -396,7 +424,7 @@ static transcoder_t* start_transcoder(const char *url) {
 // === LRU eviction ===
 static void evict_lru_if_needed() {
     if (stream_count < MAX_STREAMS) return;
-    int idx = -1; time_t oldest = LLONG_MAX;
+    int idx = -1; time_t oldest = time(NULL) + 1000;
     for (int i = 0; i < stream_count; i++) {
         if (stream_map[i].t && stream_map[i].t->last_access < oldest) {
             oldest = stream_map[i].t->last_access;
@@ -473,7 +501,7 @@ static void m3u8_handler(struct evhttp_request *req, void *arg) {
     sprintf(line, "#EXT-X-MEDIA-SEQUENCE:%d\n", first_num);
     strcat(m3u8, line);
 
-    for (int n = first_num; n < first_num + 10000; n++) {
+    for (int n = first_num; n < first_num + 100; n++) {
         for (int i = 0; i < MAX_SEGMENTS; i++) {
             if (t->segments[i].size > 0 && t->segments[i].num == n) {
                 sprintf(line, "#EXTINF:1.0,\nseg_%03d.ts?h=%x\n", t->segments[i].num, hash_str(input_url));
