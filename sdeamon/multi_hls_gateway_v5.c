@@ -112,6 +112,13 @@ static pthread_mutex_t map_mutex = PTHREAD_MUTEX_INITIALIZER;
 static struct event_base *base;
 static SSL_CTX *g_ssl_ctx = NULL;
 
+// Forward declarations to avoid implicit declarations
+static void send_cors_preflight(struct evhttp_request *req);
+static void general_cb(struct evhttp_request *req, void *arg);
+static void stop_transcoder(transcoder_t *t);
+static struct bufferevent* bevcb(struct event_base *base, void *arg);
+static int ff_interrupt_cb(void *ctx);
+
 static int getenv_int(const char *k, int defv) {
   const char *v = getenv(k);
   if (!v || !*v) return defv;
@@ -788,4 +795,10 @@ int main() {
   // parent: çocukları beklemeden daimi uyur (veya waitpid ile izleyin)
   while (1) pause();
   return 0;
+}
+
+// libevent OpenSSL bufferevent creator (used by evhttp_set_bevcb)
+static struct bufferevent* bevcb(struct event_base *base, void *arg) {
+  SSL *ssl = SSL_new(g_ssl_ctx);
+  return bufferevent_openssl_socket_new(base, -1, ssl, BUFFEREVENT_SSL_ACCEPTING, BEV_OPT_CLOSE_ON_FREE);
 }

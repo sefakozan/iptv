@@ -21,3 +21,8 @@ SEG_MS=1000 AAC_BR=96000 AAC_SR=44100 AAC_CH=1 WORKERS=4 ./gateway_workers
 WORKERS>1 için Linux çekirdeğinde SO_REUSEPORT gerekir (WSL’de mevcut).
 libfdk_aac sisteminizde yoksa otomatik native aac’e düşer; yine hızlı anmr coder+cutoff kullanılır.
 Giriş zaten 44.1/48 kHz ve seçtiğiniz kanal/sfmt ile eşleşiyorsa SWR devreden çıkar.
+
+
+ multi_hls_gateway_workers.c,
+256 akış, çoklu işçi, SO_REUSEPORT, ENV yapılandırması, SWR optimizasyonu, libfdk_aac tercihi ile
+en gelişmiş, en ölçeklenebilir, en üretimsel HLS gateway sürümüdür. 

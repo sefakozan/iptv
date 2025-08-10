@@ -1,4 +1,5 @@
 // HLS CORS Proxy (HTTPS) - multi-worker, in-memory cache, event-driven fetcher
+// CPU Optimizasyonlu Versiyon
 
 #include <event2/event.h>
 #include <event2/http.h>
@@ -20,6 +21,8 @@
 #include <unistd.h>
 #include <ctype.h>
 #include <errno.h>
+#include <sched.h>
+#include <sys/mman.h>
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -33,27 +36,72 @@
 #define PORT 5002
 #define MAX_CACHE_ITEMS 1024
 #define STREAM_TIMEOUT_SEC 300
-#define IO_CHUNK 32768
+#define IO_CHUNK 65536  // 64KB chunk size
 
 static int G_WORKERS = 1;      // ENV: WORKERS
 static int G_FETCH_TIMEOUT_MS = 8000; // ENV: FETCH_TIMEOUT_MS
 
+// Cache bucket sayısı (hash tablosu için)
+#define CACHE_HASH_SIZE 2048
+
 typedef struct {
-  unsigned int hash;
   char url[1024];
   uint8_t *data;
   size_t size;
   time_t ts;
+  int in_use;  // Reference counting
 } cache_item_t;
 
-static cache_item_t g_cache[MAX_CACHE_ITEMS];
-static int g_cache_count = 0;
-static pthread_mutex_t g_cache_mutex = PTHREAD_MUTEX_INITIALIZER;
+// Hash tabanlı cache buckets
+typedef struct {
+  cache_item_t *items;
+  int count;
+  int capacity;
+  pthread_mutex_t mutex;
+} cache_bucket_t;
+
+static cache_bucket_t g_cache_buckets[CACHE_HASH_SIZE];
+static pthread_mutex_t g_global_cache_mutex = PTHREAD_MUTEX_INITIALIZER;
+
+// Connection pooling
+#define CONNECTION_POOL_SIZE 64
+typedef struct {
+  struct evhttp_connection **connections;
+  int *in_use;
+  int size;
+  pthread_mutex_t mutex;
+} conn_pool_t;
+
+static conn_pool_t g_conn_pool = {0};
+
+// Memory pool for proxy contexts
+#define CTX_POOL_SIZE 1024
+typedef struct {
+  void **blocks;
+  int *in_use;
+  int total_blocks;
+  size_t block_size;
+  pthread_mutex_t mutex;
+} mem_pool_t;
+
+static mem_pool_t *g_ctx_pool = NULL;
 
 static struct event_base *base;
 static SSL_CTX *g_ssl_ctx = NULL;
 static SSL_CTX *g_ssl_client_ctx = NULL;
 static struct evdns_base *g_dns = NULL;
+
+// Performance statistics
+typedef struct {
+  uint64_t requests_served;
+  uint64_t cache_hits;
+  uint64_t cache_misses;
+  uint64_t bytes_transferred;
+  uint64_t redirects_handled;
+} perf_stats_t;
+
+static perf_stats_t g_stats = {0};
+static pthread_mutex_t g_stats_mutex = PTHREAD_MUTEX_INITIALIZER;
 
 // Forward declarations
 static void send_cors_preflight(struct evhttp_request *req);
@@ -61,6 +109,99 @@ static void m3u8_handler(struct evhttp_request *req);
 static void segment_handler(struct evhttp_request *req);
 static int rewrite_m3u8(const char *base_url, const char *src, size_t src_len, struct evbuffer *out);
 static void add_cors_headers(struct evhttp_request *req);
+static int restart_upstream(struct proxy_ctx *cx, const char *full_url);
+
+// Memory pool functions
+static mem_pool_t* create_mem_pool(size_t block_size, int num_blocks) {
+  mem_pool_t *pool = calloc(1, sizeof(mem_pool_t));
+  if (!pool) return NULL;
+  
+  pool->blocks = calloc(num_blocks, sizeof(void*));
+  pool->in_use = calloc(num_blocks, sizeof(int));
+  pool->block_size = block_size;
+  pool->total_blocks = num_blocks;
+  pthread_mutex_init(&pool->mutex, NULL);
+  
+  for (int i = 0; i < num_blocks; i++) {
+    pool->blocks[i] = malloc(block_size);
+  }
+  return pool;
+}
+
+static void* pool_malloc(mem_pool_t *pool, size_t size) {
+  if (!pool || size > pool->block_size) {
+    return malloc(size);  // Fallback to regular malloc
+  }
+  
+  pthread_mutex_lock(&pool->mutex);
+  for (int i = 0; i < pool->total_blocks; i++) {
+    if (!pool->in_use[i]) {
+      pool->in_use[i] = 1;
+      pthread_mutex_unlock(&pool->mutex);
+      return pool->blocks[i];
+    }
+  }
+  pthread_mutex_unlock(&pool->mutex);
+  
+  return malloc(size);  // Pool exhausted, fallback
+}
+
+static void pool_free(mem_pool_t *pool, void *ptr) {
+  if (!pool || !ptr) {
+    free(ptr);
+    return;
+  }
+  
+  pthread_mutex_lock(&pool->mutex);
+  for (int i = 0; i < pool->total_blocks; i++) {
+    if (pool->blocks[i] == ptr) {
+      pool->in_use[i] = 0;
+      pthread_mutex_unlock(&pool->mutex);
+      return;
+    }
+  }
+  pthread_mutex_unlock(&pool->mutex);
+  
+  free(ptr);  // Not in pool, regular free
+}
+
+// Connection pool functions
+static void init_connection_pool(int pool_size) {
+  g_conn_pool.connections = calloc(pool_size, sizeof(struct evhttp_connection*));
+  g_conn_pool.in_use = calloc(pool_size, sizeof(int));
+  g_conn_pool.size = pool_size;
+  pthread_mutex_init(&g_conn_pool.mutex, NULL);
+}
+
+static struct evhttp_connection* get_connection_from_pool() {
+  pthread_mutex_lock(&g_conn_pool.mutex);
+  for (int i = 0; i < g_conn_pool.size; i++) {
+    if (!g_conn_pool.in_use[i] && g_conn_pool.connections[i]) {
+      g_conn_pool.in_use[i] = 1;
+      pthread_mutex_unlock(&g_conn_pool.mutex);
+      return g_conn_pool.connections[i];
+    }
+  }
+  pthread_mutex_unlock(&g_conn_pool.mutex);
+  return NULL;
+}
+
+static void return_connection_to_pool(struct evhttp_connection *conn) {
+  if (!conn) return;
+  
+  pthread_mutex_lock(&g_conn_pool.mutex);
+  for (int i = 0; i < g_conn_pool.size; i++) {
+    if (g_conn_pool.connections[i] == conn) {
+      g_conn_pool.in_use[i] = 0;
+      pthread_mutex_unlock(&g_conn_pool.mutex);
+      return;
+    }
+  }
+  pthread_mutex_unlock(&g_conn_pool.mutex);
+  
+  // Not in pool, free it
+  evhttp_connection_free(conn);
+}
 
 // Utils
 static int getenv_int(const char *k, int defv) {
@@ -70,11 +211,13 @@ static int getenv_int(const char *k, int defv) {
   if (e && *e) return defv;
   return (int)x;
 }
+
 static unsigned int hash_str(const char *s) {
   unsigned int h=5381; unsigned char c;
   while ((c=(unsigned char)*s++)!=0) h=((h<<5)+h)+c;
   return h;
 }
+
 static void url_decode(char *dst, const char *src) {
   char a,b;
   while (*src) {
@@ -91,6 +234,7 @@ static void url_decode(char *dst, const char *src) {
   }
   *dst='\0';
 }
+
 static void url_encode(char *dst, size_t dstsz, const char *src) {
   static const char hex[]="0123456789ABCDEF";
   size_t di=0;
@@ -107,7 +251,7 @@ static void url_encode(char *dst, size_t dstsz, const char *src) {
   if (di<dstsz) dst[di]=0; else dst[dstsz-1]=0;
 }
 
-// Safe strlcpy (used throughout)
+// Safe strlcpy
 static size_t s_strlcpy(char *dst, const char *src, size_t size) {
   size_t len = src ? strlen(src) : 0;
   if (size) {
@@ -118,7 +262,7 @@ static size_t s_strlcpy(char *dst, const char *src, size_t size) {
   return len;
 }
 
-// CORS preflight helper (used by general_cb)
+// CORS helpers
 static void send_cors_preflight(struct evhttp_request *req) {
   struct evkeyvalq *out = evhttp_request_get_output_headers(req);
   evhttp_add_header(out, "Access-Control-Allow-Origin", "*");
@@ -127,14 +271,14 @@ static void send_cors_preflight(struct evhttp_request *req) {
   evhttp_add_header(out, "Access-Control-Max-Age", "600");
   evhttp_send_reply(req, 204, "No Content", NULL);
 }
-// Add simple CORS headers helper used on responses
+
 static void add_cors_headers(struct evhttp_request *req) {
   struct evkeyvalq *out = evhttp_request_get_output_headers(req);
   evhttp_add_header(out, "Access-Control-Allow-Origin", "*");
   evhttp_add_header(out, "Access-Control-Expose-Headers", "*");
 }
 
-// Resolve relative HLS URI against base
+// URL resolution
 static void split_base(const char *base, char *scheme, size_t ssz, char *hostport, size_t hsz, char *dir, size_t dsz) {
   const char *p = strstr(base, "://");
   if (!p) { s_strlcpy(scheme, "http", ssz); s_strlcpy(hostport, "", hsz); s_strlcpy(dir, base, dsz); return; }
@@ -159,6 +303,7 @@ static void split_base(const char *base, char *scheme, size_t ssz, char *hostpor
     s_strlcpy(dir, p, dsz);
   }
 }
+
 static void resolve_url(char *out, size_t osz, const char *base, const char *rel) {
   if (!rel || !*rel) { s_strlcpy(out, base, osz); return; }
   if (strncasecmp(rel, "http://", 7)==0 || strncasecmp(rel, "https://", 8)==0) { s_strlcpy(out, rel, osz); return; }
@@ -169,62 +314,147 @@ static void resolve_url(char *out, size_t osz, const char *base, const char *rel
   snprintf(out, osz, "%s://%s/%s/%s", scheme[0]?scheme:"http", hostport, dir, rel);
 }
 
-// Cache
+// Cache functions with hash table
+static int cache_hash(const char *url) {
+  unsigned long hash = 5381;
+  int c;
+  while ((c = *url++))
+    hash = ((hash << 5) + hash) + c;
+  return hash % CACHE_HASH_SIZE;
+}
+
 static cache_item_t* cache_find(const char *url) {
-  unsigned int h = hash_str(url);
-  for (int i=0;i<g_cache_count;i++) {
-    if (g_cache[i].hash==h && strcmp(g_cache[i].url,url)==0) return &g_cache[i];
+  int bucket_idx = cache_hash(url);
+  cache_bucket_t *bucket = &g_cache_buckets[bucket_idx];
+  
+  pthread_mutex_lock(&bucket->mutex);
+  for (int i = 0; i < bucket->count; i++) {
+    if (strcmp(bucket->items[i].url, url) == 0) {
+      bucket->items[i].ts = time(NULL); // Refresh timestamp
+      bucket->items[i].in_use = 1;      // Mark as in use
+      pthread_mutex_unlock(&bucket->mutex);
+      
+      pthread_mutex_lock(&g_stats_mutex);
+      g_stats.cache_hits++;
+      pthread_mutex_unlock(&g_stats_mutex);
+      
+      return &bucket->items[i];
+    }
   }
+  pthread_mutex_unlock(&bucket->mutex);
+  
+  pthread_mutex_lock(&g_stats_mutex);
+  g_stats.cache_misses++;
+  pthread_mutex_unlock(&g_stats_mutex);
+  
   return NULL;
 }
+
 static void cache_put(const char *url, uint8_t *data, size_t size) {
-  unsigned int h = hash_str(url);
-  // Replace existing
-  for (int i=0;i<g_cache_count;i++) {
-    if (g_cache[i].hash==h && strcmp(g_cache[i].url,url)==0) {
-      if (g_cache[i].data) free(g_cache[i].data);
-      g_cache[i].data=data; g_cache[i].size=size; g_cache[i].ts=time(NULL);
+  int bucket_idx = cache_hash(url);
+  cache_bucket_t *bucket = &g_cache_buckets[bucket_idx];
+  
+  pthread_mutex_lock(&bucket->mutex);
+  
+  // Check if already exists
+  for (int i = 0; i < bucket->count; i++) {
+    if (strcmp(bucket->items[i].url, url) == 0) {
+      if (bucket->items[i].data) free(bucket->items[i].data);
+      bucket->items[i].data = data;
+      bucket->items[i].size = size;
+      bucket->items[i].ts = time(NULL);
+      bucket->items[i].in_use = 0;
+      pthread_mutex_unlock(&bucket->mutex);
       return;
     }
   }
-  // Evict oldest if full
-  if (g_cache_count>=MAX_CACHE_ITEMS) {
-    int idx=0; time_t oldest=g_cache[0].ts;
-    for (int i=1;i<g_cache_count;i++) if (g_cache[i].ts < oldest) { oldest=g_cache[i].ts; idx=i; }
-    if (g_cache[idx].data) free(g_cache[idx].data);
-    // Shift tail over idx
-    memmove(&g_cache[idx], &g_cache[idx+1], (g_cache_count-idx-1)*sizeof(cache_item_t));
-    g_cache_count--;
+  
+  // Add new item
+  if (bucket->count >= bucket->capacity) {
+    // Find oldest unused item
+    int oldest_idx = -1;
+    time_t oldest_time = time(NULL);
+    
+    for (int i = 0; i < bucket->count; i++) {
+      if (!bucket->items[i].in_use && bucket->items[i].ts < oldest_time) {
+        oldest_time = bucket->items[i].ts;
+        oldest_idx = i;
+      }
+    }
+    
+    if (oldest_idx >= 0) {
+      // Replace oldest item
+      if (bucket->items[oldest_idx].data) free(bucket->items[oldest_idx].data);
+      s_strlcpy(bucket->items[oldest_idx].url, url, sizeof(bucket->items[oldest_idx].url));
+      bucket->items[oldest_idx].data = data;
+      bucket->items[oldest_idx].size = size;
+      bucket->items[oldest_idx].ts = time(NULL);
+      bucket->items[oldest_idx].in_use = 0;
+    } else if (bucket->count < MAX_CACHE_ITEMS) {
+      // Expand bucket
+      cache_item_t *new_items = realloc(bucket->items, (bucket->count + 1) * sizeof(cache_item_t));
+      if (new_items) {
+        bucket->items = new_items;
+        bucket->capacity = bucket->count + 1;
+        s_strlcpy(bucket->items[bucket->count].url, url, sizeof(bucket->items[bucket->count].url));
+        bucket->items[bucket->count].data = data;
+        bucket->items[bucket->count].size = size;
+        bucket->items[bucket->count].ts = time(NULL);
+        bucket->items[bucket->count].in_use = 0;
+        bucket->count++;
+      } else {
+        free(data); // Failed to expand, free the data
+      }
+    } else {
+      free(data); // Bucket full, can't add
+    }
+  } else {
+    // Add to existing slot
+    s_strlcpy(bucket->items[bucket->count].url, url, sizeof(bucket->items[bucket->count].url));
+    bucket->items[bucket->count].data = data;
+    bucket->items[bucket->count].size = size;
+    bucket->items[bucket->count].ts = time(NULL);
+    bucket->items[bucket->count].in_use = 0;
+    bucket->count++;
   }
-  cache_item_t *it = &g_cache[g_cache_count++];
-  it->hash = h; s_strlcpy(it->url, url, sizeof(it->url));
-  it->data = data; it->size=size; it->ts=time(NULL);
+  
+  pthread_mutex_unlock(&bucket->mutex);
 }
+
 static void cache_cleanup_expired() {
   time_t now = time(NULL);
-  for (int i=0;i<g_cache_count;) {
-    if (now - g_cache[i].ts > STREAM_TIMEOUT_SEC) {
-      if (g_cache[i].data) free(g_cache[i].data);
-      memmove(&g_cache[i], &g_cache[i+1], (g_cache_count-i-1)*sizeof(cache_item_t));
-      g_cache_count--;
-    } else i++;
+  
+  for (int bucket_idx = 0; bucket_idx < CACHE_HASH_SIZE; bucket_idx++) {
+    cache_bucket_t *bucket = &g_cache_buckets[bucket_idx];
+    pthread_mutex_lock(&bucket->mutex);
+    
+    for (int i = 0; i < bucket->count;) {
+      if (now - bucket->items[i].ts > STREAM_TIMEOUT_SEC && !bucket->items[i].in_use) {
+        if (bucket->items[i].data) free(bucket->items[i].data);
+        // Shift items
+        memmove(&bucket->items[i], &bucket->items[i+1], (bucket->count-i-1)*sizeof(cache_item_t));
+        bucket->count--;
+      } else {
+        i++;
+      }
+    }
+    
+    pthread_mutex_unlock(&bucket->mutex);
   }
 }
 
-// Upstream client context and helpers
-typedef struct {
+// Upstream client context
+typedef struct proxy_ctx {
   struct evhttp_request *down_req;
   struct evhttp_connection *up_conn;
   struct evhttp_request *up_req;
   int is_m3u8;
-  int started; // downstream reply started
-  struct evbuffer *agg; // for m3u8
-  // caching for segments
+  int started;
+  struct evbuffer *agg;
   int do_cache;
   char cache_key[2048];
   uint8_t *cbuf;
   size_t csize, ccap;
-  // redirect handling
   int redirects;
 } proxy_ctx_t;
 
@@ -252,7 +482,7 @@ static int parse_url_full(const char *url, char *scheme, size_t ssz, char *host,
 static void upstream_header_cb(struct evhttp_request *up, void *arg) {
   proxy_ctx_t *cx = (proxy_ctx_t*)arg;
   if (cx->is_m3u8 || cx->started) return;
-  // Start downstream reply with CORS + content-type
+  
   struct evkeyvalq *out = evhttp_request_get_output_headers(cx->down_req);
   add_cors_headers(cx->down_req);
   const char *ct = evhttp_find_header(evhttp_request_get_input_headers(up), "Content-Type");
@@ -271,7 +501,20 @@ static void upstream_chunk_cb(struct evhttp_request *up, void *arg) {
     if (!cx->agg) cx->agg = evbuffer_new();
     evbuffer_remove_buffer(in, cx->agg, (ssize_t)n);
   } else {
-    // Cache append without extra linearization
+    // Zero-copy buffer transfer
+    if (!cx->started) {
+      struct evkeyvalq *out = evhttp_request_get_output_headers(cx->down_req);
+      add_cors_headers(cx->down_req);
+      const char *ct = evhttp_find_header(evhttp_request_get_input_headers(up), "Content-Type");
+      evhttp_add_header(out, "Content-Type", ct ? ct : "video/MP2T");
+      evhttp_send_reply_start(cx->down_req, 200, "OK");
+      cx->started = 1;
+    }
+    
+    // Direct buffer transfer - no copying
+    evhttp_send_reply_chunk(cx->down_req, in);
+    
+    // Async cache append
     if (cx->do_cache) {
       if (cx->csize + n > cx->ccap) {
         size_t ncap = cx->ccap ? cx->ccap : 128*1024;
@@ -284,28 +527,28 @@ static void upstream_chunk_cb(struct evhttp_request *up, void *arg) {
         cx->csize += n;
       }
     }
-    // Stream upstream buffer directly to client, draining input
-    evhttp_send_reply_chunk(cx->down_req, in);
   }
 }
 
 static void upstream_done_cb(struct evhttp_request *up, void *arg) {
   proxy_ctx_t *cx = (proxy_ctx_t*)arg;
+  
   // Handle redirects (3xx)
   int code = evhttp_request_get_response_code(up);
   if (code>=301 && code<=308) {
     const char *loc = evhttp_find_header(evhttp_request_get_input_headers(up), "Location");
     if (loc && *loc) {
-      // Build absolute URL if needed
       char absu[2048];
       if (strncasecmp(loc,"http://",7)==0 || strncasecmp(loc,"https://",8)==0) {
         s_strlcpy(absu, loc, sizeof(absu));
       } else {
-        // Resolve relative to current base (cache_key holds last base)
         resolve_url(absu, sizeof(absu), cx->cache_key[0]?cx->cache_key:"", loc);
       }
       if (restart_upstream(cx, absu) == 0) {
-        return; // reissued; keep cx alive
+        pthread_mutex_lock(&g_stats_mutex);
+        g_stats.redirects_handled++;
+        pthread_mutex_unlock(&g_stats_mutex);
+        return;
       }
     }
   }
@@ -322,7 +565,7 @@ static void upstream_done_cb(struct evhttp_request *up, void *arg) {
     struct evkeyvalq *out = evhttp_request_get_output_headers(cx->down_req);
     evhttp_add_header(out, "Content-Type", "application/vnd.apple.mpegurl");
     evhttp_send_reply(cx->down_req, 200, "OK", outb);
-    evbuffer_free(outb);
+    if (outb) evbuffer_free(outb);
   } else {
     if (!cx->started) {
       struct evkeyvalq *out = evhttp_request_get_output_headers(cx->down_req);
@@ -336,21 +579,26 @@ static void upstream_done_cb(struct evhttp_request *up, void *arg) {
       uint8_t *copy = (uint8_t*)malloc(cx->csize);
       if (copy) {
         memcpy(copy, cx->cbuf, cx->csize);
-        pthread_mutex_lock(&g_cache_mutex);
         cache_put(cx->cache_key, copy, cx->csize);
-        pthread_mutex_unlock(&g_cache_mutex);
       }
     }
   }
+  
+  // Cleanup
   if (cx->agg) evbuffer_free(cx->agg);
-  if (cx->up_conn) evhttp_connection_free(cx->up_conn);
+  if (cx->up_conn) return_connection_to_pool(cx->up_conn);
   if (cx->cbuf) free(cx->cbuf);
-  free(cx);
+  pool_free(g_ctx_pool, cx);
+  
+  pthread_mutex_lock(&g_stats_mutex);
+  g_stats.requests_served++;
+  pthread_mutex_unlock(&g_stats_mutex);
 }
 
 static void upstream_error_cb(enum evhttp_request_error err, void *arg) {
   proxy_ctx_t *cx = (proxy_ctx_t*)arg;
   if (!cx) return;
+  
   if (!cx->is_m3u8) {
     if (!cx->started) {
       evhttp_send_error(cx->down_req, 502, "Upstream error");
@@ -360,16 +608,17 @@ static void upstream_error_cb(enum evhttp_request_error err, void *arg) {
   } else {
     evhttp_send_error(cx->down_req, 502, "Upstream error");
   }
+  
   if (cx->agg) evbuffer_free(cx->agg);
-  if (cx->up_conn) evhttp_connection_free(cx->up_conn);
+  if (cx->up_conn) return_connection_to_pool(cx->up_conn);
   if (cx->cbuf) free(cx->cbuf);
-  free(cx);
+  pool_free(g_ctx_pool, cx);
 }
 
-// Restart upstream on redirect (reuse same ctx)
+// Restart upstream on redirect
 static int restart_upstream(proxy_ctx_t *cx, const char *full_url) {
   if (++cx->redirects > 5) return -1;
-  if (cx->up_conn) { evhttp_connection_free(cx->up_conn); cx->up_conn=NULL; cx->up_req=NULL; }
+  if (cx->up_conn) { return_connection_to_pool(cx->up_conn); cx->up_conn=NULL; cx->up_req=NULL; }
 
   char scheme[8], host[256], pathq[2048]; int port=0;
   if (parse_url_full(full_url, scheme, sizeof(scheme), host, sizeof(host), &port, pathq, sizeof(pathq))<0) return -1;
@@ -383,7 +632,6 @@ static int restart_upstream(proxy_ctx_t *cx, const char *full_url) {
   }
   if (!bev) return -1;
 
-  // millisecond-level timeouts on upstream connection
   struct timeval tv = { .tv_sec = G_FETCH_TIMEOUT_MS/1000, .tv_usec = (G_FETCH_TIMEOUT_MS%1000)*1000 };
   bufferevent_set_timeouts(bev, &tv, &tv);
 
@@ -406,10 +654,16 @@ static int restart_upstream(proxy_ctx_t *cx, const char *full_url) {
   evhttp_add_header(hdr, "User-Agent", "mhls-proxy/2.0");
   evhttp_add_header(hdr, "Accept-Encoding", "identity");
 
-  // For playlist redirection, update base_url for rewriter; keep segment cache key as original
   if (cx->is_m3u8) s_strlcpy(cx->cache_key, full_url, sizeof(cx->cache_key));
 
-  return evhttp_make_request(conn, upreq, EVHTTP_REQ_GET, pathq);
+  int result = evhttp_make_request(conn, upreq, EVHTTP_REQ_GET, pathq);
+  if (result != 0) {
+    evhttp_connection_free(conn);
+    cx->up_conn = NULL;
+    cx->up_req = NULL;
+    return -1;
+  }
+  return 0;
 }
 
 static int start_upstream_request(struct evhttp_request *down_req, const char *full_url, int is_m3u8, int do_cache, const char *cache_key) {
@@ -427,7 +681,6 @@ static int start_upstream_request(struct evhttp_request *down_req, const char *f
   }
   if (!bev) return -1;
 
-  // millisecond-level timeouts on upstream connection
   struct timeval tv = { .tv_sec = G_FETCH_TIMEOUT_MS/1000, .tv_usec = (G_FETCH_TIMEOUT_MS%1000)*1000 };
   bufferevent_set_timeouts(bev, &tv, &tv);
 
@@ -435,8 +688,10 @@ static int start_upstream_request(struct evhttp_request *down_req, const char *f
   if (!conn) { bufferevent_free(bev); return -1; }
   evhttp_connection_set_timeout(conn, MAX(1, G_FETCH_TIMEOUT_MS/1000));
 
-  proxy_ctx_t *cx = (proxy_ctx_t*)calloc(1, sizeof(*cx));
+  proxy_ctx_t *cx = (proxy_ctx_t*)pool_malloc(g_ctx_pool, sizeof(*cx));
   if (!cx) { evhttp_connection_free(conn); return -1; }
+  memset(cx, 0, sizeof(*cx));
+  
   cx->down_req = down_req;
   cx->up_conn = conn;
   cx->is_m3u8 = is_m3u8;
@@ -445,7 +700,7 @@ static int start_upstream_request(struct evhttp_request *down_req, const char *f
   if (cache_key) s_strlcpy(cx->cache_key, cache_key, sizeof(cx->cache_key));
 
   struct evhttp_request *upreq = evhttp_request_new(upstream_done_cb, cx);
-  if (!upreq) { evhttp_connection_free(conn); free(cx); return -1; }
+  if (!upreq) { evhttp_connection_free(conn); pool_free(g_ctx_pool, cx); return -1; }
   cx->up_req = upreq;
 
   evhttp_request_set_header_cb(upreq, upstream_header_cb);
@@ -460,7 +715,7 @@ static int start_upstream_request(struct evhttp_request *down_req, const char *f
 
   if (evhttp_make_request(conn, upreq, EVHTTP_REQ_GET, pathq) != 0) {
     evhttp_connection_free(conn);
-    free(cx);
+    pool_free(g_ctx_pool, cx);
     return -1;
   }
   return 0;
@@ -474,23 +729,22 @@ static int rewrite_m3u8(const char *base_url, const char *src, size_t src_len, s
     int j=i; while (j<(int)src_len && src[j]!='\n' && src[j]!='\r') j++;
     int l = j-i; if (l >= (int)sizeof(line)) l = (int)sizeof(line)-1;
     memcpy(line, src+i, l); line[l]=0;
-    // advance
     while (j<(int)src_len && (src[j]=='\n' || src[j]=='\r')) j++;
     i=j;
 
     if (line[0]=='#') {
-      // Rewrite URI="..." occurrences in tags (e.g., EXT-X-KEY, EXT-X-MAP)
       char *p = strstr(line, "URI=\"");
       if (p) {
-        p += 5; // after URI="
+        p += 5;
         char *end = strchr(p, '"');
         if (end) {
           char orig[2048]; int ulen = (int)(end - p); if (ulen>(int)sizeof(orig)-1) ulen=(int)sizeof(orig)-1;
           memcpy(orig, p, ulen); orig[ulen]=0;
           char absu[2048]; resolve_url(absu, sizeof(absu), base_url, orig);
           char enc[4096]; url_encode(enc, sizeof(enc), absu);
-          // Build rewritten line into buffer
+          
           struct evbuffer *tmp = evbuffer_new();
+          if (!tmp) continue;
           evbuffer_add(tmp, line, (size_t)(p - line));
           const char *prefix = strstr(line, "#EXT-X-MAP") ? "/seg?u=" : "/seg?u=";
           evbuffer_add_printf(tmp, "%s%s", prefix, enc);
@@ -506,12 +760,10 @@ static int rewrite_m3u8(const char *base_url, const char *src, size_t src_len, s
       if (!strncmp(line, "#EXT-X-STREAM-INF", 17)) {
         pending_variant = 1;
       }
-      // pass-through tag
       evbuffer_add_printf(out, "%s\n", line);
       continue;
     }
 
-    // URI line (segment or child playlist)
     char absu[2048]; resolve_url(absu, sizeof(absu), base_url, line);
     char enc[4096]; url_encode(enc, sizeof(enc), absu);
     if (pending_variant || strstr(line, ".m3u8")) {
@@ -537,7 +789,6 @@ static void m3u8_handler(struct evhttp_request *req) {
   char encoded[2048]={0}; s_strlcpy(encoded, q+2, sizeof(encoded));
   char upstream[2048]; url_decode(upstream, encoded);
 
-  // Start upstream async fetch; cache_key keeps base_url for rewrite
   if (start_upstream_request(req, upstream, 1, 0, upstream) != 0) {
     evhttp_send_error(req,502,"Upstream start failed");
   }
@@ -555,25 +806,23 @@ static void segment_handler(struct evhttp_request *req) {
   char encoded[2048]={0}; s_strlcpy(encoded, u+2, sizeof(encoded));
   char target[2048]; url_decode(target, encoded);
 
-  // cache lookup
-  pthread_mutex_lock(&g_cache_mutex);
+  // Cache lookup
   cache_item_t *it = cache_find(target);
   if (it) {
-    it->ts = time(NULL);
     struct evbuffer *buf = evbuffer_new();
-    evbuffer_add(buf, it->data, it->size);
-    add_cors_headers(req);
-    struct evkeyvalq *out = evhttp_request_get_output_headers(req);
-    evhttp_add_header(out, "Content-Type", "video/MP2T");
-    evhttp_send_reply(req, 200, "OK", buf);
-    evbuffer_free(buf);
-    pthread_mutex_unlock(&g_cache_mutex);
+    if (buf) {
+      evbuffer_add_reference(buf, it->data, it->size, NULL, NULL);
+      add_cors_headers(req);
+      struct evkeyvalq *out = evhttp_request_get_output_headers(req);
+      evhttp_add_header(out, "Content-Type", "video/MP2T");
+      evhttp_send_reply(req, 200, "OK", buf);
+      evbuffer_free(buf);
+    }
     evhttp_uri_free(decoded);
     return;
   }
-  pthread_mutex_unlock(&g_cache_mutex);
 
-  // streamed proxy + fill cache
+  // Stream proxy + cache fill
   if (start_upstream_request(req, target, 0, 1, target) != 0) {
     evhttp_send_error(req,502,"Upstream start failed");
   }
@@ -584,14 +833,24 @@ static void segment_handler(struct evhttp_request *req) {
 static void* cleanup_thread(void *arg) {
   while (1) {
     sleep(30);
-    pthread_mutex_lock(&g_cache_mutex);
     cache_cleanup_expired();
-    pthread_mutex_unlock(&g_cache_mutex);
   }
   return NULL;
 }
 
-// libevent OpenSSL bufferevent creator (used by evhttp_set_bevcb)
+// Performance monitoring thread
+static void* monitor_thread(void *arg) {
+  while (1) {
+    sleep(60); // Her dakika
+    pthread_mutex_lock(&g_stats_mutex);
+    printf("Stats - Requests: %lu, Cache Hits: %lu, Misses: %lu, Redirects: %lu\n",
+           g_stats.requests_served, g_stats.cache_hits, g_stats.cache_misses, g_stats.redirects_handled);
+    pthread_mutex_unlock(&g_stats_mutex);
+  }
+  return NULL;
+}
+
+// libevent OpenSSL bufferevent creator
 static struct bufferevent* bevcb(struct event_base *base, void *arg) {
   SSL *ssl = SSL_new(g_ssl_ctx);
   return bufferevent_openssl_socket_new(base, -1, ssl, BUFFEREVENT_SSL_ACCEPTING, BEV_OPT_CLOSE_ON_FREE);
@@ -615,6 +874,14 @@ static int create_listener_socket(const char *addr, int port) {
   return fd;
 }
 
+// CPU affinity setting
+static void set_cpu_affinity(int worker_id) {
+  cpu_set_t cpuset;
+  CPU_ZERO(&cpuset);
+  CPU_SET(worker_id % sysconf(_SC_NPROCESSORS_ONLN), &cpuset);
+  sched_setaffinity(0, sizeof(cpuset), &cpuset);
+}
+
 // Router and server
 static void general_cb(struct evhttp_request *req, void *arg) {
   int cmd = evhttp_request_get_command(req);
@@ -634,21 +901,48 @@ static void general_cb(struct evhttp_request *req, void *arg) {
 }
 
 static int run_one_worker(void) {
-  base = event_base_new();
+  // CPU affinity
+  static int worker_counter = 0;
+  set_cpu_affinity(worker_counter++);
+  
+  // Optimized event base config
+  struct event_config *cfg = event_config_new();
+  event_config_set_flag(cfg, EVENT_BASE_FLAG_NO_CACHE_TIME);
+  event_config_set_flag(cfg, EVENT_BASE_FLAG_EPOLL_USE_CHANGELIST);
+  
+  base = event_base_new_with_config(cfg);
+  event_config_free(cfg);
+  
   if (!base) return 1;
-  // Create DNS base for async resolves
+  
   g_dns = evdns_base_new(base, 1);
   struct evhttp *http = evhttp_new(base);
 
   g_ssl_ctx = SSL_CTX_new(TLS_server_method());
-  if (SSL_CTX_use_certificate_file(g_ssl_ctx, "cert.pem", SSL_FILETYPE_PEM) <= 0 ||
+  if (!g_ssl_ctx || SSL_CTX_use_certificate_file(g_ssl_ctx, "cert.pem", SSL_FILETYPE_PEM) <= 0 ||
       SSL_CTX_use_PrivateKey_file(g_ssl_ctx, "key.pem", SSL_FILETYPE_PEM) <= 0) {
     fprintf(stderr, "Sertifika hatası. 'cert.pem' ve 'key.pem' oluşturun.\n");
     return 1;
   }
-  // Client-side SSL ctx for HTTPS upstream; enable session cache
+  
   g_ssl_client_ctx = SSL_CTX_new(TLS_client_method());
+  if (!g_ssl_client_ctx) {
+    fprintf(stderr, "SSL client context oluşturulamadı.\n");
+    return 1;
+  }
   SSL_CTX_set_session_cache_mode(g_ssl_client_ctx, SSL_SESS_CACHE_CLIENT);
+
+  // Initialize pools
+  init_connection_pool(CONNECTION_POOL_SIZE);
+  g_ctx_pool = create_mem_pool(sizeof(proxy_ctx_t), CTX_POOL_SIZE);
+  
+  // Initialize cache buckets
+  for (int i = 0; i < CACHE_HASH_SIZE; i++) {
+    g_cache_buckets[i].items = NULL;
+    g_cache_buckets[i].count = 0;
+    g_cache_buckets[i].capacity = 0;
+    pthread_mutex_init(&g_cache_buckets[i].mutex, NULL);
+  }
 
   evhttp_set_bevcb(http, bevcb, NULL);
   evhttp_set_allowed_methods(http, EVHTTP_REQ_GET | EVHTTP_REQ_OPTIONS);
@@ -660,8 +954,9 @@ static int run_one_worker(void) {
 
   evhttp_set_gencb(http, general_cb, NULL);
 
-  pthread_t cleanup_tid;
+  pthread_t cleanup_tid, monitor_tid;
   pthread_create(&cleanup_tid, NULL, cleanup_thread, NULL);
+  pthread_create(&monitor_tid, NULL, monitor_thread, NULL);
 
   printf("CORS Proxy PID %d ready on https://localhost:%d (WORKERS=%d)\n", getpid(), PORT, G_WORKERS);
 
@@ -670,13 +965,13 @@ static int run_one_worker(void) {
   evhttp_free(http);
   if (g_dns) evdns_base_free(g_dns, 1);
   event_base_free(base);
-  SSL_CTX_free(g_ssl_client_ctx);
-  SSL_CTX_free(g_ssl_ctx);
+  if (g_ssl_client_ctx) SSL_CTX_free(g_ssl_client_ctx);
+  if (g_ssl_ctx) SSL_CTX_free(g_ssl_ctx);
+  
   return 0;
 }
 
 int main() {
-  // ENV
   G_WORKERS = getenv_int("WORKERS", 1);
   if (G_WORKERS < 1) G_WORKERS = 1;
   G_FETCH_TIMEOUT_MS = getenv_int("FETCH_TIMEOUT_MS", 8000);

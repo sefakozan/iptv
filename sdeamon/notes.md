@@ -56,4 +56,12 @@ Hızlı kapasite ipuçları
 
 128 kbps LC-AAC tipik CPU: ~1–3%/akış/çekirdek. 200 akış için 2–6 fiziksel çekirdek hedefleyin.
 RAM: ~2 MB/akış (1s x 4 segment @ ~4–6 Mbps) + codec overhead ⇒ 200 akış ~0.5–1.5 GB.
-Egress: 5 Mbps/akış x N eşzamanlı izleyici real band genişliği ihtiyacı.      
+Egress: 5 Mbps/akış x N eşzamanlı izleyici real band genişliği ihtiyacı.  
+
+
+
+libfdk_aac kullanmak (yoksa native aac’de aac_coder=anmr, cutoff düşür).
+Bitrate/samplerate/kanal azaltmak (128k→96k, 48kHz→44.1kHz, stereo→mono).
+Segment süresini 1–2 sn aralığında tutup kopyaları en aza indirmek.
+Aynı makinede birden çok worker process (SO_REUSEPORT) ile çekirdekleri daha verimli doldurmak.
+Gereksiz swr’ı kapatmak (giriş zaten 48k stereo ise doğrudan FLTP’ye dönüştürüp ekstra yol eklememek).

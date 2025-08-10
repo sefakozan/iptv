@@ -61,6 +61,7 @@ static void m3u8_handler(struct evhttp_request *req);
 static void segment_handler(struct evhttp_request *req);
 static int rewrite_m3u8(const char *base_url, const char *src, size_t src_len, struct evbuffer *out);
 static void add_cors_headers(struct evhttp_request *req);
+static int restart_upstream(struct proxy_ctx *cx, const char *full_url);
 
 // Utils
 static int getenv_int(const char *k, int defv) {
@@ -212,7 +213,7 @@ static void cache_cleanup_expired() {
 }
 
 // Upstream client context and helpers
-typedef struct {
+typedef struct proxy_ctx {
   struct evhttp_request *down_req;
   struct evhttp_connection *up_conn;
   struct evhttp_request *up_req;
@@ -322,7 +323,7 @@ static void upstream_done_cb(struct evhttp_request *up, void *arg) {
     struct evkeyvalq *out = evhttp_request_get_output_headers(cx->down_req);
     evhttp_add_header(out, "Content-Type", "application/vnd.apple.mpegurl");
     evhttp_send_reply(cx->down_req, 200, "OK", outb);
-    evbuffer_free(outb);
+    if (outb) evbuffer_free(outb);
   } else {
     if (!cx->started) {
       struct evkeyvalq *out = evhttp_request_get_output_headers(cx->down_req);
@@ -409,7 +410,14 @@ static int restart_upstream(proxy_ctx_t *cx, const char *full_url) {
   // For playlist redirection, update base_url for rewriter; keep segment cache key as original
   if (cx->is_m3u8) s_strlcpy(cx->cache_key, full_url, sizeof(cx->cache_key));
 
-  return evhttp_make_request(conn, upreq, EVHTTP_REQ_GET, pathq);
+  int result = evhttp_make_request(conn, upreq, EVHTTP_REQ_GET, pathq);
+  if (result != 0) {
+    evhttp_connection_free(conn);
+    cx->up_conn = NULL;
+    cx->up_req = NULL;
+    return -1;
+  }
+  return 0;
 }
 
 static int start_upstream_request(struct evhttp_request *down_req, const char *full_url, int is_m3u8, int do_cache, const char *cache_key) {
@@ -491,6 +499,7 @@ static int rewrite_m3u8(const char *base_url, const char *src, size_t src_len, s
           char enc[4096]; url_encode(enc, sizeof(enc), absu);
           // Build rewritten line into buffer
           struct evbuffer *tmp = evbuffer_new();
+          if (!tmp) continue;
           evbuffer_add(tmp, line, (size_t)(p - line));
           const char *prefix = strstr(line, "#EXT-X-MAP") ? "/seg?u=" : "/seg?u=";
           evbuffer_add_printf(tmp, "%s%s", prefix, enc);
@@ -561,12 +570,14 @@ static void segment_handler(struct evhttp_request *req) {
   if (it) {
     it->ts = time(NULL);
     struct evbuffer *buf = evbuffer_new();
-    evbuffer_add(buf, it->data, it->size);
-    add_cors_headers(req);
-    struct evkeyvalq *out = evhttp_request_get_output_headers(req);
-    evhttp_add_header(out, "Content-Type", "video/MP2T");
-    evhttp_send_reply(req, 200, "OK", buf);
-    evbuffer_free(buf);
+    if (buf) {
+      evbuffer_add(buf, it->data, it->size);
+      add_cors_headers(req);
+      struct evkeyvalq *out = evhttp_request_get_output_headers(req);
+      evhttp_add_header(out, "Content-Type", "video/MP2T");
+      evhttp_send_reply(req, 200, "OK", buf);
+      evbuffer_free(buf);
+    }
     pthread_mutex_unlock(&g_cache_mutex);
     evhttp_uri_free(decoded);
     return;
@@ -641,13 +652,17 @@ static int run_one_worker(void) {
   struct evhttp *http = evhttp_new(base);
 
   g_ssl_ctx = SSL_CTX_new(TLS_server_method());
-  if (SSL_CTX_use_certificate_file(g_ssl_ctx, "cert.pem", SSL_FILETYPE_PEM) <= 0 ||
+  if (!g_ssl_ctx || SSL_CTX_use_certificate_file(g_ssl_ctx, "cert.pem", SSL_FILETYPE_PEM) <= 0 ||
       SSL_CTX_use_PrivateKey_file(g_ssl_ctx, "key.pem", SSL_FILETYPE_PEM) <= 0) {
     fprintf(stderr, "Sertifika hatası. 'cert.pem' ve 'key.pem' oluşturun.\n");
     return 1;
   }
   // Client-side SSL ctx for HTTPS upstream; enable session cache
   g_ssl_client_ctx = SSL_CTX_new(TLS_client_method());
+  if (!g_ssl_client_ctx) {
+    fprintf(stderr, "SSL client context oluşturulamadı.\n");
+    return 1;
+  }
   SSL_CTX_set_session_cache_mode(g_ssl_client_ctx, SSL_SESS_CACHE_CLIENT);
 
   evhttp_set_bevcb(http, bevcb, NULL);
@@ -670,8 +685,8 @@ static int run_one_worker(void) {
   evhttp_free(http);
   if (g_dns) evdns_base_free(g_dns, 1);
   event_base_free(base);
-  SSL_CTX_free(g_ssl_client_ctx);
-  SSL_CTX_free(g_ssl_ctx);
+  if (g_ssl_client_ctx) SSL_CTX_free(g_ssl_client_ctx);
+  if (g_ssl_ctx) SSL_CTX_free(g_ssl_ctx);
   return 0;
 }
 

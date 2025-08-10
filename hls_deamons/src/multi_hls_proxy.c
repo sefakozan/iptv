@@ -60,7 +60,6 @@ static void send_cors_preflight(struct evhttp_request *req);
 static void m3u8_handler(struct evhttp_request *req);
 static void segment_handler(struct evhttp_request *req);
 static int rewrite_m3u8(const char *base_url, const char *src, size_t src_len, struct evbuffer *out);
-static void add_cors_headers(struct evhttp_request *req);
 
 // Utils
 static int getenv_int(const char *k, int defv) {
@@ -107,17 +106,6 @@ static void url_encode(char *dst, size_t dstsz, const char *src) {
   if (di<dstsz) dst[di]=0; else dst[dstsz-1]=0;
 }
 
-// Safe strlcpy (used throughout)
-static size_t s_strlcpy(char *dst, const char *src, size_t size) {
-  size_t len = src ? strlen(src) : 0;
-  if (size) {
-    size_t cpy = (len >= size) ? size - 1 : len;
-    if (cpy) memcpy(dst, src, cpy);
-    dst[cpy] = 0;
-  }
-  return len;
-}
-
 // CORS preflight helper (used by general_cb)
 static void send_cors_preflight(struct evhttp_request *req) {
   struct evkeyvalq *out = evhttp_request_get_output_headers(req);
@@ -126,12 +114,6 @@ static void send_cors_preflight(struct evhttp_request *req) {
   evhttp_add_header(out, "Access-Control-Allow-Headers", "*");
   evhttp_add_header(out, "Access-Control-Max-Age", "600");
   evhttp_send_reply(req, 204, "No Content", NULL);
-}
-// Add simple CORS headers helper used on responses
-static void add_cors_headers(struct evhttp_request *req) {
-  struct evkeyvalq *out = evhttp_request_get_output_headers(req);
-  evhttp_add_header(out, "Access-Control-Allow-Origin", "*");
-  evhttp_add_header(out, "Access-Control-Expose-Headers", "*");
 }
 
 // Resolve relative HLS URI against base
@@ -224,8 +206,6 @@ typedef struct {
   char cache_key[2048];
   uint8_t *cbuf;
   size_t csize, ccap;
-  // redirect handling
-  int redirects;
 } proxy_ctx_t;
 
 static int parse_url_full(const char *url, char *scheme, size_t ssz, char *host, size_t hsz, int *port, char *pathq, size_t psz) {
@@ -271,7 +251,10 @@ static void upstream_chunk_cb(struct evhttp_request *up, void *arg) {
     if (!cx->agg) cx->agg = evbuffer_new();
     evbuffer_remove_buffer(in, cx->agg, (ssize_t)n);
   } else {
-    // Cache append without extra linearization
+    struct evbuffer *outb = evbuffer_new();
+    evbuffer_remove_buffer(in, outb, (ssize_t)n);
+    evhttp_send_reply_chunk(cx->down_req, outb);
+    // cache append
     if (cx->do_cache) {
       if (cx->csize + n > cx->ccap) {
         size_t ncap = cx->ccap ? cx->ccap : 128*1024;
@@ -280,41 +263,24 @@ static void upstream_chunk_cb(struct evhttp_request *up, void *arg) {
         if (nb) { cx->cbuf=nb; cx->ccap=ncap; }
       }
       if (cx->cbuf && cx->csize + n <= cx->ccap) {
-        (void)evbuffer_copyout(in, cx->cbuf + cx->csize, n);
+        unsigned char *p = evbuffer_pullup(outb, -1);
+        memcpy(cx->cbuf + cx->csize, p, n);
         cx->csize += n;
       }
     }
-    // Stream upstream buffer directly to client, draining input
-    evhttp_send_reply_chunk(cx->down_req, in);
+    evbuffer_free(outb);
   }
 }
 
 static void upstream_done_cb(struct evhttp_request *up, void *arg) {
   proxy_ctx_t *cx = (proxy_ctx_t*)arg;
-  // Handle redirects (3xx)
-  int code = evhttp_request_get_response_code(up);
-  if (code>=301 && code<=308) {
-    const char *loc = evhttp_find_header(evhttp_request_get_input_headers(up), "Location");
-    if (loc && *loc) {
-      // Build absolute URL if needed
-      char absu[2048];
-      if (strncasecmp(loc,"http://",7)==0 || strncasecmp(loc,"https://",8)==0) {
-        s_strlcpy(absu, loc, sizeof(absu));
-      } else {
-        // Resolve relative to current base (cache_key holds last base)
-        resolve_url(absu, sizeof(absu), cx->cache_key[0]?cx->cache_key:"", loc);
-      }
-      if (restart_upstream(cx, absu) == 0) {
-        return; // reissued; keep cx alive
-      }
-    }
-  }
-
   if (cx->is_m3u8) {
     size_t len = cx->agg ? evbuffer_get_length(cx->agg) : 0;
     const unsigned char *ptr = cx->agg ? evbuffer_pullup(cx->agg, -1) : NULL;
     struct evbuffer *outb = evbuffer_new();
     if (ptr && len) {
+      // Rewriter needs base url; extract from Host header & request URI
+      // We saved nothing; but upstream URL was passed via Host+path; client supplied full URL in query and we decoded into cache_key for seg; for m3u8 we can pass full in cache_key too.
       const char *base_url = cx->cache_key[0] ? cx->cache_key : "";
       rewrite_m3u8(base_url, (const char*)ptr, len, outb);
     }
@@ -327,11 +293,11 @@ static void upstream_done_cb(struct evhttp_request *up, void *arg) {
     if (!cx->started) {
       struct evkeyvalq *out = evhttp_request_get_output_headers(cx->down_req);
       add_cors_headers(cx->down_req);
-      const char *ct = evhttp_find_header(evhttp_request_get_input_headers(up), "Content-Type");
-      evhttp_add_header(out, "Content-Type", ct ? ct : "video/MP2T");
+      evhttp_add_header(out, "Content-Type", "video/MP2T");
       evhttp_send_reply_start(cx->down_req, 200, "OK");
     }
     evhttp_send_reply_end(cx->down_req);
+    // store cache if collected
     if (cx->do_cache && cx->cbuf && cx->csize>0) {
       uint8_t *copy = (uint8_t*)malloc(cx->csize);
       if (copy) {
@@ -366,52 +332,6 @@ static void upstream_error_cb(enum evhttp_request_error err, void *arg) {
   free(cx);
 }
 
-// Restart upstream on redirect (reuse same ctx)
-static int restart_upstream(proxy_ctx_t *cx, const char *full_url) {
-  if (++cx->redirects > 5) return -1;
-  if (cx->up_conn) { evhttp_connection_free(cx->up_conn); cx->up_conn=NULL; cx->up_req=NULL; }
-
-  char scheme[8], host[256], pathq[2048]; int port=0;
-  if (parse_url_full(full_url, scheme, sizeof(scheme), host, sizeof(host), &port, pathq, sizeof(pathq))<0) return -1;
-
-  struct bufferevent *bev = NULL;
-  if (strcasecmp(scheme,"https")==0) {
-    SSL *ssl = SSL_new(g_ssl_client_ctx);
-    bev = bufferevent_openssl_socket_new(base, -1, ssl, BUFFEREVENT_SSL_CONNECTING, BEV_OPT_CLOSE_ON_FREE);
-  } else {
-    bev = bufferevent_socket_new(base, -1, BEV_OPT_CLOSE_ON_FREE);
-  }
-  if (!bev) return -1;
-
-  // millisecond-level timeouts on upstream connection
-  struct timeval tv = { .tv_sec = G_FETCH_TIMEOUT_MS/1000, .tv_usec = (G_FETCH_TIMEOUT_MS%1000)*1000 };
-  bufferevent_set_timeouts(bev, &tv, &tv);
-
-  struct evhttp_connection *conn = evhttp_connection_base_bufferevent_new(base, g_dns, bev, host, (unsigned short)port);
-  if (!conn) { bufferevent_free(bev); return -1; }
-  evhttp_connection_set_timeout(conn, MAX(1, G_FETCH_TIMEOUT_MS/1000));
-  cx->up_conn = conn;
-
-  struct evhttp_request *upreq = evhttp_request_new(upstream_done_cb, cx);
-  if (!upreq) { evhttp_connection_free(conn); cx->up_conn=NULL; return -1; }
-  cx->up_req = upreq;
-
-  evhttp_request_set_header_cb(upreq, upstream_header_cb);
-  evhttp_request_set_chunked_cb(upreq, upstream_chunk_cb);
-  evhttp_request_set_error_cb(upreq, upstream_error_cb);
-
-  struct evkeyvalq *hdr = evhttp_request_get_output_headers(upreq);
-  evhttp_add_header(hdr, "Host", host);
-  evhttp_add_header(hdr, "Connection", "keep-alive");
-  evhttp_add_header(hdr, "User-Agent", "mhls-proxy/2.0");
-  evhttp_add_header(hdr, "Accept-Encoding", "identity");
-
-  // For playlist redirection, update base_url for rewriter; keep segment cache key as original
-  if (cx->is_m3u8) s_strlcpy(cx->cache_key, full_url, sizeof(cx->cache_key));
-
-  return evhttp_make_request(conn, upreq, EVHTTP_REQ_GET, pathq);
-}
-
 static int start_upstream_request(struct evhttp_request *down_req, const char *full_url, int is_m3u8, int do_cache, const char *cache_key) {
   char scheme[8], host[256], pathq[2048];
   int port=0;
@@ -427,10 +347,6 @@ static int start_upstream_request(struct evhttp_request *down_req, const char *f
   }
   if (!bev) return -1;
 
-  // millisecond-level timeouts on upstream connection
-  struct timeval tv = { .tv_sec = G_FETCH_TIMEOUT_MS/1000, .tv_usec = (G_FETCH_TIMEOUT_MS%1000)*1000 };
-  bufferevent_set_timeouts(bev, &tv, &tv);
-
   struct evhttp_connection *conn = evhttp_connection_base_bufferevent_new(base, g_dns, bev, host, (unsigned short)port);
   if (!conn) { bufferevent_free(bev); return -1; }
   evhttp_connection_set_timeout(conn, MAX(1, G_FETCH_TIMEOUT_MS/1000));
@@ -441,7 +357,6 @@ static int start_upstream_request(struct evhttp_request *down_req, const char *f
   cx->up_conn = conn;
   cx->is_m3u8 = is_m3u8;
   cx->do_cache = do_cache;
-  cx->redirects = 0;
   if (cache_key) s_strlcpy(cx->cache_key, cache_key, sizeof(cx->cache_key));
 
   struct evhttp_request *upreq = evhttp_request_new(upstream_done_cb, cx);
@@ -456,7 +371,6 @@ static int start_upstream_request(struct evhttp_request *down_req, const char *f
   evhttp_add_header(hdr, "Host", host);
   evhttp_add_header(hdr, "Connection", "keep-alive");
   evhttp_add_header(hdr, "User-Agent", "mhls-proxy/2.0");
-  evhttp_add_header(hdr, "Accept-Encoding", "identity");
 
   if (evhttp_make_request(conn, upreq, EVHTTP_REQ_GET, pathq) != 0) {
     evhttp_connection_free(conn);
@@ -646,9 +560,8 @@ static int run_one_worker(void) {
     fprintf(stderr, "Sertifika hatası. 'cert.pem' ve 'key.pem' oluşturun.\n");
     return 1;
   }
-  // Client-side SSL ctx for HTTPS upstream; enable session cache
+  // Client-side SSL ctx for HTTPS upstream
   g_ssl_client_ctx = SSL_CTX_new(TLS_client_method());
-  SSL_CTX_set_session_cache_mode(g_ssl_client_ctx, SSL_SESS_CACHE_CLIENT);
 
   evhttp_set_bevcb(http, bevcb, NULL);
   evhttp_set_allowed_methods(http, EVHTTP_REQ_GET | EVHTTP_REQ_OPTIONS);
