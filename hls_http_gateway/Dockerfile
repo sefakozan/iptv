@@ -38,10 +38,10 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Kaynak kodu kopyala
-COPY src/hls_http_gateway.c .
+COPY src/hls_http_gateway_video.c .
 
 # Dockerfile içindeki ilgili RUN satırını güncelleyin:
-RUN gcc hls_http_gateway.c -o hls_http_gateway -lavformat -lavcodec -lavutil -lswresample -levent -lpthread -lz -lm \
+RUN gcc hls_http_gateway_video.c -o hls_http_gateway -lavformat -lavcodec -lavutil -lswresample -levent -lpthread -lavdevice -lavfilter -lpostproc -lswscale -lm \
     && apt-get purge -y build-essential pkg-config \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*

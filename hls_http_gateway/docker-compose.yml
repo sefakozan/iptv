@@ -6,6 +6,7 @@ services:
     container_name: hls-http-gateway
     ports:
       - "5001:5001"
+      - "8000:8000"
     environment:
       # - HLS_PORT=5001
       # - HLS_MAX_STREAMS=20
