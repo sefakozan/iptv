@@ -12,7 +12,7 @@
 #include <libavutil/opt.h>
 #include <libavutil/avstring.h>
 #include <libavutil/channel_layout.h>
-#include <libavutil/timer.h>  // av_gettime() için
+#include <libavutil/timer.h>  // av_gettime_relative() için
 #include <libswresample/swresample.h>
 
 #include <stdio.h>
@@ -187,7 +187,7 @@ static int start_new_segment(transcoder_t *t) {
     int ret = open_segment_muxer(t, seg);
     if (ret == 0) {
         t->active_seg_index = idx;
-        t->seg_start_time_ms = av_gettime() / 1000;  // ✅ Çalışır (libavutil/timer.h)
+        t->seg_start_time_ms = av_gettime_relative() / 1000;  // ✅ Çalışır (libavutil/timer.h)
         t->seg_head++;
     }
     pthread_mutex_unlock(&t->mutex);
@@ -264,7 +264,7 @@ static void* transcode_loop(void *arg) {
     int64_t last_seg_ms = t->seg_start_time_ms;
 
     while (av_read_frame(t->ifmt_ctx, pkt) >= 0) {
-        int64_t now_ms = av_gettime() / 1000;
+        int64_t now_ms = av_gettime_relative() / 1000;
         if (now_ms - last_seg_ms >= 1000) {
             start_new_segment(t);
             last_seg_ms = t->seg_start_time_ms;
