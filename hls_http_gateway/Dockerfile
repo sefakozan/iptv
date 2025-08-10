@@ -19,7 +19,12 @@ ARG RUNTIME_DEPS="\
     libswscale-dev \
     libpostproc-dev \
     libevent-dev \
+    libevent-2.1-7 \
+    ffmpeg \
+    apt-utils\ 
     libssl-dev \
+    zlib1g-dev \
+    libnghttp2-dev \
     zlib1g-dev \
     curl"
 
@@ -36,7 +41,7 @@ WORKDIR /app
 COPY src/hls_http_gateway.c .
 
 # Dockerfile içindeki ilgili RUN satırını güncelleyin:
-RUN gcc hls_http_gateway.c -o hls_http_gateway -lavformat -lavcodec -lavutil -lswresample -levent -lpthread -lm \
+RUN gcc hls_http_gateway.c -o hls_http_gateway -lavformat -lavcodec -lavutil -lswresample -levent -lpthread -lz -lm \
     && apt-get purge -y build-essential pkg-config \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*

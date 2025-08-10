@@ -264,7 +264,8 @@ static int open_segment_muxer(transcoder_t *t, mem_segment_t *seg)
         avio_flush(t->ofmt_ctx->pb);
 
     t->segment_initialized = 1;
-    fprintf(stderr, "[gateway] Segment %d baslatildi (boyut=%zu)\n", seg->num, seg->size);
+    // TODO open
+    // fprintf(stderr, "[gateway] Segment %d baslatildi (boyut=%zu)\n", seg->num, seg->size);
     return 0;
 }
 
@@ -331,6 +332,7 @@ static int start_new_segment(transcoder_t *t)
         // Yeni segment için zaman damgası temellerini sıfırla
         t->video_pts_base = 0;
         t->audio_pts_base = 0;
+        // todo open
         fprintf(stderr, "[gateway] Aktif segment index=%d num=%d boyut=%zu\n", idx, seg->num, seg->size);
     }
     pthread_mutex_unlock(&t->mutex);
@@ -536,17 +538,49 @@ static void *transcode_loop(void *arg)
                 }
             }
             else
-            { // Bitstream filtresi yoksa doğrudan işle
+            {
+
+                // Bitstream filtresi yoksa doğrudan işle
                 // (Bu blok genellikle BSF'li blok ile aynı mantığı içerir)
                 is_key = (pkt->flags & AV_PKT_FLAG_KEY);
                 if (waiting_for_keyframe && is_key)
-                { /*...*/
+                {
+                    if (start_new_segment(t) == 0)
+                    {
+                        last_seg_ms = t->seg_start_time_ms;
+                        waiting_for_keyframe = 0;
+                    }
                 }
+
+                // Kesme isteği varsa ve keyframe geldiyse, segmenti değiştir
                 if (!waiting_for_keyframe && pending_cut && is_key)
-                { /*...*/
+                {
+
+                    if (start_new_segment(t) == 0)
+                    {
+                        last_seg_ms = t->seg_start_time_ms;
+                        pending_cut = 0;
+                    }
                 }
+
+                // Segment yazmaya hazırsa paketi yaz
                 if (!waiting_for_keyframe && t->ofmt_ctx && t->segment_initialized)
-                { /*...*/
+                {
+                    AVStream *in_st = t->ifmt_ctx->streams[pkt->stream_index];
+
+                    if (pkt->pts != AV_NOPTS_VALUE)
+                        pkt->pts += t->video_pts_base;
+                    if (pkt->dts != AV_NOPTS_VALUE)
+                        pkt->dts += t->video_pts_base;
+
+                    av_packet_rescale_ts(pkt, in_st->time_base, t->ofmt_ctx->streams[0]->time_base);
+                    pkt->stream_index = 0;
+
+                    int wret = av_interleaved_write_frame(t->ofmt_ctx, pkt);
+                    if (wret < 0)
+                        log_averr("write video packet", wret);
+                    else if (pkt->pts != AV_NOPTS_VALUE && pkt->duration > 0)
+                        t->video_pts_base = pkt->pts + pkt->duration;
                 }
             }
         }

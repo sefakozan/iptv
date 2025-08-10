@@ -7,6 +7,7 @@ FROM ubuntu:24.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Europe/Istanbul
 
+
 # Build argümanları
 ARG BUILD_DEPS="build-essential pkg-config"
 ARG RUNTIME_DEPS="\
