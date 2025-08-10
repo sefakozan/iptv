@@ -1,39 +1,33 @@
-# Dockerfile
-FROM ubuntu:24.04 AS builder
-ENV DEBIAN_FRONTEND=noninteractive
+FROM ubuntu:24.04
 
-# 1. Paketleri güncelle ve gerekli araçları kur (sistem FFmpeg kullan)
+# Gerekli paketler
 RUN apt-get update && \
     apt-get install -y \
-    apt-utils \
-        build-essential \
-        ca-certificates \
-        pkg-config \
-        libssl-dev \
-        libnghttp2-dev \
         libevent-dev \
-        zlib1g-dev \
         libavformat-dev \
         libavcodec-dev \
         libavutil-dev \
         libswresample-dev \
-        libavfilter-dev \
-        libavdevice-dev \
-        libswscale-dev \
-        libpostproc-dev \
-        wget \
-        && \
+        zlib1g-dev \
+        build-essential \
+    && \
     rm -rf /var/lib/apt/lists/*
 
-# 3. Kaynak kodu kopyala ve uygulamayı derle
-COPY src /app/src
+# Kodu kopyala ve derle
+COPY src/multi_hls_gateway.c /app/
 WORKDIR /app
-
-RUN gcc /app/src/multi_hls_gateway.c -o /app/hls_gateway \
+RUN gcc multi_hls_gateway.c -o hls_gateway \
+    -I/usr/include/x86_64-linux-gnu \
+    -I/usr/include/x86_64-linux-gnu/libavutil \
+    -I/usr/include/x86_64-linux-gnu/libavformat \
+    -I/usr/include/x86_64-linux-gnu/libavcodec \
+    -I/usr/include/x86_64-linux-gnu/libswresample \
     -levent \
-    -lavformat -lavcodec -lavutil -lswresample -lswscale -lavfilter -lavdevice \
-    -lpostproc -lm \
+    -lavformat -lavcodec -lavutil -lswresample \
     -lpthread -lz
 
+# Port
 EXPOSE 5001
-CMD ["./app/hls_gateway"]
+
+# Çalıştır
+CMD ["/app/hls_gateway"]

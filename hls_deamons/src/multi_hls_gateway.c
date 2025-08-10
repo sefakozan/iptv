@@ -1,6 +1,6 @@
-// hls_gateway_simple.c
-// HTTP + FFmpeg + libevent ile HLS transkoder (HTTPS yok)
-// Derle: gcc hls_gateway_simple.c -o hls_gateway -levent -lavformat -lavcodec -lavutil -lswresample -lpthread -lz
+// hls_gateway_final.c
+// Ubuntu 24.04 + FFmpeg 5.1 (apt) + libevent + HTTP + çoklu akış
+// Derle: gcc hls_gateway_final.c -o hls_gateway -levent -lavformat -lavcodec -lavutil -lswresample -lpthread -lz
 
 #include <event2/event.h>
 #include <event2/http.h>
@@ -12,6 +12,7 @@
 #include <libavutil/opt.h>
 #include <libavutil/avstring.h>
 #include <libavutil/channel_layout.h>
+#include <libavutil/timer.h>  // av_gettime() için
 #include <libswresample/swresample.h>
 
 #include <stdio.h>
@@ -186,7 +187,7 @@ static int start_new_segment(transcoder_t *t) {
     int ret = open_segment_muxer(t, seg);
     if (ret == 0) {
         t->active_seg_index = idx;
-        t->seg_start_time_ms = time(NULL) * 1000;
+        t->seg_start_time_ms = av_gettime() / 1000;  // ✅ Çalışır (libavutil/timer.h)
         t->seg_head++;
     }
     pthread_mutex_unlock(&t->mutex);
