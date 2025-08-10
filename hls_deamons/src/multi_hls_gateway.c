@@ -1,12 +1,12 @@
 // multi_hls_gateway_final.c
 // ✅ Üretim seviyesi, çoklu işçi, ENV destekli, derlenebilir HLS gateway
-// 🛠️ Düzeltmeler: lambda → fonksiyon, av_opt_set_int → av_opt_set, signal.h
 
 #include <event2/event.h>
 #include <event2/http.h>
 #include <event2/http_struct.h>
 #include <event2/buffer.h>
 #include <event2/keyvalq_struct.h>
+#include <event2/bufferevent_ssl.h>
 #include <openssl/ssl.h>
 #include <openssl/err.h>
 
@@ -30,13 +30,12 @@
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
-#include <signal.h>  // ✅ pause() için gerekli
+#include <signal.h>
 
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <event2/bufferevent_ssl.h>
 
 #ifndef MAX
 #define MAX(a,b) ((a)>(b)?(a):(b))
@@ -54,6 +53,7 @@ static int G_AAC_BR = 96000;
 static int G_AAC_SR = 48000;
 static int G_AAC_CH = 2;
 static int G_WORKERS = 1;
+static int G_USE_TLS = 0;
 
 typedef struct {
     uint8_t *data;
@@ -88,6 +88,9 @@ typedef struct {
     pthread_t thread;
 
     time_t last_access;
+    int64_t video_pts_base;
+    int64_t audio_pts_base;
+    int segment_initialized;
 } transcoder_t;
 
 typedef struct {
@@ -101,9 +104,7 @@ static int stream_count = 0;
 static pthread_mutex_t map_mutex = PTHREAD_MUTEX_INITIALIZER;
 static struct event_base *base;
 static SSL_CTX *g_ssl_ctx = NULL;
-static int G_USE_TLS = 1;
 
-// ✅ Güvenli getenv_int
 static int getenv_int(const char *k, int defv) {
     const char *v = getenv(k);
     if (!v || !*v) return defv;
@@ -114,7 +115,6 @@ static int getenv_int(const char *k, int defv) {
     return (int)x;
 }
 
-// Yardımcılar
 static void url_decode(char *dst, const char *src) {
     char a, b;
     while (*src) {
@@ -138,7 +138,6 @@ static unsigned int hash_str(const char *s) {
     return h;
 }
 
-// AVIO write callback
 static int seg_write_cb(void *opaque, uint8_t *buf, int buf_size) {
     mem_segment_t *seg = (mem_segment_t*)opaque;
     if (buf_size <= 0) return 0;
@@ -156,7 +155,6 @@ static int seg_write_cb(void *opaque, uint8_t *buf, int buf_size) {
     return buf_size;
 }
 
-// Small helper to pretty-print FFmpeg error codes
 static inline void log_averr(const char *what, int err) {
     if (err >= 0) return;
     char msg[256];
@@ -168,27 +166,27 @@ static int open_segment_muxer(transcoder_t *t, mem_segment_t *seg) {
     int ret = avformat_alloc_output_context2(&t->ofmt_ctx, NULL, "mpegts", NULL);
     if (ret < 0 || !t->ofmt_ctx) return AVERROR_UNKNOWN;
 
-    av_opt_set(t->ofmt_ctx->priv_data, "aac_latm", "0", 0);
-    av_opt_set(t->ofmt_ctx->priv_data, "muxdelay", "0", 0);
-    av_opt_set(t->ofmt_ctx->priv_data, "muxpreload", "0", 0);
+    // MPEG-TS özel ayarlar
     av_opt_set(t->ofmt_ctx->priv_data, "mpegts_flags", "resend_headers+initial_discontinuity", 0);
-    // Try to force immediate packet flushes
     av_opt_set(t->ofmt_ctx->priv_data, "flush_packets", "1", 0);
+    // Önemli: Bu ayarlar olmadan paketler yazılmayabilir
+    av_opt_set(t->ofmt_ctx->priv_data, "mpegts_copyts", "1", 0);
 
     AVStream *vst = avformat_new_stream(t->ofmt_ctx, NULL);
     if (!vst) return AVERROR(ENOMEM);
-    // Prefer BSF par_out for proper Annex B extradata (SPS/PPS) if filter is active
+    
     if (t->v_bsf && t->v_bsf->par_out && t->v_bsf->par_out->codec_id == AV_CODEC_ID_H264) {
         if ((ret = avcodec_parameters_copy(vst->codecpar, t->v_bsf->par_out)) < 0) return ret;
     } else {
         if ((ret = avcodec_parameters_copy(vst->codecpar, t->ifmt_ctx->streams[t->video_stream_index]->codecpar)) < 0) return ret;
     }
+    
     vst->time_base = (AVRational){1, 90000};
     vst->codecpar->codec_tag = 0;
 
     AVStream *ast = avformat_new_stream(t->ofmt_ctx, NULL);
     if (!ast) return AVERROR(ENOMEM);
-    // AAC için encoder context parametrelerini (özellikle extradata) codecpar'a kopyala
+    
     if ((ret = avcodec_parameters_from_context(ast->codecpar, t->a_enc_ctx)) < 0) return ret;
     ast->codecpar->codec_tag = 0;
     ast->time_base = (AVRational){1, t->a_enc_ctx->sample_rate};
@@ -201,33 +199,46 @@ static int open_segment_muxer(transcoder_t *t, mem_segment_t *seg) {
     t->ofmt_ctx->pb = seg->avio;
     t->ofmt_ctx->flags |= AVFMT_FLAG_CUSTOM_IO;
 
+    // Header yazmadan önce segmenti başlat
+    t->segment_initialized = 0;
+    
     if ((ret = avformat_write_header(t->ofmt_ctx, NULL)) < 0) {
-        log_averr("avformat_write_header(mpegts)", ret);
+        log_averr("avformat_write_header", ret);
         return ret;
     }
-    // flush header bytes into our memory buffer so playlist can see non-zero segment size immediately
-    if (t->ofmt_ctx->pb) avio_flush(t->ofmt_ctx->pb);
+    
+    // Header'ı hemen flush et
+    if (t->ofmt_ctx->pb) {
+        avio_flush(t->ofmt_ctx->pb);
+    }
+    
+    t->segment_initialized = 1;
     fprintf(stderr, "[gateway] segment %d started (size=%zu)\n", seg->num, seg->size);
     return 0;
 }
 
 static void close_segment_muxer(transcoder_t *t) {
     if (!t->ofmt_ctx) return;
-    av_write_trailer(t->ofmt_ctx);
-    if (t->ofmt_ctx->pb) avio_flush(t->ofmt_ctx->pb);
+    
+    // Tüm paketleri flush et
+    if (t->ofmt_ctx->pb) {
+        av_write_trailer(t->ofmt_ctx);
+        avio_flush(t->ofmt_ctx->pb);
+    }
+    
     if (t->ofmt_ctx->pb) {
         AVIOContext *pb = t->ofmt_ctx->pb;
         t->ofmt_ctx->pb = NULL;
         avio_context_free(&pb);
-        // also clear pointers on the currently active segment to avoid double-free/use-after-free
         if (t->active_seg_index >= 0 && t->active_seg_index < MAX_SEGMENTS) {
             mem_segment_t *cur = &t->segments[t->active_seg_index];
             cur->avio = NULL;
-            cur->avio_buf = NULL; // force fresh buffer allocation next time
+            cur->avio_buf = NULL;
         }
     }
     avformat_free_context(t->ofmt_ctx);
     t->ofmt_ctx = NULL;
+    t->segment_initialized = 0;
 }
 
 static int start_new_segment(transcoder_t *t) {
@@ -239,15 +250,16 @@ static int start_new_segment(transcoder_t *t) {
 
     if (seg->data) { av_free(seg->data); seg->data = NULL; seg->size = 0; seg->cap = 0; }
     if (seg->avio) { avio_context_free(&seg->avio); seg->avio = NULL; }
-    // The avio_context_free above will also free the internal buffer; ensure we don't reuse a freed pointer
     seg->avio_buf = NULL;
     seg->num = t->seg_head;
 
     int ret = open_segment_muxer(t, seg);
     if (ret == 0) {
         t->active_seg_index = idx;
-        t->seg_start_time_ms = av_gettime() / 1000;
+        t->seg_start_time_ms = av_gettime_relative() / 1000;
         t->seg_head++;
+        t->video_pts_base = 0;
+        t->audio_pts_base = 0;
         fprintf(stderr, "[gateway] active segment index=%d num=%d size=%zu\n", idx, seg->num, seg->size);
     }
     pthread_mutex_unlock(&t->mutex);
@@ -282,8 +294,14 @@ static int push_and_encode_audio(transcoder_t *t, AVFrame *in_frame) {
     AVFrame *efr = av_frame_alloc();
     if (!pkt || !efr) { ret = AVERROR(ENOMEM); goto done2; }
 
-    while (av_audio_fifo_size(t->fifo) >= t->a_enc_ctx->frame_size) {
-        efr->nb_samples = t->a_enc_ctx->frame_size;
+    while (av_audio_fifo_size(t->fifo) >= t->a_enc_ctx->frame_size || (!in_frame && av_audio_fifo_size(t->fifo) > 0)) {
+        if (av_audio_fifo_size(t->fifo) < t->a_enc_ctx->frame_size && !in_frame) {
+            // Flush için frame boyutunu ayarla
+            efr->nb_samples = av_audio_fifo_size(t->fifo);
+        } else {
+            efr->nb_samples = t->a_enc_ctx->frame_size;
+        }
+        
         efr->channel_layout = t->a_enc_ctx->channel_layout;
         efr->channels = t->a_enc_ctx->channels;
         efr->format = t->a_enc_ctx->sample_fmt;
@@ -291,39 +309,50 @@ static int push_and_encode_audio(transcoder_t *t, AVFrame *in_frame) {
         if ((ret = av_frame_get_buffer(efr, 0)) < 0) break;
 
         ret = av_audio_fifo_read(t->fifo, (void**)efr->data, efr->nb_samples);
-        if (ret < efr->nb_samples) { ret = AVERROR_UNKNOWN; break; }
+        if (ret < efr->nb_samples && in_frame) { ret = AVERROR_UNKNOWN; break; }
 
         efr->pts = t->a_next_pts;
         t->a_next_pts += efr->nb_samples;
 
         if ((ret = avcodec_send_frame(t->a_enc_ctx, efr)) < 0) break;
         while ((ret = avcodec_receive_packet(t->a_enc_ctx, pkt)) == 0) {
-            // Rescale PTS/DTS from encoder time_base to output audio stream time_base
             AVStream *out_ast = t->ofmt_ctx ? t->ofmt_ctx->streams[1] : NULL;
             if (out_ast) {
                 av_packet_rescale_ts(pkt, t->a_enc_ctx->time_base, out_ast->time_base);
+                // PTS/DTS ayarlamaları
+                if (pkt->pts != AV_NOPTS_VALUE) {
+                    pkt->pts += t->audio_pts_base;
+                }
+                if (pkt->dts != AV_NOPTS_VALUE) {
+                    pkt->dts += t->audio_pts_base;
+                }
             }
             pkt->stream_index = 1;
+            
             pthread_mutex_lock(&t->mutex);
-            if (t->ofmt_ctx) {
-                size_t before = 0, after = 0;
-                if (t->active_seg_index >= 0) before = t->segments[t->active_seg_index].size;
+            if (t->ofmt_ctx && t->segment_initialized) {
+                size_t before = t->segments[t->active_seg_index].size;
                 int wret = av_interleaved_write_frame(t->ofmt_ctx, pkt);
                 if (wret < 0) {
                     log_averr("write audio packet", wret);
-                } else if (t->active_seg_index >= 0) {
-                    after = t->segments[t->active_seg_index].size;
-                    if (after == before) {
-                        fprintf(stderr, "[gateway][warn] audio write produced no growth (seg=%d size=%zu)\n",
-                                t->segments[t->active_seg_index].num, after);
+                } else {
+                    size_t after = t->segments[t->active_seg_index].size;
+                    if (after > before) {
+                        // Başarılı yazma, base'i güncelle
+                        if (pkt->pts != AV_NOPTS_VALUE && pkt->duration > 0) {
+                            t->audio_pts_base = pkt->pts + pkt->duration;
+                        }
                     }
                 }
+                // Her paketten sonra flush
+                avio_flush(t->ofmt_ctx->pb);
             }
             pthread_mutex_unlock(&t->mutex);
             av_packet_unref(pkt);
         }
         av_frame_unref(efr);
         if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF) ret = 0;
+        if (!in_frame) break; // Flush modunda sadece bir kere
     }
 
 done2:
@@ -340,75 +369,147 @@ static void* transcode_loop(void *arg) {
     AVFrame *frame = av_frame_alloc();
     if (!pkt || !frame) return NULL;
 
-    if (start_new_segment(t) < 0) goto end;
-    int64_t last_seg_ms = t->seg_start_time_ms;
-
+    int64_t last_seg_ms = 0;
+    int pending_cut = 0;
+    int waiting_for_keyframe = 1;
+    int64_t video_frame_count = 0;
+    
     while (av_read_frame(t->ifmt_ctx, pkt) >= 0) {
-        int64_t now_ms = av_gettime() / 1000;
-        if (now_ms - last_seg_ms >= G_SEG_MS) {
-            start_new_segment(t);
-            last_seg_ms = t->seg_start_time_ms;
-        }
+        int64_t now_ms = av_gettime_relative() / 1000;
+        if (!waiting_for_keyframe && !pending_cut && (now_ms - last_seg_ms) >= G_SEG_MS) pending_cut = 1;
 
         if (pkt->stream_index == t->video_stream_index) {
             AVStream *in_st = t->ifmt_ctx->streams[pkt->stream_index];
-                if (t->v_bsf) {
-                    if (av_bsf_send_packet(t->v_bsf, pkt) == 0) {
-                        AVPacket *op = av_packet_alloc();
-                        while (av_bsf_receive_packet(t->v_bsf, op) == 0) {
-                            // Encourage TS muxer to start cleanly at keyframes
-                            if (op->flags & AV_PKT_FLAG_KEY) {
-                                op->flags |= AV_PKT_FLAG_KEY;
+            int is_key = 0;
+            AVPacket *out_pkt = NULL;
+            
+            if (t->v_bsf) {
+                if (av_bsf_send_packet(t->v_bsf, pkt) == 0) {
+                    out_pkt = av_packet_alloc();
+                    while (av_bsf_receive_packet(t->v_bsf, out_pkt) == 0) {
+                        is_key = (out_pkt->flags & AV_PKT_FLAG_KEY);
+                        
+                        if (waiting_for_keyframe && is_key) {
+                            if (start_new_segment(t) == 0) {
+                                last_seg_ms = t->seg_start_time_ms;
+                                waiting_for_keyframe = 0;
+                                video_frame_count = 0;
                             }
-                            av_packet_rescale_ts(op, in_st->time_base, t->ofmt_ctx->streams[0]->time_base);
-                            op->stream_index = 0;
+                        }
+                        
+                        if (!waiting_for_keyframe && pending_cut && is_key) {
+                            // Önceki segmenti kapat
                             pthread_mutex_lock(&t->mutex);
-                            if (t->ofmt_ctx) {
-                                size_t before = 0, after = 0;
-                                if (t->active_seg_index >= 0) before = t->segments[t->active_seg_index].size;
-                                int wret = av_interleaved_write_frame(t->ofmt_ctx, op);
-                                if (wret < 0) {
-                                    log_averr("write video packet", wret);
-                                }
-                                if (t->active_seg_index >= 0) {
-                                    after = t->segments[t->active_seg_index].size;
-                                    if (after == before) {
-                                        fprintf(stderr, "[gateway][warn] video write produced no growth (seg=%d size=%zu)\n",
-                                                t->segments[t->active_seg_index].num, after);
-                                    }
-                                }
-                            }
+                            close_segment_muxer(t);
                             pthread_mutex_unlock(&t->mutex);
-                            av_packet_unref(op);
-                        }
-                        av_packet_free(&op);
-                    }
-                } else {
-                    pthread_mutex_lock(&t->mutex);
-                    if (t->ofmt_ctx) {
-                        av_packet_rescale_ts(pkt, in_st->time_base, t->ofmt_ctx->streams[0]->time_base);
-                        pkt->stream_index = 0;
-                        size_t before = 0, after = 0;
-                        if (t->active_seg_index >= 0) before = t->segments[t->active_seg_index].size;
-                        int wret = av_interleaved_write_frame(t->ofmt_ctx, pkt);
-                        if (wret < 0) {
-                            log_averr("write video packet (no bsf)", wret);
-                        }
-                        if (t->active_seg_index >= 0) {
-                            after = t->segments[t->active_seg_index].size;
-                            if (after == before) {
-                                fprintf(stderr, "[gateway][warn] video write (no bsf) produced no growth (seg=%d size=%zu)\n",
-                                        t->segments[t->active_seg_index].num, after);
+                            
+                            // Yeni segment başlat
+                            if (start_new_segment(t) == 0) {
+                                last_seg_ms = t->seg_start_time_ms;
+                                pending_cut = 0;
+                                video_frame_count = 0;
                             }
                         }
+                        
+                        if (!waiting_for_keyframe && t->ofmt_ctx && t->segment_initialized) {
+                            // Video zaman damgası ayarlamaları
+                            if (out_pkt->pts != AV_NOPTS_VALUE) {
+                                out_pkt->pts += t->video_pts_base;
+                            }
+                            if (out_pkt->dts != AV_NOPTS_VALUE) {
+                                out_pkt->dts += t->video_pts_base;
+                            }
+                            
+                            av_packet_rescale_ts(out_pkt, in_st->time_base, t->ofmt_ctx->streams[0]->time_base);
+                            out_pkt->stream_index = 0;
+                            
+                            pthread_mutex_lock(&t->mutex);
+                            size_t before = t->segments[t->active_seg_index].size;
+                            int wret = av_interleaved_write_frame(t->ofmt_ctx, out_pkt);
+                            if (wret < 0) {
+                                log_averr("write video packet", wret);
+                            } else {
+                                size_t after = t->segments[t->active_seg_index].size;
+                                if (after > before) {
+                                    // Başarılı yazma, base'i güncelle
+                                    if (out_pkt->pts != AV_NOPTS_VALUE && out_pkt->duration > 0) {
+                                        t->video_pts_base = out_pkt->pts + out_pkt->duration;
+                                    }
+                                    video_frame_count++;
+                                }
+                            }
+                            // Her paketten sonra flush
+                            avio_flush(t->ofmt_ctx->pb);
+                            pthread_mutex_unlock(&t->mutex);
+                        }
+                        av_packet_unref(out_pkt);
                     }
+                    if (out_pkt) av_packet_free(&out_pkt);
+                }
+            } else {
+                is_key = (pkt->flags & AV_PKT_FLAG_KEY);
+                
+                if (waiting_for_keyframe && is_key) {
+                    if (start_new_segment(t) == 0) {
+                        last_seg_ms = t->seg_start_time_ms;
+                        waiting_for_keyframe = 0;
+                        video_frame_count = 0;
+                    }
+                }
+                
+                if (!waiting_for_keyframe && pending_cut && is_key) {
+                    // Önceki segmenti kapat
+                    pthread_mutex_lock(&t->mutex);
+                    close_segment_muxer(t);
+                    pthread_mutex_unlock(&t->mutex);
+                    
+                    // Yeni segment başlat
+                    if (start_new_segment(t) == 0) {
+                        last_seg_ms = t->seg_start_time_ms;
+                        pending_cut = 0;
+                        video_frame_count = 0;
+                    }
+                }
+                
+                if (!waiting_for_keyframe && t->ofmt_ctx && t->segment_initialized) {
+                    // Video zaman damgası ayarlamaları
+                    if (pkt->pts != AV_NOPTS_VALUE) {
+                        pkt->pts += t->video_pts_base;
+                    }
+                    if (pkt->dts != AV_NOPTS_VALUE) {
+                        pkt->dts += t->video_pts_base;
+                    }
+                    
+                    av_packet_rescale_ts(pkt, in_st->time_base, t->ofmt_ctx->streams[0]->time_base);
+                    pkt->stream_index = 0;
+                    
+                    pthread_mutex_lock(&t->mutex);
+                    size_t before = t->segments[t->active_seg_index].size;
+                    int wret = av_interleaved_write_frame(t->ofmt_ctx, pkt);
+                    if (wret < 0) {
+                        log_averr("write video packet (no bsf)", wret);
+                    } else {
+                        size_t after = t->segments[t->active_seg_index].size;
+                        if (after > before) {
+                            // Başarılı yazma, base'i güncelle
+                            if (pkt->pts != AV_NOPTS_VALUE && pkt->duration > 0) {
+                                t->video_pts_base = pkt->pts + pkt->duration;
+                            }
+                            video_frame_count++;
+                        }
+                    }
+                    // Her paketten sonra flush
+                    avio_flush(t->ofmt_ctx->pb);
                     pthread_mutex_unlock(&t->mutex);
                 }
+            }
         } else if (pkt->stream_index == t->audio_stream_index) {
-            if (avcodec_send_packet(t->a_dec_ctx, pkt) == 0) {
-                while (avcodec_receive_frame(t->a_dec_ctx, frame) == 0) {
-                    push_and_encode_audio(t, frame);
-                    av_frame_unref(frame);
+            if (!waiting_for_keyframe) {
+                if (avcodec_send_packet(t->a_dec_ctx, pkt) == 0) {
+                    while (avcodec_receive_frame(t->a_dec_ctx, frame) == 0) {
+                        push_and_encode_audio(t, frame);
+                        av_frame_unref(frame);
+                    }
                 }
             }
         }
@@ -416,13 +517,14 @@ static void* transcode_loop(void *arg) {
         t->last_access = time(NULL);
     }
 
-    // Flush
+    // Flush işlemleri
     avcodec_send_packet(t->a_dec_ctx, NULL);
     while (avcodec_receive_frame(t->a_dec_ctx, frame) == 0) {
         push_and_encode_audio(t, frame);
         av_frame_unref(frame);
     }
     push_and_encode_audio(t, NULL);
+    
     avcodec_send_frame(t->a_enc_ctx, NULL);
     AVPacket *fp = av_packet_alloc();
     while (avcodec_receive_packet(t->a_enc_ctx, fp) == 0) {
@@ -432,39 +534,28 @@ static void* transcode_loop(void *arg) {
         }
         fp->stream_index = 1;
         pthread_mutex_lock(&t->mutex);
-        if (t->ofmt_ctx) {
-            size_t before = 0, after = 0;
-            if (t->active_seg_index >= 0) before = t->segments[t->active_seg_index].size;
-            int wret = av_interleaved_write_frame(t->ofmt_ctx, fp);
-            if (wret < 0) {
-                log_averr("write audio packet (flush)", wret);
-            }
-            if (t->active_seg_index >= 0) {
-                after = t->segments[t->active_seg_index].size;
-                if (after == before) {
-                    fprintf(stderr, "[gateway][warn] audio flush write produced no growth (seg=%d size=%zu)\n",
-                            t->segments[t->active_seg_index].num, after);
-                }
-            }
+        if (t->ofmt_ctx && t->segment_initialized) {
+            av_interleaved_write_frame(t->ofmt_ctx, fp);
+            avio_flush(t->ofmt_ctx->pb);
         }
         pthread_mutex_unlock(&t->mutex);
         av_packet_unref(fp);
     }
-    av_packet_free(&fp);
+    if (fp) av_packet_free(&fp);
 
-end:
+    // Son segmenti kapat
     pthread_mutex_lock(&t->mutex);
     close_segment_muxer(t);
     pthread_mutex_unlock(&t->mutex);
 
-    av_packet_free(&pkt);
-    av_frame_free(&frame);
+    if (pkt) av_packet_free(&pkt);
+    if (frame) av_frame_free(&frame);
 
-    avformat_close_input(&t->ifmt_ctx);
-    avcodec_free_context(&t->a_dec_ctx);
-    avcodec_free_context(&t->a_enc_ctx);
+    if (t->ifmt_ctx) avformat_close_input(&t->ifmt_ctx);
+    if (t->a_dec_ctx) avcodec_free_context(&t->a_dec_ctx);
+    if (t->a_enc_ctx) avcodec_free_context(&t->a_enc_ctx);
     if (t->v_bsf) av_bsf_free(&t->v_bsf);
-    swr_free(&t->swr_ctx);
+    if (t->swr_ctx) swr_free(&t->swr_ctx);
     if (t->fifo) av_audio_fifo_free(t->fifo);
 
     return NULL;
@@ -475,7 +566,7 @@ static int open_audio_codec(transcoder_t *t, enum AVCodecID dec_id, AVCodecParam
     if (!dec) return -1;
     t->a_dec_ctx = avcodec_alloc_context3(dec);
     if (!t->a_dec_ctx) return -1;
-    avcodec_parameters_to_context(t->a_dec_ctx, apar);
+    if (avcodec_parameters_to_context(t->a_dec_ctx, apar) < 0) return -1;
     if (avcodec_open2(t->a_dec_ctx, dec, NULL) < 0) return -1;
 
     const AVCodec *enc = avcodec_find_encoder_by_name("libfdk_aac");
@@ -497,13 +588,12 @@ static int open_audio_codec(transcoder_t *t, enum AVCodecID dec_id, AVCodecParam
 
     if (enc && strcmp(enc->name, "libfdk_aac") == 0) {
         t->a_enc_ctx->sample_fmt = AV_SAMPLE_FMT_S16;
-        av_opt_set(t->a_enc_ctx, "profile", "aac_low", 0);
-        av_opt_set(t->a_enc_ctx, "afterburner", "0", 0);
+        av_opt_set(t->a_enc_ctx->priv_data, "profile", "aac_low", 0);
+        av_opt_set(t->a_enc_ctx->priv_data, "afterburner", "0", 0);
     } else {
-        // Native AAC prefers FLTP; set common options for better compatibility
         t->a_enc_ctx->sample_fmt = AV_SAMPLE_FMT_FLTP;
-        av_opt_set(t->a_enc_ctx, "profile", "aac_low", 0);
-        av_opt_set(t->a_enc_ctx, "cutoff", "18000", 0);
+        av_opt_set(t->a_enc_ctx->priv_data, "profile", "aac_low", 0);
+        av_opt_set(t->a_enc_ctx->priv_data, "cutoff", "18000", 0);
     }
 
     if (avcodec_open2(t->a_enc_ctx, enc, NULL) < 0) return -1;
@@ -542,15 +632,16 @@ static transcoder_t* start_transcoder(const char *url) {
     t->active_seg_index = -1;
     t->a_next_pts = 0;
     t->last_access = time(NULL);
+    t->video_pts_base = 0;
+    t->audio_pts_base = 0;
+    t->segment_initialized = 0;
 
     AVDictionary *opts = NULL;
     av_dict_set(&opts, "reconnect", "1", 0);
     av_dict_set(&opts, "reconnect_streamed", "1", 0);
     av_dict_set(&opts, "reconnect_on_network_error", "1", 0);
-    // Zor ağlar için daha uzun zaman aşımı (mikrosaniye): 15s
     av_dict_set(&opts, "rw_timeout", "15000000", 0);
     av_dict_set(&opts, "timeout", "15000000", 0);
-    // Bazı kaynaklar user-agent ister
     av_dict_set(&opts, "user_agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115 Safari/537.36", 0);
 
     int oret = avformat_open_input(&t->ifmt_ctx, url, NULL, &opts);
@@ -561,20 +652,32 @@ static transcoder_t* start_transcoder(const char *url) {
         return NULL;
     }
     av_dict_free(&opts);
-    if (avformat_find_stream_info(t->ifmt_ctx, NULL) < 0) { avformat_close_input(&t->ifmt_ctx); free(t); return NULL; }
+    if (avformat_find_stream_info(t->ifmt_ctx, NULL) < 0) { 
+        if (t->ifmt_ctx) avformat_close_input(&t->ifmt_ctx); 
+        free(t); 
+        return NULL; 
+    }
 
     t->video_stream_index = av_find_best_stream(t->ifmt_ctx, AVMEDIA_TYPE_VIDEO, -1, -1, NULL, 0);
     t->audio_stream_index = -1;
     for (unsigned i = 0; i < t->ifmt_ctx->nb_streams; i++) {
-        if (t->ifmt_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) { t->audio_stream_index = (int)i; break; }
+        if (t->ifmt_ctx->streams[i]->codecpar->codec_type == AVMEDIA_TYPE_AUDIO) { 
+            t->audio_stream_index = (int)i; 
+            break; 
+        }
     }
-    if (t->audio_stream_index < 0 || t->video_stream_index < 0) { avformat_close_input(&t->ifmt_ctx); free(t); return NULL; }
+    if (t->audio_stream_index < 0 || t->video_stream_index < 0) { 
+        if (t->ifmt_ctx) avformat_close_input(&t->ifmt_ctx); 
+        free(t); 
+        return NULL; 
+    }
 
     if (open_audio_codec(t, t->ifmt_ctx->streams[t->audio_stream_index]->codecpar->codec_id, t->ifmt_ctx->streams[t->audio_stream_index]->codecpar) < 0) {
-        avformat_close_input(&t->ifmt_ctx); free(t); return NULL;
+        if (t->ifmt_ctx) avformat_close_input(&t->ifmt_ctx); 
+        free(t); 
+        return NULL;
     }
 
-    // Initialize Annex B bitstream filter for H.264/HEVC before remuxing into MPEG-TS
     t->v_bsf = NULL;
     enum AVCodecID v_id = t->ifmt_ctx->streams[t->video_stream_index]->codecpar->codec_id;
     const AVBitStreamFilter *f = NULL;
@@ -585,20 +688,25 @@ static transcoder_t* start_transcoder(const char *url) {
     }
     if (f) {
         if (av_bsf_alloc(f, &t->v_bsf) == 0) {
-            avcodec_parameters_copy(t->v_bsf->par_in, t->ifmt_ctx->streams[t->video_stream_index]->codecpar);
+            if (avcodec_parameters_copy(t->v_bsf->par_in, t->ifmt_ctx->streams[t->video_stream_index]->codecpar) < 0) { 
+                av_bsf_free(&t->v_bsf); 
+                t->v_bsf = NULL; 
+            }
             t->v_bsf->time_base_in = t->ifmt_ctx->streams[t->video_stream_index]->time_base;
-            if (av_bsf_init(t->v_bsf) < 0) { av_bsf_free(&t->v_bsf); t->v_bsf = NULL; }
+            if (av_bsf_init(t->v_bsf) < 0) { 
+                av_bsf_free(&t->v_bsf); 
+                t->v_bsf = NULL; 
+            }
         }
     }
 
     if (pthread_create(&t->thread, NULL, transcode_loop, t) != 0) {
-        avformat_close_input(&t->ifmt_ctx);
-        avcodec_free_context(&t->a_dec_ctx);
-        avcodec_free_context(&t->a_enc_ctx);
-        swr_free(&t->swr_ctx);
+        if (t->ifmt_ctx) avformat_close_input(&t->ifmt_ctx);
+        if (t->a_dec_ctx) avcodec_free_context(&t->a_dec_ctx);
+        if (t->a_enc_ctx) avcodec_free_context(&t->a_enc_ctx);
+        if (t->swr_ctx) swr_free(&t->swr_ctx);
         if (t->v_bsf) av_bsf_free(&t->v_bsf);
         if (t->fifo) av_audio_fifo_free(t->fifo);
-    if (t->v_bsf) av_bsf_free(&t->v_bsf);
         free(t);
         return NULL;
     }
@@ -618,8 +726,16 @@ static void evict_lru_if_needed() {
     if (idx >= 0) {
         transcoder_t *t = stream_map[idx].t;
         for (int k = 0; k < MAX_SEGMENTS; k++) {
-            if (t->segments[k].data) { av_free(t->segments[k].data); t->segments[k].data = NULL; t->segments[k].size = 0; t->segments[k].cap = 0; }
-            if (t->segments[k].avio) { avio_context_free(&t->segments[k].avio); t->segments[k].avio = NULL; }
+            if (t->segments[k].data) { 
+                av_free(t->segments[k].data); 
+                t->segments[k].data = NULL; 
+                t->segments[k].size = 0; 
+                t->segments[k].cap = 0; 
+            }
+            if (t->segments[k].avio) { 
+                avio_context_free(&t->segments[k].avio); 
+                t->segments[k].avio = NULL; 
+            }
             t->segments[k].avio_buf = NULL;
         }
         free(t);
@@ -632,7 +748,7 @@ static transcoder_t* get_or_create_transcoder(const char *url) {
     pthread_mutex_lock(&map_mutex);
     for (int i = 0; i < stream_count; i++) {
         if (stream_map[i].hash == h && strcmp(stream_map[i].url, url) == 0) {
-            stream_map[i].t->last_access = time(NULL);
+            if (stream_map[i].t) stream_map[i].t->last_access = time(NULL);
             transcoder_t *ret = stream_map[i].t;
             pthread_mutex_unlock(&map_mutex);
             return ret;
@@ -652,7 +768,6 @@ static transcoder_t* get_or_create_transcoder(const char *url) {
     return t;
 }
 
-// ✅ Fonksiyon ile handler
 static void m3u8_handler(struct evhttp_request *req) {
     const char *uri = evhttp_request_get_uri(req);
     fprintf(stderr, "[gateway] m3u8 request: %s\n", uri);
@@ -688,11 +803,15 @@ static void m3u8_handler(struct evhttp_request *req) {
     sprintf(line, "#EXT-X-MEDIA-SEQUENCE:%d\n", first_num);
     strcat(m3u8, line);
 
-    for (int n = first_num; n < first_num + 10000; n++) {
+    // Sadece mevcut segmentleri listele
+    int segment_count = 0;
+    for (int n = first_num; n < first_num + MAX_SEGMENTS && segment_count < 10; n++) {
         for (int i = 0; i < MAX_SEGMENTS; i++) {
             if (t->segments[i].size > 0 && t->segments[i].num == n) {
-                sprintf(line, "#EXTINF:%.1f,\nseg_%03d.ts?h=%x\n", (double)G_SEG_MS / 1000.0, t->segments[i].num, hash_str(input_url));
+                sprintf(line, "#EXTINF:%.3f,\nseg_%03d.ts?h=%x\n", (double)G_SEG_MS / 1000.0, t->segments[i].num, hash_str(input_url));
                 strcat(m3u8, line);
+                segment_count++;
+                break;
             }
         }
     }
@@ -705,7 +824,7 @@ static void m3u8_handler(struct evhttp_request *req) {
     evhttp_add_header(out, "Access-Control-Allow-Origin", "*");
     evhttp_add_header(out, "Access-Control-Expose-Headers", "*");
     evhttp_send_reply(req, 200, "OK", buf);
-    evbuffer_free(buf);
+    if (buf) evbuffer_free(buf);
     evhttp_uri_free(decoded);
 }
 
@@ -726,7 +845,7 @@ static void segment_handler(struct evhttp_request *req) {
     transcoder_t *t = NULL;
     pthread_mutex_lock(&map_mutex);
     for (int i = 0; i < stream_count; i++) {
-        if (hash_str(stream_map[i].url) == target_hash) {
+        if (stream_map[i].t && hash_str(stream_map[i].url) == target_hash) {
             t = stream_map[i].t;
             t->last_access = time(NULL);
             break;
@@ -751,14 +870,13 @@ static void segment_handler(struct evhttp_request *req) {
     evhttp_add_header(out, "Access-Control-Allow-Origin", "*");
     evhttp_add_header(out, "Access-Control-Expose-Headers", "*");
 
-    // If this is a HEAD request, return headers with correct Content-Length but no body
     if (evhttp_request_get_command(req) == EVHTTP_REQ_HEAD) {
         char cl[32];
         snprintf(cl, sizeof(cl), "%zu", found->size);
         evhttp_add_header(out, "Content-Length", cl);
         struct evbuffer *empty = evbuffer_new();
         evhttp_send_reply(req, 200, "OK", empty);
-        evbuffer_free(empty);
+        if (empty) evbuffer_free(empty);
         evhttp_uri_free(decoded);
         return;
     }
@@ -766,7 +884,7 @@ static void segment_handler(struct evhttp_request *req) {
     struct evbuffer *buf = evbuffer_new();
     evbuffer_add(buf, found->data, found->size);
     evhttp_send_reply(req, 200, "OK", buf);
-    evbuffer_free(buf);
+    if (buf) evbuffer_free(buf);
     evhttp_uri_free(decoded);
 }
 
@@ -774,8 +892,6 @@ static struct bufferevent* bevcb(struct event_base *base, void *arg) {
     SSL *ssl = SSL_new(g_ssl_ctx);
     return bufferevent_openssl_socket_new(base, -1, ssl, BUFFEREVENT_SSL_ACCEPTING, BEV_OPT_CLOSE_ON_FREE);
 }
-
-// Bağlama libevent tarafından yapılacak
 
 static void generic_handler(struct evhttp_request *req, void *arg) {
     const char *uri = evhttp_request_get_uri(req);
@@ -791,7 +907,7 @@ static void generic_handler(struct evhttp_request *req, void *arg) {
         evhttp_add_header(out, "Content-Type", "text/plain");
         evhttp_add_header(out, "Access-Control-Allow-Origin", "*");
         evhttp_send_reply(req, 200, "OK", buf);
-        evbuffer_free(buf);
+        if (buf) evbuffer_free(buf);
         evhttp_uri_free(decoded);
         return;
     }
@@ -811,8 +927,16 @@ static void* cleanup_thread(void *arg) {
             if (now - stream_map[i].t->last_access > STREAM_TIMEOUT_SEC) {
                 transcoder_t *t = stream_map[i].t;
                 for (int k = 0; k < MAX_SEGMENTS; k++) {
-                    if (t->segments[k].data) { av_free(t->segments[k].data); t->segments[k].data = NULL; t->segments[k].size = 0; t->segments[k].cap = 0; }
-                    if (t->segments[k].avio) { avio_context_free(&t->segments[k].avio); t->segments[k].avio = NULL; }
+                    if (t->segments[k].data) { 
+                        av_free(t->segments[k].data); 
+                        t->segments[k].data = NULL; 
+                        t->segments[k].size = 0; 
+                        t->segments[k].cap = 0; 
+                    }
+                    if (t->segments[k].avio) { 
+                        avio_context_free(&t->segments[k].avio); 
+                        t->segments[k].avio = NULL; 
+                    }
                     t->segments[k].avio_buf = NULL;
                 }
                 free(t);
@@ -832,7 +956,7 @@ static int run_one_worker(void) {
 
     if (G_USE_TLS) {
         g_ssl_ctx = SSL_CTX_new(TLS_server_method());
-        if (SSL_CTX_use_certificate_file(g_ssl_ctx, "cert.pem", SSL_FILETYPE_PEM) <= 0 ||
+        if (!g_ssl_ctx || SSL_CTX_use_certificate_file(g_ssl_ctx, "cert.pem", SSL_FILETYPE_PEM) <= 0 ||
             SSL_CTX_use_PrivateKey_file(g_ssl_ctx, "key.pem", SSL_FILETYPE_PEM) <= 0) {
             fprintf(stderr, "Sertifika hatası. 'cert.pem' ve 'key.pem' oluşturun.\n");
             return 1;
@@ -862,8 +986,6 @@ static int run_one_worker(void) {
     if (g_ssl_ctx) SSL_CTX_free(g_ssl_ctx);
     return 0;
 }
-
-
 
 int main() {
     G_SEG_MS = getenv_int("SEG_MS", 1000);
