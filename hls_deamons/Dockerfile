@@ -29,15 +29,9 @@ COPY src/multi_hls_gateway.c .
 # Derle (eksik -lz bayrağı eklendi)
 RUN gcc multi_hls_gateway.c -o hls_gateway -levent -lavformat -lavcodec -lavutil -lswresample -lpthread -lz
 
-# entrypoint.sh kopyala ve çalıştırılabilir yap
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-# Çalışma dizini
-WORKDIR /var/lib/hls-gateway
 
 # Port
 EXPOSE 5001
 
 # Başlatıcı
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/app/hls_gateway"]

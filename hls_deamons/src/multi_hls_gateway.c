@@ -12,7 +12,7 @@
 #include <libavutil/opt.h>
 #include <libavutil/avstring.h>
 #include <libavutil/channel_layout.h>
-#include <libavutil/timer.h>  // av_gettime_relative() için
+#include <libavutil/time.h>  // av_gettime_relative() için
 #include <libswresample/swresample.h>
 
 #include <stdio.h>
