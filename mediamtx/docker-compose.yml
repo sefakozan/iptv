@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  mediamtx:
+    image: bluenviron/mediamtx:latest # En son kararlı sürümü kullanmak için
+    container_name: mediamtx-hls-gateway
+    ports:
+      # RTMP girişi için (örnek akışları buraya göndereceksiniz)
+      - "1935:1935" 
+      # HLS çıkışı için HTTP sunucu
+      - "8888:8888" 
+      # (İsteğe bağlı) WebRTC çıkışı
+      # - "8889:8889"
+      # (İsteğe bağlı) Prometheus metrikleri
+      # - "9999:9999"
+    volumes:
+      # MediaMTX yapılandırma dosyası
+      - ./mediamtx.yml:/mediamtx.yml:ro
+      # HLS segmentlerinin yazılacağı ve okunacağı dizin
+      # MediaMTX doğrudan dosya sistemine yazar, bu dizin container ve host arasında paylaşılır.
+      # Ancak MediaMTX genellikle doğrudan HTTP üzerinden HLS sunar, bu nedenle bu volume her zaman gerekli olmayabilir.
+      # Yalnızca segmentlerin host'ta kalıcı olması veya dışarıdan erişilmesi gerekiyorsa ekleyin.
+      # - ./hls_segments:/hls:rw 
+    environment:
+      # Yapılandırma dosyasının yolunu belirt
+      - MTX_PATHS_SOURCE=rtmp://localhost:$RTMP_PORT/[path]
+      # HLS'yi etkinleştir
+      - MTX_PROTOCOLS=hls,rtmp
+      # HLS segment süresi (saniye)
+      - MTX_HLSSEGMENTDURATION=1
+      # HLS segment sayısı
+      - MTX_HLSPARTDURATION=1
+      # HLS segmentin diskte tutulma süresi
+      - MTX_HLSSSEGMENTRETENTION=5
+      # HTTP bağlantı noktası
+      - MTX_HTTPLISTENADDRESS=:8888
+      # RTMP bağlantı noktası
+      - MTX_RTMPLISTENADDRESS=:1935
+    command: ["./mediamtx", "/mediamtx.yml"] # Yapılandırma dosyasını kullan
+    restart: unless-stopped
+    # (İsteğe bağlı) Kaynak sınırlamaları
+    # deploy:
+    #   resources:
+    #     limits:
+    #       memory: 1G
+
+# (İsteğe bağlı) Eğer yapılandırma dosyası kullanmazsanız, environment değişkenleriyle yapılandırabilirsiniz.
+# Ancak karmaşık yapılandırmalar için ayrı bir mediamtx.yml dosyası önerilir.

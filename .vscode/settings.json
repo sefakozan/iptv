@@ -33,10 +33,12 @@
 	"github.copilot.chat.codesearch.enabled": true,
 	"github.copilot.chat.agent.thinkingTool": true,
 	"github.copilot.enable": {
-		"*": true,
+		"*": false,
 		"plaintext": false,
 		"markdown": false,
-		"scminput": false
+		"scminput": false,
+		"javascript": false,
+		"c": false
 	},
 	"files.exclude": {
 		"**/.git": true,
@@ -54,5 +56,8 @@
 	"github.copilot.advanced": {
 		"listCount": 10,
 		"inlineSuggestCount": 3
+	},
+	"[c]": {
+		"editor.defaultFormatter": "ms-vscode.cpptools"
 	}
 }

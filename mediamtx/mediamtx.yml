@@ -1,0 +1,56 @@
+# MediaMTX Yapılandırma Dosyası
+# Bu dosya, docker-compose.yml'da volume olarak bağlanır.
+
+# Genel ayarlar
+# RTMP dinleme adresi
+rtmp: yes
+rtmpAddress: :1935
+
+# HTTP(HLS/WebRTC) dinleme adresi
+http: yes
+httpAddress: :8888
+
+# WebRTC (isteğe bağlı)
+webrtc: no
+# webrtcAddress: :8889
+
+# Protokolleri etkinleştir
+protocols: [rtmp, hls] # HLS'i etkinleştir
+
+# Yol (Path) Tanımları
+# Bu bölüm, sunucuya gelen akışların nasıl işleneceğini tanımlar.
+paths:
+  # "all" tüm yollar için varsayılan ayarlar.
+  all:
+    # Gelen RTMP akışlarını kabul et
+    source: http://185.234.111.229:8000/play/a051 # [path], gelen akışın yol adıyla değiştirilir.
+    # Alternatif olarak, belirli bir dış RTMP kaynağı da ayarlanabilir:
+    # source: rtsp://external-server:554/stream
+    # veya belirli bir dosya:
+    # source: /path/to/file.mp4
+    
+    # HLS ayarları
+    hls: yes
+    hlsPath: ./hls # Segmentlerin yazılacağı dizin (container içinde)
+    hlsSegmentDuration: 1s # Her segmentin süresi
+    hlsPartDuration: 1s # Her part'ın süresi (LL-HLS için)
+    hlsSegmentCount: 4 # Bellekte tutulan segment sayısı
+    hlsSegmentRetention: 5s # Segmentin diskte tutulma süresi
+    hlsAlwaysRemux: no # Gelen akışı her zaman yeniden mux'la
+    
+    # (İsteğe bağlı) Kaynak için yeniden bağlanma ayarları
+    sourceOnDemand: no # Akış sadece talep edildiğinde başlasın mı?
+    sourceOnDemandStartTimeout: 5s
+    sourceOnDemandCloseAfter: 10s
+    
+    # (İsteğe bağlı) Record ayarları
+    # recordPath: ./recordings
+    # recordFormat: fmp4
+    # recordPartDuration: 1s
+    # recordSegmentDuration: 1h
+    # recordDeleteAfter: 24h
+
+  # Belirli bir yol için özel ayarlar (örnek)
+  # my_specific_stream:
+  #   source: rtsp://camera-ip:554/stream
+  #   hlsSegmentCount: 10

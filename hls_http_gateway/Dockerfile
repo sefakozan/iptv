@@ -33,19 +33,19 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # Kaynak kodu kopyala
-COPY src/multi_hls_gateway.c .
+COPY src/hls_http_gateway.c .
 
 # Dockerfile içindeki ilgili RUN satırını güncelleyin:
-RUN gcc multi_hls_gateway.c -o hls_gateway -levent -lavformat -lavcodec -lavutil -lswresample -lpthread -lz -latomic -O2 -Wno-deprecated-declarations \
+RUN gcc hls_http_gateway.c -o hls_http_gateway -lavformat -lavcodec -lavutil -lswresample -levent -lpthread -lm \
     && apt-get purge -y build-essential pkg-config \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Varsayılan ayarlar
-ENV HLS_PORT=5001
-ENV HLS_MAX_STREAMS=20
-ENV HLS_MAX_SEGMENTS=8
-ENV HLS_TIMEOUT_SEC=300
+# ENV HLS_PORT=5001
+# ENV HLS_MAX_STREAMS=20
+# ENV HLS_MAX_SEGMENTS=8
+# ENV HLS_TIMEOUT_SEC=300
 
 # Port
 EXPOSE 5001
@@ -55,4 +55,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
     CMD curl -f http://localhost:${HLS_PORT}/ || exit 1
 
 # Başlatıcı
-ENTRYPOINT ["/app/hls_gateway"]
+ENTRYPOINT ["/app/hls_http_gateway"]
